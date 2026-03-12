@@ -1,5 +1,5 @@
 # Getting Started
-# Testing SOnarQube Client
+# Testing SonarQube Client (automatic analysis off)
 ### MacOS, Linux and WSL
 
 If you are using MacOS, Linux or WSL(Windows-Subsystem-Linux), you can skip
