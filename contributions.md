@@ -40,8 +40,9 @@ reason).
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@claudestark**   | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **@T-N-T-O**       | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@T-N-T-O**       | 29.03   | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/04fb6a6ae2ca54eaca44ab8e07af6b8d6e01fe69 | Implementation of POST /register and POST /login endpoints with token generation (#17, #21) | Users can register and log in, receiving an auth token for authenticated requests |
+|                    | 29.03   | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/6e21223f1de4a63fe6d8905217a08350d0e9c430 | Implementation of AuthService, AuthHeader, and GET /users/{userId} with 3 access levels (own profile, other profile, guest) | Core authentication layer and user profile viewing with role-based data filtering |
+|                    | 29.03   | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/22c2c234b660a0d8dbae967bc8784349a2a2dc58 | Implementation of POST /users/{userId}/logout with auth check, token invalidation and status OFFLINE | Users can securely log out, invalidating their session token |
 | **@dorianrother**  | 25.03   | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/722b5a22b0c225506954c804cc9d436302777586 | Implementation of User Story 3 | Users can now join a lobby and request a list of all active lobbies |
 | 31.03   | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/cf248622066c41e248283d5f1d932aa3f3c636ea | Tested multiple approaches for fetching data and calculating the current positions of trains from external apis. Final version implements the websockets api from geops | Realizes the core functionality of the webapp - Interpreting real-life transportation data |
 
