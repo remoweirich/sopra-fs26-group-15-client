@@ -1,116 +1,97 @@
-"use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
+"use client";
+
+/**
+ * Main Page  –  route: /
+ *
+ * Design ref: image1.png
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Classnames used (all defined in globals.css):
+ *   page-root, page-content
+ *   card, card--wide
+ *   form-title, u-text-muted, u-divider
+ *   badge-open, badge-ingame
+ *   btn-full, btn-outline-red
+ *
+ * 
+ */
+
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Button } from "antd";
-import { BookOutlined, CodeOutlined, GlobalOutlined } from "@ant-design/icons";
-import styles from "@/styles/page.module.css";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { Button, Card } from "antd";
 
-export default function Home() {
+const MainPage: React.FC = () => {
   const router = useRouter();
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            <code>app/page.tsx</code>{" "}
-            is the landing page for your application, currently being displayed.
-          </li>
-          <li>
-            <code>app/login/page.tsx</code> is the login page for users.
-          </li>
-          <li>
-            <code>app/users/page.tsx</code>{" "}
-            is the dashboard that shows an overview of all users, fetched from
-            the server.
-          </li>
-          <li>
-            <code>app/users/[id]/page.tsx</code>{" "}
-            is a slug page that shows info of a particular user. Since each user
-            has its own id, each user has its own infopage, dynamically with the
-            use of slugs.
-          </li>
-          <li>
-            To test, modify the current page <code>app/page.tsx</code>{" "}
-            and save to see your changes instantly.
-          </li>
-        </ol>
+  const { value: token } = useLocalStorage<string>("token", "");
 
-        <div className={styles.ctas}>
-          <Button
-            type="primary" // as defined in the ConfigProvider in [layout.tsx](./layout.tsx), all primary antd elements are colored #22426b, with buttons #75bd9d as override
-            color="red" // if a single/specific antd component needs yet a different color, it can be explicitly overridden in the component as shown here
-            variant="solid" // read more about the antd button and its options here: https://ant.design/components/button
-            onClick={() =>
-              globalThis.open(
-                "https://vercel.com/new",
-                "_blank",
-                "noopener,noreferrer",
-              )}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Deploy now
-          </Button>
-          <Button
-            type="default"
-            variant="solid"
-            onClick={() =>
-              globalThis.open(
-                "https://nextjs.org/docs",
-                "_blank",
-                "noopener,noreferrer",
-              )}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </Button>
+  const handlePlay = () => {
+    if (!token) {
+      router.push("/login");
+    } else {
+      router.push("/lobbies");
+    }
+  };
+
+  return (
+    <div className="page-root">
+
+      {/* ── Hero section ──────────────────────────────────────────────────── */}
+      {/*
+        .page-center-all      centres all children horizontally and adds vertical padding.
+        .page-hero-actions  lays the two CTA buttons out side-by-side with a gap.
+        btn-full is NOT used here – buttons size to their content inside the row.
+      */}
+      <section className="page-center-all">
+        {/* TODO: GuesSBB front-page Bild + Beschreibung */}
+       
+
+        <div className="page-hero-actions">
           <Button
             type="primary"
-            variant="solid"
-            onClick={() => router.push("/login")}
+            size="large"
+            onClick={handlePlay}
           >
-            Go to login
+            Jetzt spielen
+          </Button>
+
+          <Button
+            size="large"
+            className="btn-outline-red"
+            onClick={() => router.push("/leaderboard")}
+          >
+            Leaderboard
           </Button>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <Button
-          type="link"
-          icon={<BookOutlined />}
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn
-        </Button>
-        <Button
-          type="link"
-          icon={<CodeOutlined />}
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Examples
-        </Button>
-        <Button
-          type="link"
-          icon={<GlobalOutlined />}
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Go to nextjs.org →
-        </Button>
-      </footer>
+      </section>
+
+      {/* ── How-to-play cards ─────────────────────────────────────────────── */}
+      {/*
+        .page-cards-row is a CSS grid: 3 equal columns on desktop, 1 on mobile.
+        Each direct child <div className="card"> automatically fills one cell.
+        TODO: replace placeholder divs with concrete card components.
+      */}
+      <section className="page-cards-row">
+        <div className="card">{/* Step 01 – Zug-Info lesen */}
+          <Card title="Card 1">Card 1</Card>
+        </div>
+        <div className="card">{/* Step 02 – Position raten */}</div>
+        <div className="card">{/* Step 03 – Punkte sammeln */}</div>
+      </section>
+
+      {/* ── Global stats row ──────────────────────────────────────────────── */}
+      {/*
+        .page-section centres its children up to 900px wide.
+        .card--wide constrains the stats card to 720px inside that.
+        4 stats in a horizontal row: games played · players · guesses · top station.
+        TODO: fetch from GET /stats and wire values.
+      */}
+      <div className="page-section">
+        <div className="card card--wide">
+          {/* stat cells */}
+        </div>
+      </div>
+
     </div>
   );
-}
+};
+
+export default MainPage;

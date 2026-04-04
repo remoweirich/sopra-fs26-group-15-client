@@ -1,62 +1,1167 @@
+/*
+ * globals.css  –  GuessSBB shared stylesheet
+ * ─────────────────────────────────────────────────────────────────────────────
+ * HOW TO USE
+ * All styling lives here. Components and pages must NOT use inline `style={}`
+ * or CSS modules. Assign classNames from this file only.
+ *
+ * ORGANISATION
+ *   1.  Design tokens (CSS custom properties)
+ *   2.  Reset / base
+ *   3.  Navigation bar  (.navbar-*)
+ *   4.  Page shells     (.page-*)
+ *   5.  Cards           (.card-*)
+ *   6.  Forms & inputs  (.form-*)
+ *   7.  Buttons         (.btn-*)  – supplement Ant Design tokens
+ *   8.  Lobby list      (.lobby-*)
+ *   9.  Lobby wait      (.wait-*)
+ *  10.  Game screen     (.game-*)
+ *  11.  User profile    (.profile-*)
+ *  12.  Badges & tags   (.badge-*)
+ *  13.  Utilities       (.u-*)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --red:          #E30613;
+  --red-hover:    #C0000F;
+  --red-light:    #FDEAEA;   /* tinted backgrounds, host row highlight */
+
+  /* Neutrals */
+  --black:        #1A1A1A;
+  --gray-dark:    #333333;
+  --gray-mid:     #666666;
+  --gray-light:   #AAAAAA;
+  --gray-border:  #E0DAD4;
+
+  /* Surfaces */
+  --bg-page:      #F5F0EB;   /* warm off-white – entire page background */
+  --bg-surface:   #FFFFFF;   /* cards, panels, inputs */
+  --bg-subtle:    #FAF7F4;   /* interior of stat cells, alternate rows */
+
+  /* Semantic status colours */
+  --green:        #2A7A4B;
+  --green-bg:     #E8F5EE;
+  --orange:       #E67E00;
+  --orange-bg:    #FFF3E0;
+  --blue:         #1A73E8;
+  --blue-bg:      #EBF5FF;
+
+  /* Spacing scale */
+  --sp-xs:  4px;
+  --sp-sm:  8px;
+  --sp-md:  16px;
+  --sp-lg:  24px;
+  --sp-xl:  40px;
+  --sp-2xl: 64px;
+
+  /* Shape */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-card:     0 2px 12px rgba(0, 0, 0, 0.07);
+  --shadow-elevated: 0 4px 24px rgba(0, 0, 0, 0.12);
+
+  /* Layout */
+  --nav-h:       56px;   /* standard navbar height */
+  --nav-game-h:  48px;   /* compact in-game navbar height */
+  --train-bar-h: 40px;   /* red train-info strip in game */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. RESET / BASE
+   ═══════════════════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-page);
+  color: var(--black);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. NAVIGATION BAR
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Usage (standard pages):
+   <nav className="navbar">
+     <a className="navbar-brand">…</a>
+     <div className="navbar-links">
+       <a className="navbar-link">Lobby</a>
+       <a className="navbar-link navbar-link--active">Leaderboard</a>
+     </div>
+     <div className="navbar-actions">
+       <div className="navbar-search">…</div>
+       <button className="navbar-icon-btn">…</button>
+     </div>
+   </nav>
+
+   Usage (game screen – slim dark bar):
+   <nav className="navbar navbar--game">…</nav>
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  background: var(--bg-surface);
+  border-bottom: 2.5px solid var(--red);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: 0 var(--sp-lg);
 }
 
-a {
-  color: inherit;
+/* In-game variant: dark, compact */
+.navbar--game {
+  height: var(--nav-game-h);
+  background: var(--black);
+  border-bottom: none;
+}
+
+/* Brand link – logo + wordmark */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
   text-decoration: none;
+  margin-right: var(--sp-xl);
+  flex-shrink: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.navbar-brand-text {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--black);
+  letter-spacing: -0.5px;
+}
+
+/* The "SBB" part of the wordmark is red */
+.navbar-brand-text span { color: var(--red); }
+
+/* In-game variant: wordmark goes white */
+.navbar--game .navbar-brand-text       { color: #ffffff; }
+.navbar--game .navbar-brand-text span  { color: var(--red); }
+
+/* Nav link group */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  flex: 1;
+}
+
+/* Individual link / button */
+.navbar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--gray-dark);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.navbar-link:hover              { background: var(--bg-page); color: var(--black); }
+.navbar-link--active            { color: var(--red); }
+.navbar--game .navbar-link      { color: #cccccc; }
+.navbar--game .navbar-link:hover{ background: rgba(255,255,255,0.08); color: #ffffff; }
+
+/* Icon-only button (notifications, logout) */
+.navbar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--gray-mid);
+  transition: background 0.15s, color 0.15s;
+}
+
+.navbar-icon-btn:hover { background: var(--bg-page); color: var(--black); }
+
+/* Right-side action group */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  margin-left: auto;
+}
+
+/* Lobby-ID search pill */
+.navbar-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  background: var(--bg-page);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  min-width: 170px;
+  cursor: text;
+  transition: border-color 0.15s;
+}
+
+.navbar-search:focus-within { border-color: var(--gray-mid); }
+
+/* Raw <input> inside .navbar-search – Ant Design not used here */
+.navbar-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--gray-mid);
+  width: 100%;
+  font-family: inherit;
+}
+
+.navbar-search-input::placeholder { color: var(--gray-light); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. PAGE SHELLS
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .page-root          – wraps everything below the navbar (min full viewport)
+   .page-center        – vertically & horizontally centers a single card
+   .page-content       – left-aligned content column with horizontal padding
+   .page-game          – full-bleed, no scroll (map fills remaining space)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Shared: full height below navbar, page-coloured bg */
+.page-root {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--bg-page);
+}
+
+/* Center a single card (login, register, lobby-creation) */
+.page-center {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--bg-page);
+  display: flex;
+  align-items: flex-start;   /* top-align so tall cards don't get clipped */
+  justify-content: center;
+  padding: var(--sp-xl) var(--sp-lg);
+}
+
+.page-center-all {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--sp-2xl) var(--sp-lg) var(--sp-xl);
+  max-width: 760px;
+  margin: 0 auto
+}
+
+/* Scrollable content page (lobbies list, profile) */
+.page-content {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--bg-page);
+  padding: var(--sp-xl) var(--sp-lg);
+}
+
+/* Game screen: fixed height, no scroll, map expands to fill */
+.page-game {
+  height: calc(100vh - var(--nav-game-h) - var(--train-bar-h));
+  background: var(--bg-page);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Main page specific sections ────────────────────────────────────────────
+
+   .page-hero        – full-width hero block, content centred horizontally
+   .page-cards-row   – horizontal 3-column grid for the how-to-play cards;
+                       collapses to 1 column on narrow viewports
+   .page-section     – generic centred content column with vertical padding
+                       (used for the stats row and any future main-page section)
+
+   Usage in /app/page.tsx:
+     <section className="page-hero">…buttons…</section>
+     <section className="page-cards-row">
+       <div className="card">…</div>   ×3
+     </section>
+     <div className="page-section">
+       <div className="card card--wide">…stats…</div>
+     </div>
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Centred hero band */
+.page-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--sp-2xl) var(--sp-lg) var(--sp-xl);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* CTA button row inside the hero */
+.page-hero-actions {
+  display: flex;
+  gap: var(--sp-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--sp-lg);
+}
+
+/* 3-up card grid – side by side on desktop, stacked on mobile */
+.page-cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-md);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--sp-lg) var(--sp-xl);
+}
+
+@media (max-width: 640px) {
+  .page-cards-row {
+    grid-template-columns: 1fr;
   }
 }
 
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: rgb(41, 44, 59);
+/* Generic centred section wrapper */
+.page-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--sp-lg) var(--sp-xl);
 }
 
-.login-button {
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. CARDS
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Always use Ant Design <Card> with className. The AntD Card token sets
+   background + radius, but width/max-width is controlled here.
+
+   .card               – base white card (shadow, radius already in token)
+   .card--form         – narrow centred card for forms (login, register, lobby creation)
+   .card--lobby-wait   – medium card for the lobby wait screen
+   .card--wide         – wide content card (profile stats panel, lobby list)
+
+   Example:
+     <Card className="card card--form">…</Card>
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* Narrow form card – centred inside .page-center */
+.card--form {
   width: 100%;
+  max-width: 460px;
+  padding: var(--sp-lg);
 }
 
-.card-container {
+/* Lobby wait / creation card */
+.card--lobby-wait {
+  width: 100%;
+  max-width: 520px;
+}
+
+/* Wide card (profile, lobby list wrapper) */
+.card--wide {
+  width: 100%;
+  max-width: 720px;
+  margin: 5 auto;
+  padding: var(--sp-lg);
+
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. FORMS & INPUTS
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Always use Ant Design <Form>, <Form.Item>, <Input>, <Button>.
+   classNames below supplement Ant Design tokens.
+
+   .form-title         – large heading at top of a form card  (h2)
+   .form-subtitle      – muted subtitle below the title        (p)
+   .form-footer        – row below submit button (e.g. "No account? Register")
+   .form-footer-link   – inline text link in .form-footer
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.form-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--black);
+  margin: 1 1 var(--sp-xs);
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: rgb(41, 44, 59);
+  gap: var(--sp-sm);
+  padding: 10px 0;
+}
+
+.form-subtitle {
+  font-size: 14px;
+  color: var(--gray-mid);
+  margin: 0 0 var(--sp-lg);
+}
+
+/* Full-width primary submit button – add to Ant Design <Button> */
+.form-submit-btn {
+  width: 100%;
+  height: 46px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-pill) !important;
+  margin-top: var(--sp-sm);
+}
+
+.form-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-mid);
+  margin-top: var(--sp-md);
+}
+
+.form-footer-link {
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.form-footer-link:hover { text-decoration: underline; }
+
+/* Inline divider row inside a form card */
+.form-divider {
+  height: 1px;
+  background: var(--gray-border);
+  margin: var(--sp-md) 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. BUTTONS (supplement AntD tokens)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Ant Design <Button> handles the base. Apply these classNames for
+   layout-level overrides (full-width, danger-outline, etc.).
+
+   .btn-full           – 100% width block button
+   .btn-outline-red    – white bg, red border+text (secondary CTA)
+   .btn-ghost-muted    – borderless subtle button (e.g. "Leave lobby")
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Full-width – combine with Ant Design type="primary" */
+.btn-full {
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Red-outline secondary (used on main page "Leaderboard" CTA) */
+.btn-outline-red.ant-btn {
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+  background: transparent !important;
+}
+
+.btn-outline-red.ant-btn:hover {
+  background: var(--red-light) !important;
+}
+
+/* Ghost muted – subtle destructive or secondary action */
+.btn-ghost-muted.ant-btn {
+  border: none !important;
+  color: var(--gray-mid) !important;
+  background: transparent !important;
+  font-size: 13px !important;
+}
+
+.btn-ghost-muted.ant-btn:hover { color: var(--black) !important; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. LOBBY LIST  (/lobbies)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .lobby-page-header      – row with title + "New Lobby" button
+   .lobby-page-title       – h1 inside header
+   .lobby-page-subtitle    – muted p below title
+   .lobby-list             – vertical stack of lobby rows
+   .lobby-row              – single lobby entry card
+   .lobby-row-left         – flex group: status dot + name + meta
+   .lobby-row-status-dot   – 8px coloured circle (open / in-game)
+   .lobby-row-name         – lobby display name
+   .lobby-row-meta         – "Host · rounds · visibility" line
+   .lobby-row-right        – flex group: player count + join button
+   .lobby-row-players      – "👥 3/6" counter
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lobby-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-md);
+  max-width: 720px;
+  margin: 0 auto var(--sp-lg);
+}
+
+.lobby-page-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--black);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.lobby-page-subtitle {
+  font-size: 14px;
+  color: var(--gray-mid);
+  margin: var(--sp-xs) 0 0;
+}
+
+
+.lobby-list {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+
+.lobby-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-md) var(--sp-lg);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gray-border);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s;
+}
+
+.lobby-row:hover { box-shadow: var(--shadow-elevated); }
+
+.lobby-row-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.lobby-row-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.lobby-row-status-dot--open    { background: var(--green); }
+.lobby-row-status-dot--ingame  { background: var(--orange); }
+
+.lobby-row-info { min-width: 0; }
+
+.lobby-row-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.lobby-row-meta {
+  font-size: 12px;
+  color: var(--gray-mid);
+  margin-top: 2px;
+}
+
+.lobby-row-right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  flex-shrink: 0;
+}
+
+.lobby-row-players {
+  font-size: 13px;
+  color: var(--gray-mid);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. LOBBY WAIT SCREEN  (/lobbies/[lobbyId])
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .wait-header            – row with lobby name + status badge
+   .wait-lobby-name        – h2 lobby title
+   .wait-meta              – "5 rounds · Public" line below name
+   .wait-section-label     – small ALL-CAPS section headings ("PLAYERS 4/6")
+   .wait-player-list       – vertical list of player rows
+   .wait-player-row        – single player entry
+   .wait-player-row--host  – variant: red-tinted for host
+   .wait-player-avatar     – coloured circle with initial
+   .wait-player-name       – username text
+   .wait-player-status     – right-side status (✓ / WAITING… / ✕)
+   .wait-invite-box        – invite code display row
+   .wait-invite-code       – monospace code text
+   .wait-actions           – footer area with Start + Leave buttons
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.wait-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-sm);
+}
+
+.wait-lobby-name {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--black);
+  margin: 0;
+}
+
+.wait-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-xs);
+  font-size: 13px;
+  color: var(--gray-mid);
+}
+
+.wait-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  margin: var(--sp-md) 0 var(--sp-sm);
+}
+
+.wait-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+
+.wait-player-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: 10px var(--sp-md);
+  border-radius: var(--radius-md);
+  background: var(--bg-page);
+  border: 1px solid var(--gray-border);
+}
+
+/* Host player row gets a red tint */
+.wait-player-row--host {
+  background: var(--red-light);
+  border-color: #F5C0C0;
+}
+
+.wait-player-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  /* Background colour is set per-player via inline style on the element
+     because it must be derived from the player's username dynamically */
+}
+
+.wait-player-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.wait-player-status {
+  font-size: 12px;
+  color: var(--gray-light);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wait-invite-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-sm) var(--sp-md);
+  background: var(--bg-page);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-md);
+  margin-top: var(--sp-sm);
+}
+
+.wait-invite-code {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.wait-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+  margin-top: var(--sp-md);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. GAME SCREEN  (/game/[gameId])
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .train-bar              – full-width red strip below the game navbar
+   .train-bar-line-badge   – red pill showing line ID (e.g. "S12")
+   .train-bar-route        – "From X → To Y" text
+   .train-bar-times        – "Dep 12:02 · Arr 12:38" text
+   .train-bar-round        – right-side "Round 1/5" + timer
+   .train-bar-timer        – large countdown number
+
+   .game-hint-bar          – floating pill at bottom of map ("Click to guess")
+   .game-question-bar      – full-width pulsing bar below train bar
+                              ("● Current time: 12:21 – Where is the train NOW?")
+
+   .map-container          – fills remaining vertical space below bars
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.train-bar {
+  width: 100%;
+  height: var(--train-bar-h);
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--sp-lg);
+  gap: var(--sp-md);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.train-bar-line-badge {
+  background: rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.train-bar-route {
+  font-weight: 600;
+}
+
+.train-bar-route-arrow {
+  opacity: 0.7;
+  margin: 0 4px;
+}
+
+.train-bar-times {
+  opacity: 0.85;
+  font-size: 12px;
+}
+
+.train-bar-round {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.train-bar-timer {
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffffff;
+  min-width: 48px;
+  text-align: right;
+  line-height: 1;
+}
+
+/* Pulsing question bar below the train bar */
+.game-question-bar {
+  width: 100%;
+  background: #1A1A1A;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px var(--sp-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  text-align: center;
+  justify-content: center;
+}
+
+.game-question-bar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+  /* Pulsing animation applied in component via CSS animation */
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* Map area – React Leaflet / Google Maps mount target */
+.map-container {
+  flex: 1;
+  width: 100%;
+  min-height: 0; /* required for flex children to shrink */
+  position: relative;
+}
+
+/* Floating bottom hint pill on map */
+.game-hint-bar {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.72);
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. USER PROFILE  (/users/[userId])
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .profile-card           – outer white card (use with .card--wide)
+   .profile-header         – avatar row + username + bio
+   .profile-avatar         – large circle with initial
+   .profile-username       – h2 display name
+   .profile-bio            – italic description text
+   .profile-online-badge   – "● ONLINE" pill
+   .profile-joined         – "Mitglied seit …" muted line
+   .profile-stats-grid     – 3-col × 2-row grid of stat cells
+   .profile-stat-cell      – individual stat box
+   .profile-stat-value     – large number
+   .profile-stat-value--red– red variant (e.g. precision)
+   .profile-stat-label     – small label below value
+   .profile-tabs           – Ant Design Tabs wrapper for history/friends
+   .profile-history-row    – single game history list item
+   .profile-history-name   – game/lobby name
+   .profile-history-meta   – date + rounds
+   .profile-history-score  – right-aligned score number
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.profile-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-md);
+  padding: var(--sp-lg);
+  position: relative;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+  color: #ffffff;
+  flex-shrink: 0;
+  /* Background colour set dynamically via inline style */
+}
+
+.profile-header-info { flex: 1; }
+
+.profile-username {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--black);
+  margin: 0 0 4px;
+}
+
+.profile-bio {
+  font-size: 13px;
+  color: var(--gray-mid);
+  margin: 0 0 var(--sp-sm);
+  line-height: 1.5;
+}
+
+.profile-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  flex-wrap: wrap;
+}
+
+.profile-joined {
+  font-size: 12px;
+  color: var(--gray-light);
+}
+
+/* Edit button floated top-right inside .profile-header */
+.profile-edit-btn {
+  position: absolute;
+  top: var(--sp-lg);
+  right: var(--sp-lg);
+}
+
+/* 3×2 stats grid */
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;              /* thin grid lines via bg gap on parent */
+  background: var(--gray-border);
+  border-top: 1px solid var(--gray-border);
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.profile-stat-cell {
+  background: var(--bg-surface);
+  padding: var(--sp-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.profile-stat-icon {
+  font-size: 18px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.profile-stat-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--black);
+  line-height: 1;
+}
+
+/* Red accent variant – e.g. precision percentage */
+.profile-stat-value--red { color: var(--red); }
+
+.profile-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-light);
+}
+
+/* Tab content area */
+.profile-tabs-wrapper {
+  padding: 0 var(--sp-lg) var(--sp-lg);
+}
+
+/* Single history row */
+.profile-history-row {
+  display: flex;
+  align-items: center;
+  padding: var(--sp-sm) 0;
+  border-bottom: 1px solid var(--bg-subtle);
+  gap: var(--sp-sm);
+}
+
+.profile-history-icon { font-size: 16px; flex-shrink: 0; }
+
+.profile-history-info { flex: 1; min-width: 0; }
+
+.profile-history-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-history-meta {
+  font-size: 11px;
+  color: var(--gray-light);
+  margin-top: 1px;
+}
+
+.profile-history-score {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--black);
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   12. BADGES & TAGS
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Use as className on a <span> or Ant Design <Tag>.
+
+   .badge-open     – green "Open"
+   .badge-ingame   – orange "In Game"
+   .badge-waiting  – blue "Waiting…"
+   .badge-host     – red "Host"
+   .badge-public   – blue-ish "Public"
+   .badge-private  – grey "Private"
+   .badge-online   – green dot + "ONLINE"
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Shared badge base */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.badge-open    { background: var(--green-bg);  color: var(--green);  }
+.badge-ingame  { background: var(--orange-bg); color: var(--orange); }
+.badge-waiting { background: var(--blue-bg);   color: var(--blue);   }
+.badge-host    { background: var(--red-light); color: var(--red);    }
+.badge-public  { background: var(--blue-bg);   color: var(--blue);   }
+.badge-private { background: #F3F3F3;           color: var(--gray-mid); }
+
+.badge-online {
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-online::before {
+  content: "●";
+  font-size: 8px;
+  margin-right: 3px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   13. UTILITIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Horizontal divider */
+.u-divider {
+  height: 1px;
+  background: var(--gray-border);
+  margin: var(--sp-md) 0;
+}
+
+/* Section label (reused outside wait screen) */
+.u-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  margin-bottom: var(--sp-sm);
+}
+
+/* Vertical flex stack with consistent gap */
+.u-stack      { display: flex; flex-direction: column; gap: var(--sp-sm); }
+.u-stack--lg  { display: flex; flex-direction: column; gap: var(--sp-md); }
+
+/* Horizontal flex row */
+.u-row        { display: flex; align-items: center; gap: var(--sp-sm); }
+.u-row--between { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-sm); }
+
+/* Text helpers */
+.u-text-red   { color: var(--red); }
+.u-text-muted { color: var(--gray-mid); }
+.u-text-sm    { font-size: 13px; }
+.u-text-xs    { font-size: 11px; }
+.u-font-bold  { font-weight: 700; }
+.u-font-black { font-weight: 900; }
+.u-text-center{ text-align: center; }
+
+/* Screen-reader only */
+.u-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
 }

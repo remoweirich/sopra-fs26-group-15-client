@@ -22,7 +22,7 @@ interface FormFieldProps {
   value: string;
 }
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
@@ -36,19 +36,20 @@ const Login: React.FC = () => {
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
   // if you want to pick a different token, i.e "usertoken", the line above would look as follows: } = useLocalStorage<string>("usertoken", "");
 
-  const handleLogin = async (values: FormFieldProps) => {
+  const handleRegistration = async (values: FormFieldProps) => {
     router.push("/users/1"); // TODO: replace with actual new user ID from response
   };
 
   return (
    <div className="page-center page-content" >
     <div className="card card--form">
+        <h2 className="form-title">Create an Account</h2>
       <Form
         form={form}
         name="login"
         size="large"
         variant="outlined"
-        onFinish={handleLogin}
+        onFinish={handleRegistration}
         layout="vertical"
       >
         <Form.Item
@@ -67,7 +68,7 @@ const Login: React.FC = () => {
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" className="login-button">
-            Login
+            Register
           </Button>
         </Form.Item>
       </Form>
@@ -76,4 +77,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -1,0 +1,11 @@
+export type MessageType =
+  | "LOBBY_STATE"
+  | "UPDATE_LOBBY_SETTINGS"
+  | "LEAVE_LOBBY"
+  | "START_GAME"
+  | "GUESS_MESSAGE"
+  | "READY_FOR_NEXT_ROUND"
+  | "GAME_START"
+  | "ROUND_START"
+  | "ROUND_END"
+  | "SCORES";

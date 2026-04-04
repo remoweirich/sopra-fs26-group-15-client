@@ -9,13 +9,21 @@
 // Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 
 import React from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 const Profile: React.FC = () => {
   return (
     <div className="card-container">
-      <p>
-        <strong>SampleUser</strong>
-      </p>
+      <div className="card card--wide">
+        <h2>User Profile</h2>
+        {/* Display user information here */} 
+      </div>
+      <div className="card card--wide">
+        <h2></h2>
+        {/* Container Card for Stats, Friends etc. */} 
+      </div>
     </div>
   );
 };

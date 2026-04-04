@@ -4,6 +4,8 @@ import { App as AntdApp, ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
 
+import Navbar from "./navbar";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -15,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sopra FS26 Group 15",
-  description: "sopra-fs26-group-15-client",
+  title: "GuessSBB",
+  description: "Guess where the Swiss train is right now.",
 };
 
 export default function RootLayout({
@@ -25,43 +27,84 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="de">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ConfigProvider
           theme={{
             algorithm: theme.defaultAlgorithm,
             token: {
-              // general theme options are set in token, meaning all primary elements (button, menu, ...) will have this color
-              colorPrimary: "#22426b", // selected input field boarder will have this color as well
-              borderRadius: 8,
-              colorText: "#fff",
-              fontSize: 16,
-
-              // Alias Token
-              colorBgContainer: "#16181D",
+              // Brand colour – SBB red. Controls focus rings, active borders, etc.
+              colorPrimary: "#E30613",
+              // Page background (warm off-white, visible behind cards)
+              colorBgBase: "#F5F0EB",
+              // Surface colour used inside cards, inputs, dropdowns
+              colorBgContainer: "#FFFFFF",
+              // Default body text
+              colorText: "#1A1A1A",
+              colorTextSecondary: "#666666",
+              // Border default
+              colorBorder: "#E0DAD4",
+              colorBorderSecondary: "#EDE8E2",
+              // Shape
+              borderRadius: 12,
+              borderRadiusLG: 16,
+              borderRadiusSM: 8,
+              // Typography – use the Next.js Geist variable
+              fontFamily: "var(--font-geist-sans), sans-serif",
+              fontSize: 15,
             },
-            // if a component type needs special styling, setting here will override default options set in token
             components: {
               Button: {
-                colorPrimary: "#75bd9d", // this will color all buttons in #75bd9d, overriding the default primaryColor #22426b set in token line 35
-                algorithm: true, // enable algorithm (redundant with line 33 but here for demo purposes)
-                controlHeight: 38,
+                // Primary buttons are SBB red with pill shape
+                colorPrimary: "#E30613",
+                colorPrimaryHover: "#C0000F",
+                colorPrimaryActive: "#A0000C",
+                controlHeight: 42,
+                borderRadius: 999, // pill
+                fontWeight: 600,
+                algorithm: true,
               },
               Input: {
-                colorBorder: "gray", // color boarder selected is not overridden but instead is set by primary color in line 35
-                colorTextPlaceholder: "#888888",
-                algorithm: false, // disable algorithm (line 32)
+                colorBorder: "#D0CAC4",
+                colorTextPlaceholder: "#AAAAAA",
+                colorBgContainer: "#FFFFFF",
+                borderRadius: 10,
+                controlHeight: 44,
+                algorithm: false,
               },
               Form: {
-                labelColor: "#fff",
-                algorithm: theme.defaultAlgorithm, // specify a specifc algorithm instead of true/false
+                labelColor: "#333333",
+                algorithm: theme.defaultAlgorithm,
               },
-              Card: {},
+              Card: {
+                colorBgContainer: "#FFFFFF",
+                borderRadius: 16,
+                paddingLG: 28,
+              },
+              Select: {
+                colorBorder: "#D0CAC4",
+                borderRadius: 10,
+                controlHeight: 44,
+              },
+              Menu: {
+                colorItemBg: "transparent",
+                colorItemText: "#333333",
+                colorItemTextSelected: "#E30613",
+                colorItemTextHover: "#E30613",
+                itemBorderRadius: 8,
+              },
+              Tabs: {
+                colorPrimary: "#E30613",
+                inkBarColor: "#E30613",
+              },
+              Tag: {
+                borderRadius: 999,
+              },
             },
           }}
         >
           <AntdRegistry>
-            <AntdApp>{children}</AntdApp>
+            <AntdApp><Navbar/>{children}</AntdApp>
           </AntdRegistry>
         </ConfigProvider>
       </body>
