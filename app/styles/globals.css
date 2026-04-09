@@ -295,6 +295,19 @@ html, body {
   position: relative;
 }
 
+.submit-guess-container {
+  display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: fixed;
+            bottom: 20px;
+            justify-content: space-between;
+            width: auto;
+            margin-left: 100px;
+            padding: 0 var(--sp-lg);
+}
+
+
 /* ── Main page specific sections ────────────────────────────────────────────
 
    .page-hero        – full-width hero block, content centred horizontally
@@ -862,6 +875,11 @@ html, body {
   animation: pulse-dot 1.4s ease-in-out infinite;
 }
 
+.guess-coordinates {
+    padding: 8px var(--sp-lg);
+
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.35; }
@@ -869,7 +887,8 @@ html, body {
 
 /* Map area – React Leaflet / Google Maps mount target */
 .map-container {
-  flex: 1;
+  height: calc(100vh - 120px);
+  /*flex: 1;*/
   width: 100%;
   min-height: 0; /* required for flex children to shrink */
   position: relative;
