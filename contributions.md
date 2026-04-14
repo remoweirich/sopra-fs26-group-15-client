@@ -69,7 +69,8 @@ reason).
 
 ## Contributions Week 3 - [Begin Date] to [End Date]
 
-_Continue with the same table format as above._
+| **@dorianrother**  | 9.4   | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/7c3ebf13ad3f5b539945f8491958ab91dd941b1d | Integrated and visualized Map Component, implemented game logic, tested integration with mock websocket server for sending GUESS_MESSAGEs and recieving ROUND_START messages | This implements the core functionality of the game: The player is now able to see a interactable map and place and send their guess.  |
+
 
 ---
 
