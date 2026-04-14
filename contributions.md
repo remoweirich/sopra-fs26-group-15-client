@@ -61,7 +61,9 @@ reason).
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **@T-N-T-O**       | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **@dorianrother**  | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@dorianrother**  | 6.4   | https://github.com/remoweirich/sopra-fs26-group-15-server/pull/65/changes/f01f7cb2abd34118a6a280eedb3791b402dd35b6 | Added a REST endpoint to leave a lobby | This allows users already in a lobby to leave it before starting the game |
+|                    | 6.4.   | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/87fa687d3bd5e662342f49da5b9d29586ce7c7bc | Basic setup, route structure and styling for front-end | This creates a shared framework, so that the group can start the work on the front-end independently. In the globals.css, the formatting is centrally defined via class names, which allows for a uniform appearence of the application. |
+
 
 ---
 
