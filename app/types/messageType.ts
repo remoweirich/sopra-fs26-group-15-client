@@ -6,6 +6,7 @@ export type MessageType =
   | "GUESS_MESSAGE"
   | "READY_FOR_NEXT_ROUND"
   | "GAME_START"
+  | "GAME_END"
   | "ROUND_START"
   | "ROUND_END"
   | "SCORES";

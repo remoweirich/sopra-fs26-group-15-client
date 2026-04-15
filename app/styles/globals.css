@@ -295,6 +295,19 @@ html, body {
   position: relative;
 }
 
+.submit-guess-container {
+  display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: fixed;
+            bottom: 20px;
+            justify-content: space-between;
+            width: auto;
+            margin-left: 100px;
+            padding: 0 var(--sp-lg);
+}
+
+
 /* ── Main page specific sections ────────────────────────────────────────────
 
    .page-hero        – full-width hero block, content centred horizontally
@@ -862,6 +875,11 @@ html, body {
   animation: pulse-dot 1.4s ease-in-out infinite;
 }
 
+.guess-coordinates {
+    padding: 8px var(--sp-lg);
+
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.35; }
@@ -869,7 +887,8 @@ html, body {
 
 /* Map area – React Leaflet / Google Maps mount target */
 .map-container {
-  flex: 1;
+  height: calc(100vh - 120px);
+  /*flex: 1;*/
   width: 100%;
   min-height: 0; /* required for flex children to shrink */
   position: relative;
@@ -892,7 +911,211 @@ html, body {
   z-index: 10;
 }
 
+/* Split layout used during ROUND_RESULT phase:
+   map shrinks to fill left side, result panel appears on the right.
+ 
+   Usage:
+   <div className="game-result-layout">
+     <div className="map-container">…map…</div>
+     <aside className="result-panel">…</aside>
+   </div>
+*/
+.game-result-layout {
+  display: flex;
+  height: 100%;   /* fills .page-game */
+}
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10b. ROUND RESULT PANEL
+   ═══════════════════════════════════════════════════════════════════════════
+ 
+   .result-panel               – fixed-width right sidebar, white bg, scrollable
+   .result-panel-header        – "ROUND X / Y" label + "🎯 Result" heading
+   .result-panel-round-label   – small ALL-CAPS "ROUND 1 / 5" above heading
+   .result-panel-title         – large "🎯 Result" h2
+   .result-panel-subtitle      – "S12 · Brugg AG → Zürich HB · 12:21" muted line
+ 
+   .result-actual-position     – yellow-tinted box showing the actual train location
+   .result-actual-label        – ALL-CAPS "ACTUAL POSITION" label inside the box
+   .result-actual-value        – station name text inside the box
+ 
+   .result-section-label       – ALL-CAPS section divider ("THIS ROUND", "OVERALL STANDINGS")
+ 
+   .result-player-row          – one player's round result row
+   .result-player-row--you     – variant: highlighted row for the current user
+   .result-player-rank         – rank number (#4) shown only in overall standings
+   .result-player-avatar       – small coloured circle with initial
+   .result-player-info         – flex column: username + distance
+   .result-player-name         – username
+   .result-player-distance     – "4.4 km" muted distance text
+   .result-player-score        – right-aligned "+896" score delta (green = you, gray = others)
+   .result-player-score--you   – green colour variant for own score
+ 
+   .result-panel-footer        – sticky bottom area with the "Next round" button
+   ═══════════════════════════════════════════════════════════════════════════ */
+ 
+.result-panel {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--gray-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+ 
+.result-panel-header {
+  padding: var(--sp-lg) var(--sp-lg) var(--sp-sm);
+}
+ 
+.result-panel-round-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  margin-bottom: var(--sp-xs);
+}
+ 
+.result-panel-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--black);
+  margin: 0 0 var(--sp-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+ 
+.result-panel-subtitle {
+  font-size: 13px;
+  color: var(--gray-mid);
+  margin: 0;
+}
+ 
+/* Yellow-tinted actual-position callout */
+.result-actual-position {
+  margin: var(--sp-sm) var(--sp-lg);
+  background: #FFFBEA;
+  border: 1px solid #F0E080;
+  border-radius: var(--radius-md);
+  padding: var(--sp-sm) var(--sp-md);
+}
+ 
+.result-actual-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  margin-bottom: 4px;
+}
+ 
+.result-actual-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--black);
+}
+ 
+/* Section dividers */
+.result-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-light);
+  padding: var(--sp-md) var(--sp-lg) var(--sp-xs);
+}
+ 
+/* Player rows */
+.result-player-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: 10px var(--sp-lg);
+  border-radius: var(--radius-md);
+  margin: 0 var(--sp-sm);
+}
+ 
+/* Highlighted row for the viewing user */
+.result-player-row--you {
+  background: var(--bg-page);
+}
+ 
+.result-player-rank {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-light);
+  min-width: 20px;
+}
+ 
+.result-player-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  /* Background colour set dynamically via inline style */
+}
+ 
+.result-player-info {
+  flex: 1;
+  min-width: 0;
+}
+ 
+.result-player-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+}
+ 
+.result-player-distance {
+  font-size: 11px;
+  color: var(--gray-light);
+  margin-top: 1px;
+}
+ 
+/* Score delta – default gray, green when it's the viewing user */
+.result-player-score {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gray-mid);
+  flex-shrink: 0;
+}
+ 
+.result-player-score--you {
+  color: var(--green);
+}
+ 
+/* Overall standings row – same structure, no distance line */
+.result-standings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  padding: 8px var(--sp-lg);
+  font-size: 14px;
+}
+ 
+.result-standings-rank  { font-weight: 700; color: var(--gray-dark); min-width: 24px; }
+.result-standings-name  { flex: 1; color: var(--black); }
+.result-standings-score { font-weight: 700; color: var(--black); }
+ 
+/* Sticky footer with next-round button */
+.result-panel-footer {
+  margin-top: auto;
+  padding: var(--sp-md) var(--sp-lg) var(--sp-lg);
+  border-top: 1px solid var(--gray-border);
+  background: var(--bg-surface);
+  position: sticky;
+  bottom: 0;
+}
+ 
 /* ═══════════════════════════════════════════════════════════════════════════
    11. USER PROFILE  (/users/[userId])
    ═══════════════════════════════════════════════════════════════════════════

@@ -54,59 +54,278 @@
  *   Local setInterval counts down; sync again on next ROUND_START.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
-import { GameState, WsMessage } from "@/types";
-import { Button } from "antd";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { Message} from "@/types/message";
+import { Train } from "@/types/train";
+import { Round } from "@/types/round";
+import type { MessageType } from "@/types/messageType";
+
+import { Button, message } from "antd";
+import "maplibre-gl/dist/maplibre-gl.css";
+import { RMap, RMarker } from "maplibre-react-components";
+import { MapLayerMouseEvent, MapLayerTouchEvent } from "maplibre-gl";
+import RoundOverview from "./RoundOverview";
+import LoadingScreen from "./LoadingScreen";
 
 const GamePage: React.FC = () => {
   const router    = useRouter();
   const { id: gameId } = useParams<{ id: string }>();
   const apiService = useApi();
   const { value: token } = useLocalStorage<string>("token", "");
+  const { value: userId } = useLocalStorage<string>("userId", "");
 
-  const [gameState,         setGameState]         = useState<GameState | null>(null);
-  const [secondsRemaining,  setSecondsRemaining]  = useState<number>(0);
-  const [guessCoords,      setGuessCoords]      = useState<{ lat: number; lng: number } | null>(null);
-    const [guessSubmitted,   setGuessSubmitted]   = useState<boolean>(false);
+
+ type GameState = 
+    | "ROUND_IN_PROGRESS"
+    | "LOADING"
+    | "BETWEEN_ROUNDS"
+    | "GAME_ENDED"
+  ;
+
+  type UserResult = {
+    userId: string;
+    score: string;
+    totalscore: string;
+    xCoordinate: number;
+    yCoordinate: number;
+    distance: number;
+  }
+
+  type GuessMessagePayload = {
+    lobbyId: string;
+    userId: string;
+    token: string;
+    lat: number;
+    lon: number;
+  }
+
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const clientRef = useRef<Client | null>(null);
+
+  const [gameState,         setGameState]         = useState<GameState | null>("ROUND_IN_PROGRESS");
+  const [currentTime,         setCurrentTime]         = useState<string>("");
+  const [timerActive,        setTimerActive]        = useState<boolean>(true);
+  const [secondsRemaining,  setSecondsRemaining]  = useState<number>(30);
+  const [guessCoords,      setGuessCoords]      = useState<[number, number] | null>(null);
+  const [guessSubmitted,   setGuessSubmitted]   = useState<boolean>(false);
+  const [clickPosition, setClickPosition] = useState<null | [number, number]>(
+    null,
+  );
+  const [currentTrain, setCurrentTrain] = useState<Train | null>(null);
+  const [currentRound, setCurrentRound] = useState<number | null>(null);
+  const [maxRounds, setMaxRounds] = useState<number | null>(null);
+  const [results, setResults] = useState<{currentRound: number; userResults: [UserResult]; train: Train} | null>(null); // Replace 'any' with your actual score type
+  const [totalResults, setTotalResults] = useState<[{userId: string; score: number}] | null>(null); // Replace 'any' with your actual total results type
 
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ── Initial fetch ────────────────────────────────────────────────────────
-  useEffect(() => {
-    const fetchGame = async () => {
-      
-    };
+  const useMockServer = true;
 
-    if (gameId) fetchGame();
-  }, [gameId]);
+
+  //prevent hidration error
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+    // ── Guess submission ─────────────────────────────────────────────────────
+  const handleSubmitGuess = async () => {
+    if (!clickPosition) return;
+
+    const [lon, lat] = clickPosition;
+
+    const payload: GuessMessagePayload = {
+      lobbyId: gameId!,
+      userId: userId!, 
+      token: token,
+      lat: lat, 
+      lon: lon 
+  };
+
+    console.log("Guess:", payload);
+  
+    if (!clientRef.current || !clientRef.current.connected) {
+      console.warn("WebSocket not connected yet");
+      return;
+    }
+    
+    
+    clientRef.current.publish({
+      destination: `/app/game/${gameId}/guess`,
+      body: JSON.stringify({
+        type: "GUESS_MESSAGE",
+        payload: payload
+        })
+      });
+    setGuessCoords([lat, lon]); // record for later use (e.g. showing pin)
+
+    setGuessSubmitted(true);
+    console.log("Guess submitted:", payload);
+  }
 
   // ── Local countdown timer ────────────────────────────────────────────────
   useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+      if (gameState === "ROUND_IN_PROGRESS" && timerActive) {
+        setSecondsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
+      }
+      if (secondsRemaining <= 0 && !guessSubmitted) {
+            handleSubmitGuess(); // auto-submit when timer runs out
+            
+          }
+
+    }, 1000);
     
-  }, [secondsRemaining]);
+    
+    // Clean up the timer when the component unmounts
+    return () => clearInterval(timer);
+    }, [handleSubmitGuess, guessSubmitted]);
 
-  // ── WebSocket – real-time game events ────────────────────────────────────
+  useEffect(() => {
+    
+}, []);
   
+  // ── WebSocket – real-time game events ────────────────────────────────────
+  useEffect(() => {
+    // Create SockJS connection
+    let stompClient: Client;
 
-  // ── Guess submission ─────────────────────────────────────────────────────
-  const handleSubmitGuess = async () => {
+    if (useMockServer) {
+      // Native WebSocket — works directly with the mock server
+      stompClient = new Client({
+        webSocketFactory: () => new WebSocket("ws://localhost:8080"),
+        onConnect: () => { 
+          console.log("Connected!");
+
+            // Subscribe to lobby topic
+            stompClient.subscribe(`/topic/game/${gameId}`, (message) => {
+              const update: Message = JSON.parse(message.body);
+              console.log("Received WS message:", update);
+
+              // Update state → triggers re-render
+              setMessages((prev) => [...prev, update]);
+
+              handleMessage(update);
+            });
+        },
+        onDisconnect: () => {
+            console.log("Disconnected");
+          },
+      });
+    } else {
+      // SockJS — for the real backend
+      stompClient = new Client({
+        webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+        onConnect: () => { 
+          console.log("Connected!");
+
+            // Subscribe to game topic
+            stompClient.subscribe(`/topic/game/${gameId}`, (message) => {
+              const update: Message = JSON.parse(message.body);
+
+              console.log("Received WS message:", update);
+
+              // Update state → triggers re-render
+              setMessages((prev) => [...prev, update]);
+
+              handleMessage(update);
+            });
+        },
+
+        onDisconnect: () => {
+            console.log("Disconnected");
+          },
+      });
+    }
+
+    stompClient.activate();
+    clientRef.current = stompClient;
+
+
+    
+
+    // Cleanup on unmount
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [gameId]);  
+
+  const handleMessage = useCallback((message: Message) => {
+    switch (message.type) {
+      case "ROUND_START":
+        console.log("Round started:", message);
+        setGuessCoords(null);
+        setGuessSubmitted(false);
+        setClickPosition(null);
+        setCurrentTrain(message.payload.train);
+        setCurrentRound(message.payload.currentRound);
+        setMaxRounds(message.payload.maxRounds);
+        setGameState("ROUND_IN_PROGRESS");
+        //start the local timer for 30 seconds
+        setSecondsRemaining(30);
+        setTimerActive(true);
+
+        break;
+
+      case "ROUND_END":
+        //send current guess if not already sent
+        if (guessCoords && !guessSubmitted) {
+          handleSubmitGuess();
+        }
+        //show loading screen until results have arrived
+        // reset timer
+        setTimerActive(false);
+        break;
+      
+      case "SCORES":
+        console.log("Scores updated:", message);
+        setResults(message.payload); //total results contained in UserResult
+        
+        
+        setCurrentTrain(message.payload.train)
+        setGameState("BETWEEN_ROUNDS");
+        break;
+
+      case "GAME_END":
+        setGameState("GAME_ENDED");
+        // Teardown if needed
+        router.push("/game/{gameId}/leaderboard");
+        break;
+    }
+
+  }, [guessCoords, guessSubmitted, handleSubmitGuess, gameId, router]);
+
+
+ 
+  
+  // ── Map click handler (passed from RMap component) ─────────────────────
+  const handleMapClick = (e: MapLayerMouseEvent) => {
+    setClickPosition(e.lngLat.toArray());
     
   };
-
-  // ── Map click handler (passed down to map component) ─────────────────────
-  const handleMapClick = (lat: number, lng: number) => {
+  const handleMapClickTouch = (e: MapLayerTouchEvent) => {
+    setClickPosition(e.lngLat.toArray());
     
   };
 
   // ── Render ───────────────────────────────────────────────────────────────
-  const train = gameState?.currentTrain;
+  const train = currentTrain;
+  
+  if (gameState === "ROUND_IN_PROGRESS") {
+    return (
+  
+  // in-round Map view with train info bar, question, and map interaction
 
-  return (
     <>
       {/* ── Compact game navbar ─────────────────────────────────────────── */}
       <nav className="navbar navbar--game">
@@ -125,14 +344,14 @@ const GamePage: React.FC = () => {
       <div className="train-bar">
         {/* Line badge e.g. "S12" */}
         <span className="train-bar-line-badge">
-          {train?.lineId ?? "—"}
+          {train?.trainId ?? "—"}
         </span>
 
         {/* Route */}
         <span className="train-bar-route">
-          From {train?.fromStation}
+          From {train?.lineOrigin}
           <span className="train-bar-route-arrow"> → </span>
-          To {train?.toStation}
+          To {train?.lineDestination}
         </span>
 
         {/* Times */}
@@ -143,7 +362,7 @@ const GamePage: React.FC = () => {
         {/* Round indicator + countdown */}
         <div className="train-bar-round">
           <span>
-            Round {gameState?.currentRound}/{gameState?.totalRounds}
+            Round {currentRound}/{maxRounds}
           </span>
           <span className="train-bar-timer">{secondsRemaining}s</span>
         </div>
@@ -152,12 +371,39 @@ const GamePage: React.FC = () => {
       {/* ── Question bar ────────────────────────────────────────────────── */}
       <div className="game-question-bar">
         <span className="game-question-bar-dot" />
-        Current time: {train?.currentTime} – Where is the train NOW?
+        Current time: {currentTime} – Where is the train NOW?
       </div>
 
       {/* ── Map area ────────────────────────────────────────────────────── */}
       <div className="page-game">
-        <div className="map-container">
+        <div className="map-container" style={{ height: "100vh" }}>
+          {mounted && (
+          <RMap
+            minZoom={6}
+            initialCenter={[7.4707, 46.95]}
+            initialZoom={8}
+            mapStyle="https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json"
+            onClick={handleMapClick}
+            onTouchEnd={handleMapClickTouch}
+            >
+            {
+              clickPosition && (<RMarker longitude={clickPosition[0]} latitude={clickPosition[1]}/>) 
+            }
+            {/* Floating hint / submit button at map bottom */}
+            {clickPosition && !guessSubmitted && !guessCoords && (
+              <div className="submit-guess-container">
+                <div className="card">
+                  <span className="guess-coordinates">{clickPosition[1].toFixed(3)}°N, {clickPosition[0].toFixed(3)}°E</span>
+                </div>
+                <Button type="primary" onClick={handleSubmitGuess}>
+                  Confirm Guess
+                </Button>
+              </div>
+              )}
+              {
+                /*if guessSubmitted, indicate to user to wait*/
+              }
+            </RMap>)}
           {/*
             TODO: Mount map component here (React-Leaflet recommended).
             Pass onMapClick={handleMapClick} so the page captures coordinates.
@@ -167,7 +413,7 @@ const GamePage: React.FC = () => {
               - Show the correct-position pin after ROUND_END WS message
           */}
 
-          {/* Floating hint / submit button at map bottom */}
+          
           {/*!guessSubmitted ? (
             <div className="game-hint-bar">
               {guessCoords
@@ -185,8 +431,23 @@ const GamePage: React.FC = () => {
           )*/}
         </div>
       </div>
-    </>
-  );
+    </>) }
+    
+    //pass the necessary arguments (actual train pos, scores & guesses of players) as props to the round overview component
+    else if (gameState === "BETWEEN_ROUNDS") {
+      return <RoundOverview 
+                train={currentTrain}
+                results={results?.userResults || []}
+                currentRound={currentRound}
+                maxRounds={maxRounds}
+                clientRef={clientRef.current}/>
+                
+    }
+    else {
+      return <LoadingScreen />;
+    }
+
+  
 };
 
 export default GamePage;
