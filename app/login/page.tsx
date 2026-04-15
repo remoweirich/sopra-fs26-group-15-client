@@ -20,7 +20,9 @@ const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
-  const {set: setToken,  } = useLocalStorage<string>("token", ""); 
+
+  const {set: setToken,  } = useLocalStorage<string>("token", "");
+  const {set: setUserId} = useLocalStorage<number>("userId", -1); 
 
   const handleLogin = async (values: LoginPostDTO) => {
       try {
@@ -30,6 +32,7 @@ const Login: React.FC = () => {
         }
         const response = await apiService.post<UserAuthDTO>("/login", loginCredentials)
         setToken(response.token)
+        setUserId(response.userId)
         router.push(`/users/${response.userId}`)
   
       } catch (error) {

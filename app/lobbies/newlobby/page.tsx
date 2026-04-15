@@ -27,23 +27,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-//import { Lobby } from "@/types";
-import { Button, Form, Input } from "antd";
-
-interface LobbyFormFields {
- /*Add form fields here*/
-}
+import { Button, Form, Input, Radio, InputNumber } from "antd";
+import { CreateLobbyPostDTO, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
+import handleJoin from "@/lobbies/page";
 
 const LobbyCreationPage: React.FC = () => {
   const router     = useRouter();
   const apiService = useApi();
-  const [form]     = Form.useForm<LobbyFormFields>();
+  const [form]     = Form.useForm<CreateLobbyPostDTO>();
 
   
 
   // ── Submit ──────────────────────────────────────────────────────────────
-  const handleCreate = async (values: LobbyFormFields) => {
-    router.push("/lobbies/123"); // TODO: replace with actual new lobby ID from response
+  const handleCreate = async (createLobbyPostDTO: CreateLobbyPostDTO) => {
+    const response = await apiService.post<LobbyAccessDTO>("/lobbies", createLobbyPostDTO);
+    const lobbyCodeDTO: LobbyCodeDTO = {
+      lobbyCode: response.lobbyCode};
+
+    handleJoin({ lobbyId: response.lobbyId, userId: response.userId, token: response.token, lobbyCodeDTO });
     
   };
 
@@ -57,7 +58,7 @@ const LobbyCreationPage: React.FC = () => {
           {/* TODO: target/dart icon */}
           New Lobby
         </h2>
-        <p className="form-subtitle">Set up your game.</p>
+        <p className="form-subtitle">Create a new lobby</p>
 
         <Form
           form={form}
@@ -70,11 +71,43 @@ const LobbyCreationPage: React.FC = () => {
             {/*To Do: add Form.Item for all items */}
           
           <Form.Item
-            name="name"
+            name="lobby name"
             label="Lobby Name"
             rules={[{ required: true, message: "Please enter a lobby name!" }]}
           >
             <Input placeholder="e.g. Pendler-Challenge" />
+          </Form.Item>
+
+          <Form.Item
+            name="amount of players"
+            label="Amount of Players"
+            rules={[{ required: true, message: "Please enter the amount of players!" }]}
+          >
+            <InputNumber placeholder="e.g. 5" />
+          </Form.Item>
+
+          <Form.Item
+            name="rounds"
+            label="Rounds"
+            rules={[{ required: true, message: "Please select amount of rounds to be played!" }]}
+          >
+            <Radio.Group>
+              <Radio value={1}>1</Radio>
+              <Radio value={3}>3</Radio>
+              <Radio value={5}>5</Radio>
+              <Radio value={10}>10</Radio>
+            </Radio.Group>
+          </Form.Item>
+
+          <Form.Item
+            name="lobby visibility"
+            label="Lobby Visibility"
+            rules={[{ required: true, message: "Please select a visibility option!" }]}
+          >
+            <Radio.Group>
+              <Radio value={true}>Private</Radio>
+              <Radio value={false}>Public</Radio>
+            </Radio.Group>
           </Form.Item>
 
           <Form.Item>
@@ -83,7 +116,7 @@ const LobbyCreationPage: React.FC = () => {
               htmlType="submit"
               className="form-submit-btn btn-full"
             >
-              Create &amp; Wait for Players
+              Create Lobby
             </Button>
           </Form.Item>
 

@@ -19,7 +19,7 @@ import { Button, Form, Input } from "antd";
 const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<RegisterPostDTO>();
 
   const {set: setToken} = useLocalStorage<string>("token", "");
 
