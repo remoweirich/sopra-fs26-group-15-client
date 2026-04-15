@@ -37,6 +37,7 @@ const LobbiesPage: React.FC = () => {
 
   const [lobbies, setLobbies]   = useState<Lobby[]>([]);
   const [loading, setLoading]   = useState(true);
+  const [emptyLobbyList, setEmptyLobbyList] = useState(false);
 
   // ── Fetch lobby list ────────────────────────────────────────────────────
   useEffect(() => {
@@ -65,8 +66,14 @@ const LobbiesPage: React.FC = () => {
         scores: [1, 2, 3],
         size: 5
       };
-      setLobbies([lobby1, lobby2])
+      
+
+      const response = await apiService.get<Lobby[]>("/lobbies");
+      setLobbies(response);
       setLoading(false);
+      if (response.length === 0) {
+        setEmptyLobbyList(true);
+      }
     };
 
     fetchLobbies();
@@ -75,12 +82,12 @@ const LobbiesPage: React.FC = () => {
 
   // ── Join lobby ──────────────────────────────────────────────────────────
   const handleJoin = async (lobbyId: number, userId: number, token: string, lobbyCodeDTO: LobbyCodeDTO) => {
+
+    const lobbyAccessDTO = await apiService.post<LobbyAccessDTO>(`/lobbies/${lobbyId}`, { headers: { userId, token }, lobbyCodeDTO });
     const {set: setLobbyCode} = useLocalStorage<string>("lobbyCode", "");
-    setLobbyCode(lobbyCodeDTO.lobbyCode);
-    
+    setLobbyCode(lobbyAccessDTO.lobbyCode);
 
-
-    router.push(`/lobbies/${lobbyId}`);
+    router.push(`/lobbies/${lobbyAccessDTO.lobbyId}`);
 
   };
 
@@ -108,6 +115,10 @@ const LobbiesPage: React.FC = () => {
       {/* Lobby list */}
       {loading ? (
         <Spin />
+      ) : emptyLobbyList ? (
+        <div className="lobby-list">
+          <p>No lobbies available.</p>
+        </div>
       ) : (
         <div className="lobby-list">
           {lobbies.map((lobby) => (
