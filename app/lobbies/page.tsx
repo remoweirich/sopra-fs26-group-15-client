@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Lobby, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
-import { Button, Spin, Modal } from "antd";
+import { Button, Spin, Modal, Tooltip } from "antd";
 
 type PendingAction =
     | { type: "create" }
@@ -213,13 +213,15 @@ const LobbiesPage: React.FC = () => {
                 <div className="lobby-row-players">
                   {lobby.size} player{lobby.size !== 1 && "s"}
                 </div>
-                <Button
-                  type="primary"
-                  onClick={() => handleJoinClick(lobby)}
-                  disabled={lobby.lobbyState !== "WAITING"}
-                >
-                  Join
-                </Button>
+                <Tooltip title={lobby.lobbyState !== "WAITING" ? "Game already started" : ""}>
+                  <Button
+                      type="primary"
+                      onClick={() => handleJoinClick(lobby)}
+                      disabled={lobby.lobbyState !== "WAITING"}
+                  >
+                    Join
+                  </Button>
+                </Tooltip>
               </div>
             </div>
           ))}
