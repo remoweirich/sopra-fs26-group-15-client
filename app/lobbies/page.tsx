@@ -7,6 +7,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { Lobby, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { Button, Spin, Modal, Tooltip } from "antd";
 import { UserAuthDTO, RegisterPostDTO } from "@/types/user";
+import { useLobbyActions } from "@/hooks/useLobbyActions";
 
 type PendingAction =
   | { type: "create" }
@@ -17,6 +18,7 @@ type PendingAction =
 const LobbiesPage: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
+  const { handleJoin } = useLobbyActions();
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
 
@@ -107,28 +109,6 @@ const LobbiesPage: React.FC = () => {
       });
       setIsAuthModalVisible(true);
     }
-  };
-
-  const handleJoin = async (lobbyId: number, lobbyCodeDTO: LobbyCodeDTO) => {
-
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("token");
-
-    // const response = await apiService.post<LobbyAccessDTO>(
-    //   `/lobbies/${lobbyId}`,
-    //   {
-    //     headers: {
-    //       userId: userId ? Number(userId) : null,
-    //       token: token ?? null,
-    //     },
-    //     lobbyCodeDTO,
-    //   }
-    // );
-
-    // setLobbyCode(response.lobbyCode);
-    //router.push(`/lobbies/${response.lobbyId}`);
-    console.log("Joining lobby with ID:", lobbyId, "and code:", lobbyCodeDTO.lobbyCode , "using credentials - userId:", userId, "token:", token);
-
   };
 
   const handleContinueAsGuest = async () => {

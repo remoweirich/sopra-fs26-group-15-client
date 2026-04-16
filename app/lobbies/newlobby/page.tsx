@@ -7,12 +7,13 @@ import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form, Input, Radio, InputNumber } from "antd";
 import { CreateLobbyPostDTO, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
-import handleJoin from "@/lobbies/page";
+import { useLobbyActions } from "@/hooks/useLobbyActions";
 
 const NewLobbyPage: React.FC = () => {
   const router     = useRouter();
   const apiService = useApi();
   const [form]     = Form.useForm<CreateLobbyPostDTO>();
+  const { handleJoin } = useLobbyActions();
 
   
 
@@ -52,7 +53,7 @@ const NewLobbyPage: React.FC = () => {
       lobbyCode: response.lobbyCode
     };
 
-    handleJoin({ lobbyId: response.lobbyId, lobbyCodeDTO });
+    handleJoin(response.lobbyId, lobbyCodeDTO);
     
   };
 
