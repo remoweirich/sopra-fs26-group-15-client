@@ -1,15 +1,18 @@
+import {UserDTO} from "@/types/user";
+import {Round} from "@/types/round";
+
 export interface Lobby {
   lobbyId: number;
   lobbyName: string;
   lobbyCode: string;
-  adminId: number;
-  rounds: number;
+  admin: Admin;
+  rounds: Round[];
   visibility: "PUBLIC" | "PRIVATE";
   lobbyState: "WAITING" | "IN_GAME" | "FINISHING";
   currentRound: number;
-  scores: number[];
+  scores: Score[];
   size: number;
-  players?: number[];
+  users?: UserDTO[];
 }
 
 export interface CreateLobbyPostDTO {
@@ -35,4 +38,14 @@ export interface UpdateLobbyPostDTO {
   size: number;
   maxRounds: number;
   visibility: "PUBLIC" | "PRIVATE";
+}
+
+export interface Admin {
+  token: string;
+  userId: number;
+}
+
+export interface Score {
+  userId: number;
+  points: number;
 }

@@ -4,6 +4,7 @@ import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { getApiDomain } from "@/utils/domain";
 import { Message } from "@/types/message";
+import {LobbyMessage} from "@/types/lobbyMessage";
 
 
 interface WebSocketContextType {

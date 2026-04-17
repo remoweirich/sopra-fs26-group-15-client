@@ -42,7 +42,6 @@ import { Lobby } from "@/types/lobby";
 import { LobbyMessage } from "@/types/lobbyMessage";
 import { Button } from "antd";
 import {validateStyleMin} from "@maplibre/maplibre-gl-style-spec";
-import state = validateStyleMin.state;
 
 const LobbyWaitPage: React.FC = () => {
   const router     = useRouter();
@@ -91,9 +90,13 @@ const LobbyWaitPage: React.FC = () => {
     const subscription = webSocket.subscribe<LobbyMessage>(
         `/topic/lobby/${lobbyId}`,
         (message) => {
+          console.log(message);
           if (message.type === "LOBBY_STATE") {
             console.log("WebSocket Update received", message.payload);
             setLobby(message.payload);
+          } else if (message.type === "GAME_START") {
+            console.log(" Started");
+            router.push(`/game/${lobbyId}`);
           }
           }
     );
@@ -104,7 +107,17 @@ const LobbyWaitPage: React.FC = () => {
 
   // ── Actions ──────────────────────────────────────────────────────────────
   const handleStartGame = async () => {
-    router.push(`/game/${lobbyId}`); // TODO
+    if (!webSocket.isConnected) return;
+    console.log("Starting game");
+
+    const destination = `/app/lobby/${lobbyId}/start`;
+
+    const messageBody: LobbyMessage = {
+      type: "START_GAME",
+      payload: null
+    }
+
+    webSocket.publish(destination, messageBody);
   };
 
   const handleLeave = async () => {
@@ -116,7 +129,8 @@ const LobbyWaitPage: React.FC = () => {
   }
 
   // Vor dem return in der Komponente:
-  const isHost = lobby && userData ? lobby.adminId === userData.userId : false;
+  const isHost = lobby && userData ? lobby.admin.userId === userData.userId : false;
+  console.log("mmmmmmmmmmmm: ", isHost, lobby, userData, lobby?.admin.userId === userData?.userId);
 
   if (!lobby) return <div className="page-center">Laden...</div>;
   
@@ -135,32 +149,15 @@ const LobbyWaitPage: React.FC = () => {
             <span className="badge badge-waiting">Waiting...</span>
           </div>
 
-          {/* Meta: Runden & Sichtbarkeit */}
-          <div className="wait-meta">
-            {lobby.rounds} rounds ·
-            <span className={`badge ${lobby.visibility === 'PUBLIC' ? 'badge-public' : 'badge-private'}`}>
-             {lobby.visibility}
-          </span>
-          </div>
-
           {/* Player List Section */}
           <div className="wait-section-label">
-            PLAYERS ({lobby.players?.length || 0} / {lobby.size})
+            PLAYERS ({lobby.users?.length || 0} / {lobby.size})
           </div>
 
           <div className="wait-player-list">
-            {lobby.players?.map((playerId) => (
-                <div key={playerId} className={`wait-player-row ${playerId === lobby.adminId ? 'wait-player-row--host' : ''}`}>
-                  <div className="wait-player-avatar">
-                    {/* Platzhalter für Avatar-Icon oder Initialen */}
-                    {playerId.toString().substring(0, 1)}
-                  </div>
-                  <span className="wait-player-name">
-                Player {playerId} {playerId === userData?.userId && " (You)"}
-              </span>
-                  {playerId === lobby.adminId && (
-                      <span className="badge badge-host">Host</span>
-                  )}
+            {lobby.users?.map((userDTO) => (
+                <div key={userDTO.username} className={`wait-player-row`}>
+                  {userDTO.username}
                 </div>
             ))}
           </div>
@@ -186,9 +183,8 @@ const LobbyWaitPage: React.FC = () => {
                     type="primary"
                     className="btn-full"
                     onClick={handleStartGame}
-                    disabled={lobby.players && lobby.players.length < 2} // Optional: Start erst ab 2 Spielern
                 >
-                  Start Game ({lobby.rounds} Rounds)
+                  Start Game
                 </Button>
             )}
 
