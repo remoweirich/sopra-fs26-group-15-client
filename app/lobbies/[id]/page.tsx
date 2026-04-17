@@ -37,45 +37,70 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
-//import { useWebSocket } from "@/hooks/useWebSocket";
+import { useWebSocket } from "@/context/WebSocketContext";
 import { Lobby } from "@/types/lobby";
+import { LobbyMessage } from "@/types/lobbyMessage";
 import { Button } from "antd";
+import {validateStyleMin} from "@maplibre/maplibre-gl-style-spec";
+import state = validateStyleMin.state;
 
 const LobbyWaitPage: React.FC = () => {
   const router     = useRouter();
   const lobbyId = Number(useParams().id);
   const apiService  = useApi();
+  const webSocket = useWebSocket();
 
+  //const token = JSON.parse(localStorage.getItem("token") || '""') as string;
+  //const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
+  const [userData, setUserData] = useState< {userId: number; token: string} | null>(null);
   const [lobby, setLobby]   = useState<Lobby | null>(null);
+
+  useEffect(() => {
+    const storedToken = JSON.parse(localStorage.getItem("token") || '""');
+    const storedUserId = JSON.parse(localStorage.getItem("userId") || '0');
+    setUserData({ userId: storedUserId, token: storedToken });
+  }, []);
 
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("token") || '""') as string;
-    const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
+    if (!lobbyId || !userData) return;
 
-    console.log("LobbyPage before fetch: ", userId, lobbyId, token);
     const fetchLobby = async () => {
       try {
         const response = await apiService.get<Lobby>(
             `/lobbies/${lobbyId}`,
             {
-              headers: {userId: userId.toString(), token: token},
+              headers: {userId: userData.userId.toString(), token: userData.token},
             }
             );
-        console.log(response);
+        console.log(response); //to be removed
         setLobby(response);
       } catch (e) {
-        throw e;
+        console.error("Fetch error: ", e);
       }
     };
-
     fetchLobby();
-  }, [router]);
+  }, [lobbyId, userData]);
 
-  // ── WebSocket – live lobby updates ───────────────────────────────────────
-  
+
+  // ── Websocket fetch ────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!webSocket.isConnected || !lobbyId) return;
+
+    const subscription = webSocket.subscribe<LobbyMessage>(
+        `/topic/lobby/${lobbyId}`,
+        (message) => {
+          if (message.type === "LOBBY_STATE") {
+            console.log("WebSocket Update received", message.payload);
+            setLobby(message.payload);
+          }
+          }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [webSocket.isConnected, lobbyId]);
+
 
   // ── Actions ──────────────────────────────────────────────────────────────
   const handleStartGame = async () => {
@@ -90,6 +115,10 @@ const LobbyWaitPage: React.FC = () => {
 
   }
 
+  // Vor dem return in der Komponente:
+  const isHost = lobby && userData ? lobby.adminId === userData.userId : false;
+
+  if (!lobby) return <div className="page-center">Laden...</div>;
   
 
   
@@ -97,44 +126,82 @@ const LobbyWaitPage: React.FC = () => {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="page-center page-content">
-      <div className="card card--wide">
+      <div className="page-center page-content">
+        <div className="card card--lobby-wait card--wide">
 
-        {/* Header row: lobby name + status badge */}
-        <div className="wait-header">
-          <h2>Lobby Name
-          </h2>
-          {/* TODO: badge-waiting "Waiting…" */}
-        </div>
+          {/* Header: Name + Status */}
+          <div className="wait-header">
+            <h2 className="wait-lobby-name">{lobby.lobbyName}</h2>
+            <span className="badge badge-waiting">Waiting...</span>
+          </div>
 
-        
+          {/* Meta: Runden & Sichtbarkeit */}
+          <div className="wait-meta">
+            {lobby.rounds} rounds ·
+            <span className={`badge ${lobby.visibility === 'PUBLIC' ? 'badge-public' : 'badge-private'}`}>
+             {lobby.visibility}
+          </span>
+          </div>
 
-        <div className="u-divider" />
+          {/* Player List Section */}
+          <div className="wait-section-label">
+            PLAYERS ({lobby.players?.length || 0} / {lobby.size})
+          </div>
 
-        
+          <div className="wait-player-list">
+            {lobby.players?.map((playerId) => (
+                <div key={playerId} className={`wait-player-row ${playerId === lobby.adminId ? 'wait-player-row--host' : ''}`}>
+                  <div className="wait-player-avatar">
+                    {/* Platzhalter für Avatar-Icon oder Initialen */}
+                    {playerId.toString().substring(0, 1)}
+                  </div>
+                  <span className="wait-player-name">
+                Player {playerId} {playerId === userData?.userId && " (You)"}
+              </span>
+                  {playerId === lobby.adminId && (
+                      <span className="badge badge-host">Host</span>
+                  )}
+                </div>
+            ))}
+          </div>
 
-        {/* Action buttons */}
-        <div className="wait-actions">
-          
+          <div className="u-divider" />
+
+          {/* Invite Section */}
+          <div className="wait-section-label">INVITE FRIENDS</div>
+          <div className="wait-invite-box">
+            <code className="wait-invite-code">{lobby.lobbyCode}</code>
             <Button
-              type="primary"
-              className="btn-full"
-              onClick={handleStartGame}
+                size="small"
+                onClick={() => navigator.clipboard.writeText(lobby.lobbyCode)}
             >
-              Start Game 
+              Copy
             </Button>
-          
+          </div>
 
-          <Button
-            className="btn-ghost-muted btn-full"
-            onClick={handleLeave}
-          >
-            Leave lobby 
-          </Button>
+          {/* Action buttons */}
+          <div className="wait-actions">
+            {isHost && (
+                <Button
+                    type="primary"
+                    className="btn-full"
+                    onClick={handleStartGame}
+                    disabled={lobby.players && lobby.players.length < 2} // Optional: Start erst ab 2 Spielern
+                >
+                  Start Game ({lobby.rounds} Rounds)
+                </Button>
+            )}
+
+            <Button
+                className="btn-ghost-muted btn-full"
+                onClick={handleLeave}
+            >
+              {isHost ? "Leave & Transfer Host" : "Leave Lobby"}
+            </Button>
+          </div>
+
         </div>
-
       </div>
-    </div>
   );
 };
 

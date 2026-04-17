@@ -38,7 +38,7 @@ export const useLobbyActions = () => {
 
       // 2. WebSocket: Standleitung öffnen
       // Wir schicken userId und token mit, damit der Interceptor im Backend uns lässt
-      connect(lobbyId, userId.toString(), token);
+      connect(userId.toString(), token);
       console.log("lobbyId before router push: ", lobbyId);
       router.push(`/lobbies/${lobbyId}`);
     } catch (error) {

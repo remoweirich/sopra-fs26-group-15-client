@@ -29,3 +29,10 @@ export interface LobbyAccessDTO {
 export interface LobbyCodeDTO {
   lobbyCode: string;
 }
+
+export interface UpdateLobbyPostDTO {
+  lobbyName: string;
+  size: number;
+  maxRounds: number;
+  visibility: "PUBLIC" | "PRIVATE";
+}
