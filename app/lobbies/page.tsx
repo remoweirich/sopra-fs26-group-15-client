@@ -27,6 +27,8 @@ const LobbiesPage: React.FC = () => {
   const [hasCredentials, setHasCredentials] = useState<boolean>(false);
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
 
+  const [inputCodes, setInputCodes] = useState<{ [key: number]: string }>({});
+
   const { set: setLobbyCode } = useLocalStorage<string>("lobbyCode", "");
 
 
@@ -99,13 +101,14 @@ const LobbiesPage: React.FC = () => {
   };
 
   const handleJoinClick = (lobby: Lobby) => {
+    const enteredCode = inputCodes[lobby.lobbyId] || lobby.lobbyCode;
     if (hasCredentials) {
-      handleJoin(lobby.lobbyId, { lobbyCode: lobby.lobbyCode });
+      handleJoin(lobby.lobbyId, { lobbyCode: enteredCode });
     } else {
       setPendingAction({
         type: "join",
         lobbyId: lobby.lobbyId,
-        lobbyCode: lobby.lobbyCode,
+        lobbyCode: enteredCode,
       });
       setIsAuthModalVisible(true);
     }
@@ -139,6 +142,7 @@ const LobbiesPage: React.FC = () => {
 
     return values;
   }
+
 
 
 
@@ -184,6 +188,27 @@ const LobbiesPage: React.FC = () => {
                 </div>
               </div>
               <div className="lobby-row-right">
+                <div className="private-lobby-code">
+                  {lobby.visibility === "PRIVATE" && (
+                    <input
+                      id={`lobby-code-${lobby.lobbyId}`}
+                      placeholder="Enter Lobby Code"
+                      value={inputCodes[lobby.lobbyId] || ""} // Wert aus dem State
+                      onChange={(e) => setInputCodes({
+                        ...inputCodes,
+                        [lobby.lobbyId]: e.target.value // Nur den Code für diese ID ändern
+                      })}
+                      style={{
+                        border: "none",
+                        background: "transparent",
+                        outline: "none",
+                        fontSize: 13,
+                        color: "var(--sbb-mid-gray)",
+                        width: "100%",
+                      }}
+                    />)}
+
+                </div>
                 <div className="lobby-row-players">
                   {lobby.size} player{lobby.size !== 1 && "s"}
                 </div>
@@ -191,7 +216,7 @@ const LobbiesPage: React.FC = () => {
                   <Button
                     type="primary"
                     onClick={() => handleJoinClick(lobby)}
-                    disabled={lobby.lobbyState !== "WAITING"}
+                    disabled={lobby.lobbyState !== "WAITING" || (lobby.visibility === "PRIVATE" && !inputCodes[lobby.lobbyId])}
                   >
                     Join
                   </Button>

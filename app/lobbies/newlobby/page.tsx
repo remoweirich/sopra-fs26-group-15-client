@@ -19,15 +19,18 @@ const NewLobbyPage: React.FC = () => {
 
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleCreate = async (createLobbyPostDTO: CreateLobbyPostDTO) => {
-    const token = JSON.parse(localStorage.getItem("token") || '""') as string;
-    const userId = Number(localStorage.getItem("userId") || "-1");
+    const rawToken = localStorage.getItem("token");
+const token = rawToken ? JSON.parse(rawToken) : "";
+
+const rawUserId = localStorage.getItem("userId");
+const userId = rawUserId ? JSON.parse(rawUserId) : -1;
 
     const payload = {
     lobbyName: createLobbyPostDTO.lobbyName,
     size: Number(createLobbyPostDTO.size),
     maxRounds: Number(createLobbyPostDTO.maxRounds),
     // WICHTIG: Boolean zu Enum-String konvertieren
-    visibility: createLobbyPostDTO.visibility ? "PUBLIC" : "PRIVATE", 
+    visibility: createLobbyPostDTO.visibility, 
   };
 
     console.log("NewLobbyPage - Retrieved token from localStorage:", token);
@@ -47,7 +50,7 @@ const NewLobbyPage: React.FC = () => {
     );
 
     localStorage.setItem("token", JSON.stringify(response.token)); 
-    localStorage.setItem("userId", JSON.stringify(response.userId));
+localStorage.setItem("userId", JSON.stringify(response.userId));
 
     const lobbyCodeDTO: LobbyCodeDTO = {
       lobbyCode: response.lobbyCode
@@ -114,8 +117,8 @@ const NewLobbyPage: React.FC = () => {
             rules={[{ required: true, message: "Please select a visibility option!" }]}
           >
             <Radio.Group>
-              <Radio value={true}>Private</Radio>
-              <Radio value={false}>Public</Radio>
+              <Radio value={"PRIVATE"}>Private</Radio>
+              <Radio value={"PUBLIC"}>Public</Radio>
             </Radio.Group>
           </Form.Item>
 

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { App as AntdApp, ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
+import { WebSocketProvider } from "@/context/WebSocketContext";
 
 import Navbar from "./navbar";
 
@@ -104,7 +105,9 @@ export default function RootLayout({
           }}
         >
           <AntdRegistry>
+            <WebSocketProvider>
             <AntdApp><Navbar/>{children}</AntdApp>
+            </WebSocketProvider>
           </AntdRegistry>
         </ConfigProvider>
       </body>
