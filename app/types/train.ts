@@ -3,13 +3,28 @@ export interface Train {
     currentY: number;
     trainId: string;
     timeStamp: number;
-    line: string;
-    lineOrigin: string;
-    lineDestination: string;
+    line: Line;
+    lineOrigin: Station;
+    lineDestination: Station;
     departureTime: number;
     arrivalTime: number;
+    lastLeavingStation: Station;
+    nextPendingStation: Station;
 
-  fromStation: string;
-  toStation: string;
+  fromStation: Station;
+  toStation: Station;
   
+}
+
+type Station = {
+  stationName: string;
+  xCoordinate: number;
+  yCoordinate: number;
+  arrivalTime: number;
+  departureTime: number;
+}
+
+
+type Line = {
+  name: string;
 }

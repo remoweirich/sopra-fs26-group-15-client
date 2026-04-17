@@ -155,7 +155,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           </h2>
           <p className="result-panel-subtitle">
             {/* TODO: trainInfo.lineId · trainInfo.fromStation → trainInfo.toStation · trainInfo.currentTime */}
-            {train?.trainId} · {train?.lineOrigin} → {train?.lineDestination} · 12:21
+            {train?.trainId} · {train?.lineOrigin?.stationName} → {train?.lineDestination?.stationName} · 12:21
           </p>
         </div>
 
