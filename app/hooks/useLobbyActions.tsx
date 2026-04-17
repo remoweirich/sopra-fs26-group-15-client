@@ -35,11 +35,11 @@ export const useLobbyActions = () => {
       token = lobbyAccesDTO.token;
 
       localStorage.setItem("token", JSON.stringify(token)); 
- localStorage.setItem("userId", JSON.stringify(userId));
+      localStorage.setItem("userId", JSON.stringify(userId));
 
       // 2. WebSocket: Standleitung öffnen
       // Wir schicken userId und token mit, damit der Interceptor im Backend uns lässt
-      connect(lobbyId, userId.toString(), token);
+      connect(userId.toString(), token);
     } catch (error) {
       console.error("Fehler beim Beitreten zur Lobby:", error);
       // Hier kannst du dem User eine Fehlermeldung anzeigen
