@@ -30,15 +30,17 @@ export const useLobbyActions = () => {
     }
 
     try {
-      const lobbyAccesDTO = await joinLobby(lobbyId, lobbyCodeDTO, Number(userId), token);
+      const lobbyAccessDTO = await joinLobby(lobbyId, lobbyCodeDTO, Number(userId), token);
       //await connectToLobbyWebSocket(lobbyId, Number(userId), token);
       //router.push(`/lobbies/${lobbyId}`);
       console.log("Lobby beigetreten, weiterleiten zur Lobby-Seite...");
-      console.log(lobbyAccesDTO);
+      console.log(lobbyAccessDTO);
 
       // 2. WebSocket: Standleitung öffnen
       // Wir schicken userId und token mit, damit der Interceptor im Backend uns lässt
       connect(lobbyId, userId.toString(), token);
+      console.log("lobbyId before router push: ", lobbyId);
+      router.push(`/lobbies/${lobbyId}`);
     } catch (error) {
       console.error("Fehler beim Beitreten zur Lobby:", error);
       // Hier kannst du dem User eine Fehlermeldung anzeigen

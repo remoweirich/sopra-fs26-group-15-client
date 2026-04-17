@@ -24,6 +24,7 @@ const token = rawToken ? JSON.parse(rawToken) : "";
 
 const rawUserId = localStorage.getItem("userId");
 const userId = rawUserId ? JSON.parse(rawUserId) : -1;
+  console.log(userId, token);
 
     const payload = {
     lobbyName: createLobbyPostDTO.lobbyName,
@@ -44,7 +45,7 @@ const userId = rawUserId ? JSON.parse(rawUserId) : -1;
       {                        // 3. Options (Headers)
         headers: {
           token: token,
-          userId: userId.toString(),
+          userId: userId,
         },
       }
     );
