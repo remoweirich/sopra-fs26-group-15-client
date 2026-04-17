@@ -64,6 +64,7 @@ const LobbyWaitPage: React.FC = () => {
               headers: {userId: userId.toString(), token: token},
             }
             );
+        console.log(response);
         setLobby(response);
       } catch (e) {
         throw e;
