@@ -44,7 +44,7 @@ const NewLobbyPage: React.FC = () => {
       {                        // 3. Options (Headers)
         headers: {
           token: token,
-          userId: userId.toString(),
+          userId: userId,
         },
       }
     );

@@ -19,26 +19,27 @@ export const useLobbyActions = () => {
     
     const rawToken = localStorage.getItem("token");
     let token = rawToken ? JSON.parse(rawToken) : "";
-
     const rawUserId = localStorage.getItem("userId");
     let userId = rawUserId ? JSON.parse(rawUserId) : -1;
 
 
     try {
-      const lobbyAccesDTO: LobbyAccessDTO = await joinLobby(lobbyId, lobbyCodeDTO, Number(userId), token);
+      const lobbyAccessDTO = await joinLobby(lobbyId, lobbyCodeDTO, Number(userId), token);
       //await connectToLobbyWebSocket(lobbyId, Number(userId), token);
       //router.push(`/lobbies/${lobbyId}`);
       console.log("Lobby beigetreten, weiterleiten zur Lobby-Seite...");
-      console.log(lobbyAccesDTO);
-      userId = lobbyAccesDTO.userId;
-      token = lobbyAccesDTO.token;
+      console.log(lobbyAccessDTO);
+      userId = lobbyAccessDTO.userId;
+      token = lobbyAccessDTO.token;
 
       localStorage.setItem("token", JSON.stringify(token)); 
       localStorage.setItem("userId", JSON.stringify(userId));
 
       // 2. WebSocket: Standleitung öffnen
       // Wir schicken userId und token mit, damit der Interceptor im Backend uns lässt
-      connect(lobbyId, userId.toString(), token);
+      connect(userId.toString(), token);
+      console.log("lobbyId before router push: ", lobbyId);
+      router.push(`/lobbies/${lobbyId}`);
     } catch (error) {
       console.error("Fehler beim Beitreten zur Lobby:", error);
       // Hier kannst du dem User eine Fehlermeldung anzeigen
@@ -58,15 +59,15 @@ export const useLobbyActions = () => {
       lobbyCodeDTO,               // Der Body (z.B. der Lobby-Code)
       {
         headers: {
-          token: token, // Fallback auf leeren String, falls token null ist
-          userId: userId.toString(), // Fallback auf -1, falls userId null ist
+          token: token,
+          userId: userId.toString(),
         },
       }
     );
 
     console.log("useLobbyActions - joinLobby erfolgreich, Antwort:", response);
 
-  
+
     console.log("REST: Erfolgreich in der DB beigetreten");
     return response;
 

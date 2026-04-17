@@ -39,39 +39,56 @@ import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
-import { Lobby, WsMessage } from "@/types";
-import { Button, Spin } from "antd";
+import { Lobby } from "@/types/lobby";
+import { Button } from "antd";
 
 const LobbyWaitPage: React.FC = () => {
   const router     = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const lobbyId = Number(useParams().id);
   const apiService  = useApi();
-  const { value: token }    = useLocalStorage<string>("token", "");
-  const { value: userId }   = useLocalStorage<string>("userId", "");
 
-  const [lobby,   setLobby]   = useState<Lobby | null>(null);
+  const [lobby, setLobby]   = useState<Lobby | null>(null);
 
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
+    const token = JSON.parse(localStorage.getItem("token") || '""') as string;
+    const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
+
+    console.log("LobbyPage before fetch: ", userId, lobbyId, token);
     const fetchLobby = async () => {
-      
+      try {
+        const response = await apiService.get<Lobby>(
+            `/lobbies/${lobbyId}`,
+            {
+              headers: {userId: userId.toString(), token: token},
+            }
+            );
+        console.log(response);
+        setLobby(response);
+      } catch (e) {
+        throw e;
+      }
     };
 
-    if (id) fetchLobby();
-  }, [id]);
+    fetchLobby();
+  }, [router]);
 
   // ── WebSocket – live lobby updates ───────────────────────────────────────
   
 
   // ── Actions ──────────────────────────────────────────────────────────────
   const handleStartGame = async () => {
-    router.push(`/game/${id}`); // TODO
+    router.push(`/game/${lobbyId}`); // TODO
   };
 
   const handleLeave = async () => {
     router.push("/lobbies"); // TODO: send leave request to backend, 
   };
+
+  const updateLobbySettings = async () => {
+
+  }
 
   
 
