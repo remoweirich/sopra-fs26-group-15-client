@@ -10,29 +10,28 @@ import { CreateLobbyPostDTO, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby"
 import { useLobbyActions } from "@/hooks/useLobbyActions";
 
 const NewLobbyPage: React.FC = () => {
-  const router     = useRouter();
+  const router = useRouter();
   const apiService = useApi();
-  const [form]     = Form.useForm<CreateLobbyPostDTO>();
+  const [form] = Form.useForm<CreateLobbyPostDTO>();
   const { handleJoin } = useLobbyActions();
 
-  
+
 
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleCreate = async (createLobbyPostDTO: CreateLobbyPostDTO) => {
     const rawToken = localStorage.getItem("token");
-const token = rawToken ? JSON.parse(rawToken) : "";
+    const token = rawToken ? JSON.parse(rawToken) : "";
 
-const rawUserId = localStorage.getItem("userId");
-const userId = rawUserId ? JSON.parse(rawUserId) : -1;
-  console.log(userId, token);
+    const rawUserId = localStorage.getItem("userId");
+    const userId = rawUserId ? JSON.parse(rawUserId) : -1;
 
     const payload = {
-    lobbyName: createLobbyPostDTO.lobbyName,
-    size: Number(createLobbyPostDTO.size),
-    maxRounds: Number(createLobbyPostDTO.maxRounds),
-    // WICHTIG: Boolean zu Enum-String konvertieren
-    visibility: createLobbyPostDTO.visibility, 
-  };
+      lobbyName: createLobbyPostDTO.lobbyName,
+      size: Number(createLobbyPostDTO.size),
+      maxRounds: Number(createLobbyPostDTO.maxRounds),
+      // WICHTIG: Boolean zu Enum-String konvertieren
+      visibility: createLobbyPostDTO.visibility,
+    };
 
     console.log("NewLobbyPage - Retrieved token from localStorage:", token);
     console.log("NewLobbyPage - Retrieved userId from localStorage:", userId);
@@ -50,15 +49,15 @@ const userId = rawUserId ? JSON.parse(rawUserId) : -1;
       }
     );
 
-    localStorage.setItem("token", JSON.stringify(response.token)); 
-localStorage.setItem("userId", JSON.stringify(response.userId));
+    localStorage.setItem("token", JSON.stringify(response.token));
+    localStorage.setItem("userId", JSON.stringify(response.userId));
 
     const lobbyCodeDTO: LobbyCodeDTO = {
       lobbyCode: response.lobbyCode
     };
 
     handleJoin(response.lobbyId, lobbyCodeDTO);
-    
+
   };
 
   // ── Render ──────────────────────────────────────────────────────────────
@@ -81,8 +80,8 @@ localStorage.setItem("userId", JSON.stringify(response.userId));
           layout="vertical"
           onFinish={handleCreate}
         >
-            {/*To Do: add Form.Item for all items */}
-          
+          {/*To Do: add Form.Item for all items */}
+
           <Form.Item
             name="lobbyName"
             label="Lobby Name"
@@ -133,7 +132,7 @@ localStorage.setItem("userId", JSON.stringify(response.userId));
             </Button>
           </Form.Item>
 
-          
+
 
         </Form>
       </div>
