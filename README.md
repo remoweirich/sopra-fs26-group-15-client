@@ -81,6 +81,20 @@ and open a new one and try to run the command again
 <br>
 <br>
 
+# Release workflow
+
+This client now uses semantic-release on `main`.
+
+- Use Conventional Commits such as `feat:`, `fix:`, `refactor:`, and `docs:`
+- Every qualifying push to `main` creates a `vX.Y.Z` tag
+- `CHANGELOG.md` is updated automatically
+- GitHub Releases are published automatically
+- Changelog updates are committed back as `chore(release): <version>`
+
+<br>
+<br>
+<br>
+
 # Troubleshooting the installation
 
 If the four steps above did not work for you and re-running the setup.sh script
