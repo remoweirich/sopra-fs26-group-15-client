@@ -1,13 +1,16 @@
 "use client";
-import React, { createContext, useContext, useRef, useState } from "react";
-import { Client } from "@stomp/stompjs";
+import React, { createContext, useContext, useRef, useState, useCallback } from "react";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { getApiDomain } from "@/utils/domain";
+import { Message } from "@/types/message";
 
 
 interface WebSocketContextType {
-  connect: (lobbyId: number, userId: string, token: string) => void;
+  connect: (userId: string, token: string) => void;
   disconnect: () => void;
+  subscribe: <T>(topic: string, callback: (payload: T) => void) => StompSubscription | undefined;
+  publish: (destination: string, body: Message) => void;
   isConnected: boolean;
 }
 
@@ -17,29 +20,48 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const stompClient = useRef<Client | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  const connect = (lobbyId: number, userId: string, token: string) => {
-    if (stompClient.current?.active) return; // Bereits verbunden
+  const connect = (userId: string, token: string) => {
+    if (stompClient.current?.active) return;
 
     const socket = new SockJS(`${getApiDomain()}/ws`);
     const client = new Client({
       webSocketFactory: () => socket,
       connectHeaders: { userId, token },
       onConnect: () => {
-        console.log("WebSocket verbunden!");
+        console.log("WebSocket Tunnel Established!");
         setIsConnected(true);
-        
-        // Wir abonnieren die Lobby. WICHTIG: Header auch hier mitsenden!
-        client.subscribe(`/topic/lobby/${lobbyId}`, (message) => {
-          console.log("Broadcast erhalten:", JSON.parse(message.body));
-          // Hier könntest du ein Event-System triggern
-        }, { userId, token });
       },
-      onDisconnect: () => setIsConnected(false),
+      onDisconnect: () => {
+        setIsConnected(false)
+        console.log("WebSocket Disconnected");
+      },
     });
 
     client.activate();
     stompClient.current = client;
   };
+
+  const subscribe = useCallback(<T,>(topic: string, callback: (payload: T) => void) => {
+    if (!stompClient.current?.connected){
+      console.log("WebSocket not connected, cannot subscribe to topic:", topic);
+      return;
+    }
+    console.log("WebSocket subscribing to topic:", topic);
+    return stompClient.current.subscribe(topic, (message: IMessage) => {
+      const parsedBody: T = JSON.parse(message.body)
+      callback(parsedBody);
+    });
+  }, []);
+
+
+  const publish = useCallback((destination: string, body: Message) => {
+    if (stompClient.current?.connected) {
+      stompClient.current.publish({
+        destination,
+        body: JSON.stringify(body),
+      });
+    }
+  }, []);
 
   const disconnect = () => {
     stompClient.current?.deactivate();
@@ -48,7 +70,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <WebSocketContext.Provider value={{ connect, disconnect, isConnected }}>
+    <WebSocketContext.Provider value={{ connect, disconnect, subscribe, publish, isConnected }}>
       {children}
     </WebSocketContext.Provider>
   );
