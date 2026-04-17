@@ -21,20 +21,21 @@ export const useLobbyActions = () => {
 
     // 2. PARSEN, um die Anführungszeichen zu entfernen
     // Wenn rawToken '"abc"' ist, wird token durch JSON.parse zu 'abc'
-    const userId = rawUserId ? JSON.parse(rawUserId) : null;
-    const token = rawToken ? JSON.parse(rawToken) : null;
+    let userId = rawUserId ? JSON.parse(rawUserId) : -1;
+    let token = rawToken ? JSON.parse(rawToken) : "";
 
-    if (!userId || !token) {
-        console.error("Nicht eingeloggt!");
-        return;
-    }
 
     try {
-      const lobbyAccesDTO = await joinLobby(lobbyId, lobbyCodeDTO, Number(userId), token);
+      const lobbyAccesDTO: LobbyAccessDTO = await joinLobby(lobbyId, lobbyCodeDTO, Number(userId), token);
       //await connectToLobbyWebSocket(lobbyId, Number(userId), token);
       //router.push(`/lobbies/${lobbyId}`);
       console.log("Lobby beigetreten, weiterleiten zur Lobby-Seite...");
       console.log(lobbyAccesDTO);
+      userId = lobbyAccesDTO.userId;
+      token = lobbyAccesDTO.token;
+
+      localStorage.setItem("token", JSON.stringify(token)); 
+ localStorage.setItem("userId", JSON.stringify(userId));
 
       // 2. WebSocket: Standleitung öffnen
       // Wir schicken userId und token mit, damit der Interceptor im Backend uns lässt
@@ -53,17 +54,23 @@ export const useLobbyActions = () => {
     
     console.log("useLobbyActions - joinLobby aufgerufen mit:", { lobbyId, lobbyCodeDTO, userId, token });
     
-    await apiService.post(
+    const response = await apiService.post<LobbyAccessDTO>(
       `/lobbies/${lobbyId}`, // Dein Endpoint für den Beitritt
       lobbyCodeDTO,               // Der Body (z.B. der Lobby-Code)
       {
         headers: {
-          token: token,
-          userId: userId.toString(),
+          token: token, // Fallback auf leeren String, falls token null ist
+          userId: userId.toString(), // Fallback auf -1, falls userId null ist
         },
       }
     );
+
+    console.log("useLobbyActions - joinLobby erfolgreich, Antwort:", response);
+
+  
     console.log("REST: Erfolgreich in der DB beigetreten");
+    return response;
+
   };
   return { handleJoin };
 
