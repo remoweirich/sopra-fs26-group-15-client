@@ -6,6 +6,7 @@ import "@/styles/globals.css";
 import { WebSocketProvider } from "@/context/WebSocketContext";
 
 import Navbar from "./navbar";
+import { AuthProvider } from "./context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -105,9 +106,16 @@ export default function RootLayout({
           }}
         >
           <AntdRegistry>
-            <WebSocketProvider>
-            <AntdApp><Navbar/>{children}</AntdApp>
-            </WebSocketProvider>
+            <AuthProvider>
+              <WebSocketProvider>
+                <AntdApp>
+                  <Navbar />
+                  <main className="page-root">
+                    {children}
+                  </main>
+                </AntdApp>
+              </WebSocketProvider>
+            </AuthProvider>
           </AntdRegistry>
         </ConfigProvider>
       </body>
