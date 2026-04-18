@@ -41,8 +41,8 @@ import { User } from "@/types/user";
 
 type UserResult = {
     userId: string;
-    score: string;
-    totalscore: string;
+    roundPoints: string;
+    totalPoints: string;
     xCoordinate: number;
     yCoordinate: number;
     distance: number;
@@ -58,7 +58,7 @@ interface RoundOverviewProps {
 
 const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, clientRef }) => {   
     
-    const { value: userId } = useLocalStorage<string>("userId", "");
+    const { value: userId } = useLocalStorage<string>("userId", "1"); //hardcoded for testing, needs to be set later with login
     const { id: gameId } = useParams();
     const [unsortedResults, setUnsortedResults] = useState<UserResult[]>(results);
     const [sortedRoundResults, setSortedRoundResults] = useState<UserResult[]>([]);
@@ -75,12 +75,12 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
     useEffect(() => {
         //sort user results by score descending
         console.log("unsorted results:", unsortedResults);
-        const sortedResults = [...unsortedResults].sort((a, b) => parseInt(b.totalscore) - parseInt(a.totalscore));
+        const sortedResults = [...unsortedResults].sort((a, b) => parseInt(b.roundPoints) - parseInt(a.totalscore));
         setSortedRoundResults(sortedResults);
         console.log("sorted results:", sortedResults);
 
         //sort total results by totalscore descending
-        const sortedTotalResults = [...unsortedResults].sort((a, b) => parseInt(b.score) - parseInt(a.score));
+        const sortedTotalResults = [...unsortedResults].sort((a, b) => parseInt(b.totalPoints) - parseInt(a.score));
         setSortedTotalResults(sortedTotalResults);
         console.log("sorted total results:", sortedTotalResults);
 
@@ -107,6 +107,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
             }
             })
         });
+        console.log("Sent ready message for user" + userId)
     }
 
   return (
@@ -155,7 +156,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           </h2>
           <p className="result-panel-subtitle">
             {/* TODO: trainInfo.lineId · trainInfo.fromStation → trainInfo.toStation · trainInfo.currentTime */}
-            {train?.trainId} · {train?.lineOrigin} → {train?.lineDestination} · 12:21
+            {train?.trainId} · {train?.lineOrigin?.stationName} → {train?.lineDestination?.stationName} · 12:21
           </p>
         </div>
 
@@ -164,7 +165,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           <div className="result-actual-label">Actual Position</div>
           <div className="result-actual-value">
             {/* TODO: actualPosition from ROUND_END payload */}
-            Zwischen Baden &amp; Wettingen
+            Zwischen {train?.lastLeavingStation.stationName} &amp; {train?.nextPendingStation.stationName}
           </div>
         </div>
 
@@ -185,7 +186,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                         <div className="result-player-name">You</div>
                         <div className="result-player-distance">{result.distance} km</div>
                     </div>
-                    <span className="result-player-score">{result.score}</span>
+                    <span className="result-player-score">{result.roundPoints}</span>
                 </div>) : (
                 <div className="result-player-row">
                     <div className="result-player-avatar">
@@ -195,7 +196,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                         <div className="result-player-name">{result.userId /*to do: fetch username*/}</div>
                         <div className="result-player-distance">{result.distance} km</div>
                     </div>
-                    <span className="result-player-score">{result.score}</span>
+                    <span className="result-player-score">{result.roundPoints}</span>
             </div>
             )))}
            
@@ -210,7 +211,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
             <div className="result-standings-row">
           <span className="result-standings-rank">{index+1}.</span>
           <span className="result-standings-name">{result.userId == userId ? ("You"): result.userId}</span>
-          <span className="result-standings-score">{result.totalscore}</span>
+          <span className="result-standings-score">{result.totalPoints}</span>
         </div>
         ))}
 
@@ -221,7 +222,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           <Button
             type="primary"
             className="btn-full"
-            onClick={() => {handleReadyForNextRound()}}
+            onClick={handleReadyForNextRound}
           >
             {/* TODO: conditionally render "Waiting for host…" if !isHost */}
             Next round (2/5) →
