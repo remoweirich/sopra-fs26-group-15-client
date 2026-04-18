@@ -59,8 +59,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
-import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
+import { useWebSocket } from "@/context/WebSocketContext";
 import { Message} from "@/types/message";
 import { Train } from "@/types/train";
 import { Round } from "@/types/round";
@@ -79,7 +78,8 @@ const GamePage: React.FC = () => {
   const { id: gameId } = useParams<{ id: string }>();
   const apiService = useApi();
   const { value: token } = useLocalStorage<string>("token", "");
-  const { value: userId } = useLocalStorage<string>("userId", "1");//hardcoded for testing, needs to be set later with login
+  const { value: userId } = useLocalStorage<string>("userId", "");//hardcoded for testing, needs to be set later with login
+  const { connect, disconnect, subscribe, publish, isConnected } = useWebSocket();
 
 
  type GameState = 
@@ -108,7 +108,6 @@ const GamePage: React.FC = () => {
 
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const clientRef = useRef<Client | null>(null);
 
   const [gameState,         setGameState]         = useState<GameState | null>("ROUND_IN_PROGRESS");
   const [currentTime,         setCurrentTime]         = useState<string>("");
@@ -125,10 +124,7 @@ const GamePage: React.FC = () => {
   const [results, setResults] = useState<{currentRound: number; userResults: [UserResult]; train: Train} | null>(null); // Replace 'any' with your actual score type
   const [totalResults, setTotalResults] = useState<[{userId: string; score: number}] | null>(null); // Replace 'any' with your actual total results type
 
-
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const useMockServer = false;
 
 
   //prevent hidration error
@@ -157,19 +153,16 @@ const GamePage: React.FC = () => {
 
     console.log("Guess:", payload);
   
-    if (!clientRef.current || !clientRef.current.connected) {
+    if (!isConnected) {
       console.warn("WebSocket not connected yet");
       return;
     }
     
     
-    clientRef.current.publish({
-      destination: `/app/game/${gameId}/guess`,
-      body: JSON.stringify({
-        type: "GUESS_MESSAGE",
-        payload: payload
-        })
-      });
+    publish(`/app/game/${gameId}/guess`, {
+      type: "GUESS_MESSAGE",
+      payload: payload
+    });
     setGuessCoords([lat, lon]); // record for later use (e.g. showing pin)
 
     setGuessSubmitted(true);
@@ -201,85 +194,29 @@ const GamePage: React.FC = () => {
   
   // ── WebSocket – real-time game events ────────────────────────────────────
   useEffect(() => {
-    // Create SockJS connection
-    let stompClient: Client;
+    if (!isConnected) return;
 
-    if (useMockServer) {
-      // Native WebSocket — works directly with the mock server
-      stompClient = new Client({
-        webSocketFactory: () => new WebSocket("ws://localhost:8080"),
-        onConnect: () => { 
-          console.log("Connected!");
+    const subscription = subscribe<Message>(`/topic/game/${gameId}`, (update) => {
+      console.log("Received WS message:", update);
+      setMessages((prev) => [...prev, update]);
+      handleMessage(update);
+    });
 
-            // Subscribe to lobby topic
-            stompClient.subscribe(`/topic/game/${gameId}`, (message) => {
-              const update: Message = JSON.parse(message.body);
-              console.log("Received WS message:", update);
+    // Send initial ready message
+    publish(`/app/game/${gameId}/ready`, {
+      type: "READY_FOR_NEXT_ROUND",
+      payload: {
+        userId: userId,
+        isReady: true
+      }
+    });
 
-              // Update state → triggers re-render
-              setMessages((prev) => [...prev, update]);
+    console.log("Sent initial READY_FOR_NEXT_ROUND message");
 
-              handleMessage(update);
-            });
-        },
-        onDisconnect: () => {
-            console.log("Disconnected");
-          },
-      });
-    } else {
-      // SockJS — for the real backend
-      //userID just for integration testing
-      
-
-      stompClient = new Client({
-        webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
-        onConnect: () => { 
-          console.log("Connected!");
-
-          const message = {
-            type: "READY_FOR_NEXT_ROUND",
-            payload: {
-                userId: userId,
-                isReady: true
-            }}
-          //send first ready message
-          stompClient.publish({
-        destination: `/app/game/${gameId}/ready`,
-        body: JSON.stringify(message)
-        });
-
-        console.log("Sent initial READY_FOR_NEXT_ROUND message:", message);
-
-            // Subscribe to game topic
-            stompClient.subscribe(`/topic/game/${gameId}`, (message) => {
-              const update: Message = JSON.parse(message.body);
-
-              console.log("Received WS message:", update);
-
-              // Update state → triggers re-render
-              setMessages((prev) => [...prev, update]);
-
-              handleMessage(update);
-            });
-        },
-
-        onDisconnect: () => {
-            console.log("Disconnected");
-          },
-      });
-    }
-
-    stompClient.activate();
-    clientRef.current = stompClient;
-
-
-    
-
-    // Cleanup on unmount
     return () => {
-      stompClient.deactivate();
+      if (subscription) subscription.unsubscribe();
     };
-  }, [gameId]);  
+  }, [isConnected, subscribe, publish, gameId, userId]);  
 
   const handleMessage = useCallback((message: Message) => {
     switch (message.type) {
@@ -481,7 +418,7 @@ const GamePage: React.FC = () => {
                 results={results?.userResults || []}
                 currentRound={currentRound}
                 maxRounds={maxRounds}
-                clientRef={clientRef.current}/>
+                publish={publish}/>
                 
     }
     else {

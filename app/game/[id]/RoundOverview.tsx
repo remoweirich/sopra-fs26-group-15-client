@@ -30,7 +30,6 @@ import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
-import { Client } from "@stomp/stompjs";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { RMap, RMarker } from "maplibre-react-components";
 //import { Message} from "@types/message";
@@ -38,6 +37,7 @@ import { Train } from "@/types/train";
 import { Round } from "@/types/round";
 import type { MessageType } from "@/types/messageType";
 import { User } from "@/types/user";
+import { Message } from "@/types/message";
 
 type UserResult = {
     userId: string;
@@ -53,10 +53,10 @@ interface RoundOverviewProps {
     results: UserResult[];
     currentRound: number | null;
     maxRounds: number | null;
-    clientRef: Client | null;
+    publish: (destination: string, body: Message) => void;
     }
 
-const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, clientRef }) => {   
+const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish }) => {   
     
     const { value: userId } = useLocalStorage<string>("userId", "1"); //hardcoded for testing, needs to be set later with login
     const { id: gameId } = useParams();
@@ -92,20 +92,12 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         }
         setReadyForNextRound(true);
 
-        if (!clientRef || !clientRef.connected) {
-            console.warn("WebSocket not connected yet");
-            return;
-    }
-
-        clientRef.publish({
-        destination: `/app/game/${gameId}/ready`,
-        body: JSON.stringify({
+        publish(`/app/game/${gameId}/ready`, {
             type: "READY_FOR_NEXT_ROUND",
             payload: {
                 userId: userId,
                 isReady: true
             }
-            })
         });
         console.log("Sent ready message for user" + userId)
     }
