@@ -37,42 +37,102 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
-//import { useWebSocket } from "@/hooks/useWebSocket";
-import { Lobby, WsMessage } from "@/types";
-import { Button, Spin } from "antd";
+import { useWebSocket } from "@/context/WebSocketContext";
+import { Lobby } from "@/types/lobby";
+import { LobbyMessage } from "@/types/lobbyMessage";
+import { Button } from "antd";
+import {validateStyleMin} from "@maplibre/maplibre-gl-style-spec";
 
 const LobbyWaitPage: React.FC = () => {
   const router     = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const lobbyId = Number(useParams().id);
   const apiService  = useApi();
-  const { value: token }    = useLocalStorage<string>("token", "");
-  const { value: userId }   = useLocalStorage<string>("userId", "");
+  const webSocket = useWebSocket();
 
-  const [lobby,   setLobby]   = useState<Lobby | null>(null);
+  //const token = JSON.parse(localStorage.getItem("token") || '""') as string;
+  //const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
+  const [userData, setUserData] = useState< {userId: number; token: string} | null>(null);
+  const [lobby, setLobby]   = useState<Lobby | null>(null);
+
+  useEffect(() => {
+    const storedToken = JSON.parse(localStorage.getItem("token") || '""');
+    const storedUserId = JSON.parse(localStorage.getItem("userId") || '0');
+    setUserData({ userId: storedUserId, token: storedToken });
+  }, []);
 
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
+    if (!lobbyId || !userData) return;
+
     const fetchLobby = async () => {
-      
+      try {
+        const response = await apiService.get<Lobby>(
+            `/lobbies/${lobbyId}`,
+            {
+              headers: {userId: userData.userId.toString(), token: userData.token},
+            }
+            );
+        console.log(response); //to be removed
+        setLobby(response);
+      } catch (e) {
+        console.error("Fetch error: ", e);
+      }
     };
+    fetchLobby();
+  }, [lobbyId, userData]);
 
-    if (id) fetchLobby();
-  }, [id]);
 
-  // ── WebSocket – live lobby updates ───────────────────────────────────────
-  
+  // ── Websocket fetch ────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!webSocket.isConnected || !lobbyId) return;
+
+    const subscription = webSocket.subscribe<LobbyMessage>(
+        `/topic/lobby/${lobbyId}`,
+        (message) => {
+          console.log(message);
+          if (message.type === "LOBBY_STATE") {
+            console.log("WebSocket Update received", message.payload);
+            setLobby(message.payload);
+          } else if (message.type === "GAME_START") {
+            console.log(" Started");
+            router.push(`/game/${lobbyId}`);
+          }
+          }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, [webSocket.isConnected, lobbyId]);
+
 
   // ── Actions ──────────────────────────────────────────────────────────────
   const handleStartGame = async () => {
-    router.push(`/game/${id}`); // TODO
+    if (!webSocket.isConnected) return;
+    console.log("Starting game");
+
+    const destination = `/app/lobby/${lobbyId}/start`;
+
+    const messageBody: LobbyMessage = {
+      type: "START_GAME",
+      payload: null
+    }
+
+    webSocket.publish(destination, messageBody);
   };
 
   const handleLeave = async () => {
     router.push("/lobbies"); // TODO: send leave request to backend, 
   };
 
+  const updateLobbySettings = async () => {
+
+  }
+
+  // Vor dem return in der Komponente:
+  const isHost = lobby && userData ? lobby.admin.userId === userData.userId : false;
+  console.log("mmmmmmmmmmmm: ", isHost, lobby, userData, lobby?.admin.userId === userData?.userId);
+
+  if (!lobby) return <div className="page-center">Laden...</div>;
   
 
   
@@ -80,44 +140,64 @@ const LobbyWaitPage: React.FC = () => {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="page-center page-content">
-      <div className="card card--wide">
+      <div className="page-center page-content">
+        <div className="card card--lobby-wait card--wide">
 
-        {/* Header row: lobby name + status badge */}
-        <div className="wait-header">
-          <h2>Lobby Name
-          </h2>
-          {/* TODO: badge-waiting "Waiting…" */}
-        </div>
+          {/* Header: Name + Status */}
+          <div className="wait-header">
+            <h2 className="wait-lobby-name">{lobby.lobbyName}</h2>
+            <span className="badge badge-waiting">Waiting...</span>
+          </div>
 
-        
+          {/* Player List Section */}
+          <div className="wait-section-label">
+            PLAYERS ({lobby.users?.length || 0} / {lobby.size})
+          </div>
 
-        <div className="u-divider" />
+          <div className="wait-player-list">
+            {lobby.users?.map((userDTO) => (
+                <div key={userDTO.username} className={`wait-player-row`}>
+                  {userDTO.username}
+                </div>
+            ))}
+          </div>
 
-        
+          <div className="u-divider" />
 
-        {/* Action buttons */}
-        <div className="wait-actions">
-          
+          {/* Invite Section */}
+          <div className="wait-section-label">INVITE FRIENDS</div>
+          <div className="wait-invite-box">
+            <code className="wait-invite-code">{lobby.lobbyCode}</code>
             <Button
-              type="primary"
-              className="btn-full"
-              onClick={handleStartGame}
+                size="small"
+                onClick={() => navigator.clipboard.writeText(lobby.lobbyCode)}
             >
-              Start Game 
+              Copy
             </Button>
-          
+          </div>
 
-          <Button
-            className="btn-ghost-muted btn-full"
-            onClick={handleLeave}
-          >
-            Leave lobby 
-          </Button>
+          {/* Action buttons */}
+          <div className="wait-actions">
+            {isHost && (
+                <Button
+                    type="primary"
+                    className="btn-full"
+                    onClick={handleStartGame}
+                >
+                  Start Game
+                </Button>
+            )}
+
+            <Button
+                className="btn-ghost-muted btn-full"
+                onClick={handleLeave}
+            >
+              {isHost ? "Leave & Transfer Host" : "Leave Lobby"}
+            </Button>
+          </div>
+
         </div>
-
       </div>
-    </div>
   );
 };
 

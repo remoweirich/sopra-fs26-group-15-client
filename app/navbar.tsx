@@ -1,21 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Badge, Input } from "antd";
-/*import {
-  BookOpen,
-  Trophy,
-  User,
-  LogOut,
-  Bell,
-  Search,
-} from "lucide-react";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import fetchUser from "@/users/[id]/page";
+import { ApiService } from "./api/apiService";
+import { MyUserDTO, UserDTO } from "./types/user";
+import { Bell, LogOut } from "lucide-react";
 
-To Do: Add icons
-
-*/
 // ---------------------------------------------------------------------------
 // GuessSBB SVG logo mark (simplified train-pin icon)
 // ---------------------------------------------------------------------------
@@ -34,20 +28,70 @@ function LogoMark() {
 
 // ---------------------------------------------------------------------------
 
-interface NavbarProps {
-  /** Pass to highlight the active link */
-  currentUser?: { id: number; username: string } | null;
-  notificationCount?: number;
-  onLogout?: () => void;
-}
 
-export default function Navbar({
-  currentUser,
-  notificationCount = 0,
-  onLogout,
-}: NavbarProps) {
+export default function Navbar() {
+
+  const [resolvedUser, setResolvedUser] = useState<{ userId: number; username: string } | null>(null);
+  const [notificationCount, setNotificationCount] = useState(3); // Placeholder for notification count, replace with actual logic to fetch count
+  const [showLinks, setShowLinks] = useState(false);
+
+
   const pathname = usePathname();
   const router = useRouter();
+  const apiService = new ApiService();
+
+
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem("token") || '""');
+const userId = JSON.parse(localStorage.getItem("userId") || "-1");
+    
+
+    console.log("Navbar - Retrieved token from localStorage:", token);
+    console.log("Navbar - Retrieved userId from localStorage:", userId);
+
+    
+
+    if (!token || userId === -1) {
+      setResolvedUser(null);
+      setShowLinks(true);
+      return;
+    }
+
+    const fetchAndSetUser = async () => {
+      try {
+        const userData = await apiService.get(
+          `/users/${Number(userId)}`,
+          {
+            headers: { token: token },
+          }) as MyUserDTO | UserDTO;
+        if ("email" in userData) {
+          setResolvedUser({ userId: userId, username: userData.username });
+        } else {
+          setResolvedUser(null);
+        }
+      }
+      catch (error) {
+        //console.error("Error fetching user data in Navbar:", error);
+        setResolvedUser(null);
+      }
+
+    };
+
+    fetchAndSetUser();
+    setShowLinks(true);
+  }, []);
+
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+
+    setResolvedUser(null);
+
+    router.push("/login");
+  };
+
 
   function handleLobbySearch(e: React.KeyboardEvent<HTMLInputElement>) {
     const value = (e.target as HTMLInputElement).value.trim();
@@ -72,45 +116,62 @@ export default function Navbar({
       </Link>
 
       {/* Primary links */}
-      <div className="navbar-links">
-        <Badge count={notificationCount} size="small" offset={[4, -2]}>
+      {showLinks && <div className="navbar-links">
+        {resolvedUser && <Badge count={notificationCount} size="small" offset={[4, -2]}>
           <button className="navbar-link" aria-label="Notifications">
+            <Bell size={20} /> {/* Hier wird das Icon angezeigt */}
           </button>
-        </Badge>
+        </Badge>}
 
         <Link href="/lobbies" className={linkClass("/lobbies")}>
-          Lobby
+          Lobbies
         </Link>
 
         <Link href="/leaderboard" className={linkClass("/leaderboard")}>
           Leaderboard
         </Link>
 
-        {currentUser && (
+        {resolvedUser && (
           <Link
-            href={`/users/${currentUser.id}`}
-            className={linkClass(`/users/${currentUser.id}`)}
+            href={`/users/${resolvedUser.userId}`}
+            className={linkClass(`/users/${resolvedUser.userId}`)}
           >
-            
-            {currentUser.username}
+            {resolvedUser.username}
           </Link>
         )}
-      </div>
 
-      {/* Right side */}
-      <div className="navbar-right">
-        {onLogout && (
+        {!resolvedUser && (
+          <Link href="/login" className={linkClass("/login")}>
+            Login
+          </Link>
+        )}
+
+        {!resolvedUser && (
+          <Link href="/register" className={linkClass("/register")}>
+            Register
+          </Link>
+        )}
+
+        {resolvedUser && (
           <button
             className="navbar-link"
-            onClick={onLogout}
+            onClick={handleLogout}
             aria-label="Logout"
+            title="Abmelden" // Zeigt Text an, wenn man mit der Maus drüberfährt
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }} // Optional: Styling für Ausrichtung
           >
-            
+            <LogOut size={20} />
+            {/* Wenn du NUR das Icon willst, lösch das Wort "Logout" hier einfach */}
           </button>
         )}
 
+      </div>}
+
+      {/* Right side */}
+      <div className="navbar-right">
+        
         <label className="navbar-lobby-search" htmlFor="lobby-id-search">
-          
+
           <input
             id="lobby-id-search"
             placeholder="Enter Lobby ID"

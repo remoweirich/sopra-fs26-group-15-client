@@ -60,11 +60,15 @@ export class ApiService {
    * @param endpoint - The API endpoint (e.g. "/users").
    * @returns JSON data of type T.
    */
-  public async get<T>(endpoint: string): Promise<T> {
+  public async get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
+
     const res = await fetch(url, {
+      ...options,
       method: "GET",
-      headers: this.defaultHeaders,
+      headers: {
+        ...this.defaultHeaders,
+        ...options.headers,}
     });
     return this.processResponse<T>(
       res,
@@ -78,11 +82,15 @@ export class ApiService {
    * @param data - The payload to post.
    * @returns JSON data of type T.
    */
-  public async post<T>(endpoint: string, data: unknown): Promise<T> {
+  public async post<T>(endpoint: string, data: unknown, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
+
     const res = await fetch(url, {
       method: "POST",
-      headers: this.defaultHeaders,
+      headers: {
+        ...this.defaultHeaders,
+        ...options.headers,
+      },
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -97,11 +105,14 @@ export class ApiService {
    * @param data - The payload to update.
    * @returns JSON data of type T.
    */
-  public async put<T>(endpoint: string, data: unknown): Promise<T> {
+  public async put<T>(endpoint: string, data: unknown, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "PUT",
-      headers: this.defaultHeaders,
+      headers: {
+        ...this.defaultHeaders,
+        ...options.headers,
+      },
       body: JSON.stringify(data),
     });
     return this.processResponse<T>(
@@ -115,11 +126,14 @@ export class ApiService {
    * @param endpoint - The API endpoint (e.g. "/users/123").
    * @returns JSON data of type T.
    */
-  public async delete<T>(endpoint: string): Promise<T> {
+  public async delete<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const res = await fetch(url, {
       method: "DELETE",
-      headers: this.defaultHeaders,
+      headers: {
+        ...this.defaultHeaders,
+        ...options.headers,
+      },
     });
     return this.processResponse<T>(
       res,
