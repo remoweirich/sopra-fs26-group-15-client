@@ -11,9 +11,10 @@ Classnames used:
 
 import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
+// import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form, Input } from "antd";
 import { UserAuthDTO, LoginPostDTO } from "@/types/user";
+import { useAuth } from "@/context/AuthContext";
 
 
 const Login: React.FC = () => {
@@ -21,8 +22,9 @@ const Login: React.FC = () => {
   const apiService = useApi();
   const [form] = Form.useForm();
 
-  const {set: setToken,  } = useLocalStorage<string>("token", "");
-  const {set: setUserId} = useLocalStorage<number>("userId", -1); 
+  // const {set: setToken,  } = useLocalStorage<string>("token", "");
+  // const {set: setUserId} = useLocalStorage<number>("userId", -1);
+  const {login} = useAuth(); 
 
   const handleLogin = async (values: LoginPostDTO) => {
       try {
@@ -31,8 +33,9 @@ const Login: React.FC = () => {
           password: values.password,
         }
         const response = await apiService.post<UserAuthDTO>("/login", loginCredentials)
-        setToken(response.token)
-        setUserId(response.userId)
+        // setToken(response.token)
+        // setUserId(response.userId)
+        await login(response.token, response.userId);
         router.push(`/users/${response.userId}`)
   
       } catch (error) {

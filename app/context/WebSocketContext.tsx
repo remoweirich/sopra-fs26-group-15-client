@@ -24,7 +24,14 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const credentials = useRef<{ userId: string; token: string } | null>(null);
 
   const connect = (userId: string, token: string) => {
-    if (stompClient.current?.active) return;
+    if (stompClient.current?.active && 
+      credentials.current?.userId === userId) {
+    return;
+  }
+  if (stompClient.current) {
+    console.log("Reconnecting with new credentials...");
+    stompClient.current.deactivate(); 
+  }
 
     credentials.current = {userId, token};
 

@@ -1,38 +1,5 @@
 "use client";
 
-/**
- * Lobby Wait Screen  –  route: /lobbies/[lobbyId]
- *
- * 
- * ─────────────────────────────────────────────────────────────────────────────
- * Layout (inside page-center):
- *   .card.card--lobby-wait
- *     .wait-header         →  lobby name  +  status badge ("Waiting…")
- *     .wait-meta           →  "5 rounds · Public"
- *     .wait-section-label  →  "PLAYERS (4/6)"
- *     .wait-player-list    →  .wait-player-row  ×N
- *     .u-divider
- *     .wait-section-label  →  "INVITE FRIENDS"
- *     .wait-invite-box     →  invite code + Copy button
- *     .wait-actions
- *       Button (primary, full)  →  "Start Game (N rounds)"   [host only]
- *       Button (ghost-muted)    →  "Leave lobby (host transfers)"
- *
- * Classnames for styling (all in globals.css):
- *   page-center
- *   card, card--lobby-wait
- *   wait-header, wait-lobby-name, wait-meta
- *   wait-section-label
- *   wait-player-list
- *   wait-player-row  (+ --host modifier for the host player)
- *   wait-player-avatar, wait-player-name, wait-player-status
- *   wait-invite-box, wait-invite-code
- *   wait-actions
- *   badge  badge-waiting | badge-public | badge-private | badge-host
- *   btn-full, btn-ghost-muted
- *   u-divider, u-section-label
- *
- */
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -40,50 +7,59 @@ import { useApi } from "@/hooks/useApi";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { Lobby } from "@/types/lobby";
 import { LobbyMessage } from "@/types/lobbyMessage";
-import { Button } from "antd";
-import {validateStyleMin} from "@maplibre/maplibre-gl-style-spec";
+import { App, Button} from "antd";
+import { useAuth } from "@/context/AuthContext";
+
 
 const LobbyWaitPage: React.FC = () => {
   const router     = useRouter();
-  const lobbyId = Number(useParams().id);
+  const params     = useParams();
+  const lobbyId = Number(params.id);
   const apiService  = useApi();
   const webSocket = useWebSocket();
+  const { message } = App.useApp();
 
   //const token = JSON.parse(localStorage.getItem("token") || '""') as string;
   //const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
-  const [userData, setUserData] = useState< {userId: number; token: string} | null>(null);
-  const [lobby, setLobby]   = useState<Lobby | null>(null);
+  const {user:currentUser, token} = useAuth();
+    const [lobby, setLobby]   = useState<Lobby | null>(null);
 
-  useEffect(() => {
-    const storedToken = JSON.parse(localStorage.getItem("token") || '""');
-    const storedUserId = JSON.parse(localStorage.getItem("userId") || '0');
-    setUserData({ userId: storedUserId, token: storedToken });
-  }, []);
+  
+  // const [userData, setUserData] = useState< {userId: number; token: string} | null>(null);
 
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!lobbyId || !userData) return;
+    if (!lobbyId || !token || !currentUser) return;
 
     const fetchLobby = async () => {
       try {
         const response = await apiService.get<Lobby>(
             `/lobbies/${lobbyId}`,
             {
-              headers: {userId: userData.userId.toString(), token: userData.token},
+              headers: {userId: currentUser.userId.toString(), token: token},
             }
             );
         console.log(response); //to be removed
         setLobby(response);
       } catch (e) {
         console.error("Fetch error: ", e);
+        router.push("/lobbies"); // If lobby not found or error occurs, navigate back to lobby list 
       }
     };
     fetchLobby();
-  }, [lobbyId, userData]);
+  }, [lobbyId, token, currentUser, router, apiService]);
 
 
   // ── Websocket fetch ────────────────────────────────────────────────────────
+  // 1. Zuerst: Ein Effekt, der die Verbindung bei Bedarf wiederherstellt (Refresh-Schutz)
+useEffect(() => {
+  if (!webSocket.isConnected && token && currentUser) {
+    console.log("WebSocket nicht verbunden - starte Reconnect...");
+    webSocket.connect(currentUser.userId.toString(), token);
+  }
+}, [webSocket.isConnected, token, currentUser, webSocket]);
+  
   useEffect(() => {
     if (!webSocket.isConnected || !lobbyId) return;
 
@@ -102,12 +78,14 @@ const LobbyWaitPage: React.FC = () => {
     );
 
     return () => subscription?.unsubscribe();
-  }, [webSocket.isConnected, lobbyId]);
+  }, [webSocket.isConnected, lobbyId, router, webSocket]);
 
 
   // ── Actions ──────────────────────────────────────────────────────────────
   const handleStartGame = async () => {
-    if (!webSocket.isConnected) return;
+    if (!webSocket.isConnected){
+      message.warning("Verbindung wird noch aufgebaut...");
+    return;}
     console.log("Starting game");
 
     const destination = `/app/lobby/${lobbyId}/start`;
@@ -121,7 +99,12 @@ const LobbyWaitPage: React.FC = () => {
   };
 
   const handleLeave = async () => {
-    router.push("/lobbies"); // TODO: send leave request to backend, 
+    //   if (!webSocket.isConnected){
+    //     antdMessage.warning("Verbindung wird noch aufgebaut...");
+    //     return;
+    //   }
+    //   webSocket.publish(`/app/lobby/${lobbyId}/leave`, {});
+    // router.push("/lobbies"); // TODO: send leave request to backend, 
   };
 
   const updateLobbySettings = async () => {
@@ -129,8 +112,7 @@ const LobbyWaitPage: React.FC = () => {
   }
 
   // Vor dem return in der Komponente:
-  const isHost = lobby && userData ? lobby.admin.userId === userData.userId : false;
-  console.log("mmmmmmmmmmmm: ", isHost, lobby, userData, lobby?.admin.userId === userData?.userId);
+  const isHost = lobby && currentUser ? lobby.admin?.userId === currentUser.userId : false;
 
   if (!lobby) return <div className="page-center">Laden...</div>;
   

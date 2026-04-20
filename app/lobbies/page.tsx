@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
+import { useAuth } from "@/context/AuthContext";
+// import useLocalStorage from "@/hooks/useLocalStorage";
 import { Lobby, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
+import { useWebSocket } from "@/context/WebSocketContext";
 import { Button, Spin, Modal, Tooltip } from "antd";
-import { UserAuthDTO, RegisterPostDTO } from "@/types/user";
+// import { UserAuthDTO, RegisterPostDTO } from "@/types/user";
 import { useLobbyActions } from "@/hooks/useLobbyActions";
 
 type PendingAction =
@@ -21,76 +23,77 @@ const LobbiesPage: React.FC = () => {
   const { handleJoin } = useLobbyActions();
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const { user: currentUser, token, login } = useAuth();
 
   const [loading, setLoading] = useState(true);
-  const [emptyLobbyList, setEmptyLobbyList] = useState(false);
-  const [hasCredentials, setHasCredentials] = useState<boolean>(false);
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
 
   const [inputCodes, setInputCodes] = useState<{ [key: number]: string }>({});
 
-  const { set: setLobbyCode } = useLocalStorage<string>("lobbyCode", "");
+  // const { set: setLobbyCode } = useLocalStorage<string>("lobbyCode", "");
 
 
   useEffect(() => {
 
     const fetchLobbies = async () => {
-      const lobby1: Lobby = {
-        lobbyId: 1,
-        lobbyName: "Lobby 1",
-        lobbyCode: "ABC123",
-        adminId: 123,
-        rounds: 3,
-        visibility: "PRIVATE",
-        lobbyState: "IN_GAME",
-        currentRound: 0,
-        scores: [1, 2, 3],
-        size: 5
-      };
-      const lobby2: Lobby = {
-        lobbyId: 2,
-        lobbyName: "Lobby 2",
-        lobbyCode: "ABC123",
-        adminId: 123,
-        rounds: 3,
-        visibility: "PRIVATE",
-        lobbyState: "WAITING",
-        currentRound: 0,
-        scores: [1, 2, 3],
-        size: 5
-      };
+      // const lobby1: Lobby = {
+      //   lobbyId: 1,
+      //   lobbyName: "Lobby 1",
+      //   lobbyCode: "ABC123",
+      //   adminId: 123,
+      //   rounds: 3,
+      //   visibility: "PRIVATE",
+      //   lobbyState: "IN_GAME",
+      //   currentRound: 0,
+      //   scores: [1, 2, 3],
+      //   size: 5
+      // };
+      // const lobby2: Lobby = {
+      //   lobbyId: 2,
+      //   lobbyName: "Lobby 2",
+      //   lobbyCode: "ABC123",
+      //   adminId: 123,
+      //   rounds: 3,
+      //   visibility: "PRIVATE",
+      //   lobbyState: "WAITING",
+      //   currentRound: 0,
+      //   scores: [1, 2, 3],
+      //   size: 5
+      // };
 
       try {
+        setLoading(true);
         const response = await apiService.get<Lobby[]>("/lobbies");
-        const combindesdLobbies = [...response, lobby1, lobby2];
+        // const combindesdLobbies = [...response, lobby1, lobby2];
         //setLobbies(combindesdLobbies); // Only for testing - replace with response when backend is ready
         setLobbies(response);
-
-        setLoading(false);
+        console.log(response); //to be removed
         console.log("Fetched lobbies:", response.length);
         if (response.length === 0) {
           console.log("No lobbies found.");
-          setEmptyLobbyList(true);
         }
       }
       catch (error) {
 
         console.error("Error fetching lobbies:", error);
       }
+      finally {
+        setLoading(false);
+      }
     };
 
     fetchLobbies();
 
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    // const token = localStorage.getItem("token");
+    // const userId = localStorage.getItem("userId");
 
-    setHasCredentials(!!token && !!userId);
+    // setHasCredentials(!!token && !!userId);
 
-  }, []);
+  }, [apiService, token]);
 
 
   const handleCreateNewLobby = () => {
-    if (hasCredentials) {
+    if (token) {
       router.push("/lobbies/newlobby");
     } else {
       setPendingAction({
@@ -102,7 +105,7 @@ const LobbiesPage: React.FC = () => {
 
   const handleJoinClick = (lobby: Lobby) => {
     const enteredCode = inputCodes[lobby.lobbyId] || lobby.lobbyCode;
-    if (hasCredentials) {
+    if (token) {
       handleJoin(lobby.lobbyId, { lobbyCode: enteredCode });
     } else {
       setPendingAction({
@@ -116,32 +119,40 @@ const LobbiesPage: React.FC = () => {
 
   const handleContinueAsGuest = async () => {
     if (!pendingAction) return;
-    if (pendingAction.type === "create") {
-
-      router.push("/lobbies/newlobby");
-
-    } else if (pendingAction.type === "join") {
-
-      await handleJoin(
-        pendingAction.lobbyId, { lobbyCode: pendingAction.lobbyCode }
-      );
-    }
+    const action = pendingAction;
 
     setIsAuthModalVisible(false);
     setPendingAction(null);
-  };
 
-  const createGuestCredentials = () => {
-    const values: RegisterPostDTO = {
-      username: "",
-      email: "",
-      password: "",
-      isGuest: true,
-      userBio: ""
-    };
+    if (action.type === "create") {
 
-    return values;
+      router.push("/lobbies/newlobby");
+
+    } else if (action.type === "join") {
+      try {
+        await handleJoin(
+          action.lobbyId, { lobbyCode: action.lobbyCode }
+        );
+      } catch (error) {
+        console.error("Guest join failed", error);
+
+      }
+    }
   }
+
+
+
+  // const createGuestCredentials = () => {
+  //   const values: RegisterPostDTO = {
+  //     username: "",
+  //     email: "",
+  //     password: "",
+  //     isGuest: true,
+  //     userBio: ""
+  //   };
+
+  //   return values;
+  // }
 
 
 
@@ -170,7 +181,7 @@ const LobbiesPage: React.FC = () => {
       {/* Lobby list */}
       {loading ? (
         <Spin />
-      ) : emptyLobbyList ? (
+      ) : lobbies.length === 0 ? (
         <div className="lobby-list">
           <p>No lobbies available.</p>
         </div>
@@ -183,7 +194,7 @@ const LobbiesPage: React.FC = () => {
                 <div className="lobby-row-info">
                   <div className="lobby-row-name">{lobby.lobbyName}</div>
                   <div className="lobby-row-meta">
-                    Host: {lobby.adminId} | Rounds: {lobby.rounds} | Visibility: {lobby.visibility}
+                    Host: {lobby.admin?.userId || "Unknown"} | Rounds: {lobby.rounds?.length || 0} | Visibility: {lobby.visibility}
                   </div>
                 </div>
               </div>
@@ -261,5 +272,6 @@ const LobbiesPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default LobbiesPage;

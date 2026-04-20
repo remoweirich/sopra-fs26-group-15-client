@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { ApiService } from "@/api/apiService";
 import { AuthContextType } from "@/types/auth";
+import { useRouter } from "next/navigation";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -14,6 +15,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<{ userId: number; username: string } | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
 
     const fetchUser = async (token: string, userId: number) => {
         try {
@@ -64,11 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    const login = (token: string, userId: number) => {
+    const login = async (token: string, userId: number) => {
         localStorage.setItem("token", JSON.stringify(token));
         localStorage.setItem("userId", JSON.stringify(userId));
         setToken(token);
-        fetchUser(token, userId);
+        await fetchUser(token, userId);
     };
 
     const logout = () => {
@@ -76,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("userId");
         setToken(null);
         setUser(null);
+        router.push("/login");
     };
 
     return (

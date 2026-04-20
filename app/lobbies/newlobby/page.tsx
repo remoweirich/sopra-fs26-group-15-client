@@ -1,41 +1,45 @@
 "use client";
 
 
-import { useState } from "react";
+// import { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
-import { Button, Form, Input, Radio, InputNumber } from "antd";
+// import useLocalStorage from "@/hooks/useLocalStorage";
+import { Button, Form, Input, Radio, InputNumber, App } from "antd";
 import { CreateLobbyPostDTO, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { useLobbyActions } from "@/hooks/useLobbyActions";
+import { useAuth } from "@/context/AuthContext";
 
 const NewLobbyPage: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm<CreateLobbyPostDTO>();
   const { handleJoin } = useLobbyActions();
+  const {message: antdMessage} = App.useApp();
+
+  const {user:currentUser, token, login} = useAuth();
 
 
 
   // ── Submit ──────────────────────────────────────────────────────────────
-  const handleCreate = async (createLobbyPostDTO: CreateLobbyPostDTO) => {
-    const rawToken = localStorage.getItem("token");
-    const token = rawToken ? JSON.parse(rawToken) : "";
+  const handleCreate = async (values: CreateLobbyPostDTO) => {
+  
+    // const rawToken = localStorage.getItem("token");
+    // const token = rawToken ? JSON.parse(rawToken) : "";
 
-    const rawUserId = localStorage.getItem("userId");
-    const userId = rawUserId ? JSON.parse(rawUserId) : -1;
+    // const rawUserId = localStorage.getItem("userId");
+    // const userId = rawUserId ? JSON.parse(rawUserId) : -1;
 
     const payload = {
-      lobbyName: createLobbyPostDTO.lobbyName,
-      size: Number(createLobbyPostDTO.size),
-      maxRounds: Number(createLobbyPostDTO.maxRounds),
+      lobbyName: values.lobbyName,
+      size: Number(values.size),
+      maxRounds: Number(values.maxRounds),
       // WICHTIG: Boolean zu Enum-String konvertieren
-      visibility: createLobbyPostDTO.visibility,
+      visibility: values.visibility,
     };
 
-    console.log("NewLobbyPage - Retrieved token from localStorage:", token);
-    console.log("NewLobbyPage - Retrieved userId from localStorage:", userId);
-    console.log("NewLobbyPage - Lobby creation data:", createLobbyPostDTO);
+    console.log(currentUser ? currentUser.userId.toString() : "-1")
 
     // Aufruf mit 3 Argumenten:
     const response = await apiService.post<LobbyAccessDTO>(
@@ -43,20 +47,21 @@ const NewLobbyPage: React.FC = () => {
       payload,      // 2. Data (Body) - schicke direkt das DTO
       {                        // 3. Options (Headers)
         headers: {
-          token: token,
-          userId: userId,
+          token: token ? token : "",
+          userId: currentUser ? currentUser.userId.toString() : "-1",
         },
       }
     );
 
-    localStorage.setItem("token", JSON.stringify(response.token));
-    localStorage.setItem("userId", JSON.stringify(response.userId));
+    // localStorage.setItem("token", JSON.stringify(response.token));
+    // localStorage.setItem("userId", JSON.stringify(response.userId));
+    await login(response.token, response.userId);
 
     const lobbyCodeDTO: LobbyCodeDTO = {
       lobbyCode: response.lobbyCode
     };
 
-    handleJoin(response.lobbyId, lobbyCodeDTO);
+    handleJoin(response.lobbyId, lobbyCodeDTO, {userId: response.userId, token: response.token});
 
   };
 

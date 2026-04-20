@@ -11,18 +11,17 @@ Classnames used:
 
 import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
+// import useLocalStorage from "@/hooks/useLocalStorage";
 import { RegisterPostDTO, UserAuthDTO, LoginPostDTO } from "@/types/user";
 import { Button, Form, Input } from "antd";
+import { useAuth } from "@/context/AuthContext";
 
 
 const Register: React.FC = () => {
+  const {login} = useAuth();
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm<RegisterPostDTO>();
-
-  const {set: setToken} = useLocalStorage<string>("token", "");
-  const {set: setUserId} = useLocalStorage<number>("userId", -1);
 
 
   const handleRegistration = async (values: RegisterPostDTO) => {
@@ -35,8 +34,9 @@ const Register: React.FC = () => {
         password: values.password,
       }
       const response = await apiService.post<UserAuthDTO>("/login", loginCredentials)
-      setToken(response.token)
-      setUserId(response.userId)
+      // setToken(response.token)
+      // setUserId(response.userId)
+      await login(response.token, response.userId);
 
       router.push(`/users/${response.userId}`)
 

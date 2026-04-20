@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import useLocalStorage from "@/hooks/useLocalStorage";
+// import useLocalStorage from "@/hooks/useLocalStorage";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
-import { fetchUser } from "@/utils/fetchUser";
-import { Button, Tabs, Input, Form } from "antd";
+// import { fetchUser } from "@/utils/fetchUser";
+import { Button, Tabs, Input, Form, App } from "antd";
+import { useAuth } from "@/context/AuthContext";
 
 // Dummy Game History
 const DUMMY_HISTORY = [
@@ -22,50 +23,54 @@ function formatNumber(n: number): string {
 }
 
 const Profile: React.FC = () => {
+  const {message} = App.useApp();
   const apiService = useApi();
   const router = useRouter();
   const profileId = Number(useParams().id);
-  const [user, setUser] = useState<MyUserDTO | UserDTO | null>(null);
+  // const [user, setUser] = useState<MyUserDTO | UserDTO | null>(null);
   const [editing, setEditing] = useState(false);
   const [form] = Form.useForm();
+  const { user: currentUser, token, login, isLoading } = useAuth();
 
+  const [profileData, setProfileData] = useState<MyUserDTO | UserDTO | null>(null);
 
+  const isOwnProfile = currentUser?.userId === profileId;
 
   useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("token") || '""') as string;
+    // const token = JSON.parse(localStorage.getItem("token") || '""') as string;
+    if (!token) return;
 
-    const fetchUser = async () => {
+
+
+    const loadProfile = async () => {
       try {
-        const userData = await apiService.get(
-          `/users/${Number(profileId)}`,
+        const data = await apiService.get<MyUserDTO | UserDTO>(
+          `/users/${profileId}`,
           {
             headers: { token: token },
           }
-        ) as MyUserDTO | UserDTO;
+        );
 
 
-        if ("email" in userData) {
-          return userData as MyUserDTO;
+        if ("email" in data) {
+          // Es ist ein MyUserDTO (wahrscheinlich mein eigenes Profil)
+          setProfileData(data as MyUserDTO);
         } else {
-          return userData as UserDTO;
-
+          // Es ist ein UserDTO (ein fremdes Profil)
+          setProfileData(data as UserDTO);
         }
       }
       catch (error) {
-        throw error
+        router.push("/lobbies");
+
       }
     }
 
-    fetchUser()
-      .then((data) => setUser(data))
-      .catch((error) => {
-        console.error("Failed to fetch user data:", error);
-        router.push("/login");
-      });
+    loadProfile();
 
-  }, [router]);
+  }, [profileId, token, router, apiService]);
 
-  if (!user) {
+  if (isLoading || !profileData) {
     return (
       <div className="page-center page-content">
         <p className="u-text-muted">Loading profile...</p>
@@ -73,16 +78,16 @@ const Profile: React.FC = () => {
     );
   }
 
-  const initial = user.username ? user.username[0].toUpperCase() : "?";
-  const creationDate = user.creationDate
-    ? new Date(user.creationDate).toLocaleDateString("de-CH", {
+  const initial = profileData.username ? profileData.username[0].toUpperCase() : "?";
+  const creationDate = profileData.creationDate
+    ? new Date(profileData.creationDate).toLocaleDateString("de-CH", {
       day: "2-digit",
       month: "long",
       year: "numeric",
     })
     : "";
 
-  const scoreboard = user.userScoreboard;
+  const scoreboard = profileData.userScoreboard;
   const totalPoints = scoreboard?.totalPoints ?? 0;
   const gamesPlayed = scoreboard?.gamesPlayed ?? 0;
   const gamesWon = scoreboard?.gamesWon ?? 0;
@@ -91,29 +96,48 @@ const Profile: React.FC = () => {
   const winRate = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
 
   const handleEdit = () => {
-    form.setFieldsValue({
-      username: user.username,
-      userBio: user.userBio || "",
-      password: "",
-    });
-    setEditing(true);
+    // Wir nehmen die Daten von profileData (dem User, den wir gerade sehen)
+    if (profileData) {
+      form.setFieldsValue({
+        username: profileData.username,
+        userBio: profileData.userBio || "",
+        password: "", // Passwort bleibt leer zur Sicherheit
+      });
+      setEditing(true);
+    }
   };
 
-  const handleSave = async (values: { username: string; userBio: string; password: string }) => {
-    /*try {
-      await apiService.put(`/users/${Number(profileId)}`, {
-        username: values.username,
-        userBio: values.userBio,
-        password: values.password || undefined,
-        email: user.email,
-        userId: Number(userId),
-        token: token,
-      });
-      setUser({ ...user, username: values.username, userBio: values.userBio });
+  const handleSave = async (values: any) => {
+    if (!token) return;
+
+    try {
+      await apiService.put(`/users/${profileId}`, {
+        ...values,
+        token: token, // Falls deine API das im Body braucht
+      }, { headers: { token: token ?? undefined } });
+
+      message.success("Profil aktualisiert!");
+
+      const updatedData = {...profileData, ...values };
+      setProfileData(updatedData);
+
+      form.setFieldsValue(updatedData);
+
+      // Seite neu laden oder State updaten
       setEditing(false);
+
+      if (isOwnProfile && values.username) {
+        await login(token, profileId);
+       // Hier müsstest du deine login-Logik aus dem Context evtl. erweitern
+       // oder einfach die Seite refreshen, falls der Context das noch nicht kann.
+    }
+
+      // Profi-Tipp: Wenn der Username geändert wurde, 
+      // müsste man hier eigentlich login(token, profileId) nochmal triggern
+      // um den globalen Context (Navbar!) zu aktualisieren.
     } catch (error) {
-      console.error("Update failed:", error);
-    }*/
+      message.error("Update fehlgeschlagen.");
+    }
   };
 
   return (
@@ -129,8 +153,8 @@ const Profile: React.FC = () => {
             <div className="profile-online-dot" />
           </div>
           <div className="profile-header-info">
-            <h2 className="profile-username">{user.username}</h2>
-            {user.userBio && <p className="profile-bio">{user.userBio}</p>}
+            <h2 className="profile-username">{profileData.username}</h2>
+            {profileData.userBio && <p className="profile-bio">{profileData.userBio}</p>}
             <div className="profile-meta-row">
               <span className="badge badge-online">Online</span>
               {creationDate && (
@@ -138,14 +162,15 @@ const Profile: React.FC = () => {
               )}
             </div>
           </div>
-          {!editing ? (
+          {isOwnProfile &&(
+            !editing ? (
             <Button className="profile-edit-btn" size="middle" onClick={handleEdit}>
               ⚙️ Edit
             </Button>
           ) : (
             <Button className="profile-edit-btn" size="middle" onClick={() => setEditing(false)}>
               ⊘ Close
-            </Button>
+            </Button>)
           )}
         </div>
 
@@ -259,7 +284,7 @@ const Profile: React.FC = () => {
               },
               {
                 key: "friends",
-                label: `Friends (${user.friends?.length ?? 0})`,
+                label: `Friends (${profileData.friends?.length ?? 0})`,
                 children: <p className="u-text-muted">No friends yet.</p>,
               },
               {

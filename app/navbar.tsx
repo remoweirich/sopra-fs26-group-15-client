@@ -4,11 +4,10 @@ import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Badge, Input } from "antd";
-import useLocalStorage from "@/hooks/useLocalStorage";
-import fetchUser from "@/users/[id]/page";
 import { ApiService } from "./api/apiService";
 import { MyUserDTO, UserDTO } from "./types/user";
 import { Bell, LogOut } from "lucide-react";
+import { useAuth } from "./context/AuthContext";
 
 // ---------------------------------------------------------------------------
 // GuessSBB SVG logo mark (simplified train-pin icon)
@@ -31,66 +30,66 @@ function LogoMark() {
 
 export default function Navbar() {
 
-  const [resolvedUser, setResolvedUser] = useState<{ userId: number; username: string } | null>(null);
+  // const [resolvedUser, setResolvedUser] = useState<{ userId: number; username: string } | null>(null);
   const [notificationCount, setNotificationCount] = useState(3); // Placeholder for notification count, replace with actual logic to fetch count
-  const [showLinks, setShowLinks] = useState(false);
-
+  // const [showLinks, setShowLinks] = useState(false);
+  const{user,logout,isLoading} = useAuth();
 
   const pathname = usePathname();
   const router = useRouter();
-  const apiService = new ApiService();
+  // const apiService = new ApiService();
 
 
-  useEffect(() => {
-    const token = JSON.parse(localStorage.getItem("token") || '""');
-const userId = JSON.parse(localStorage.getItem("userId") || "-1");
+//   useEffect(() => {
+//     const token = JSON.parse(localStorage.getItem("token") || '""');
+// const userId = JSON.parse(localStorage.getItem("userId") || "-1");
     
 
-    console.log("Navbar - Retrieved token from localStorage:", token);
-    console.log("Navbar - Retrieved userId from localStorage:", userId);
+//     console.log("Navbar - Retrieved token from localStorage:", token);
+//     console.log("Navbar - Retrieved userId from localStorage:", userId);
 
     
 
-    if (!token || userId === -1) {
-      setResolvedUser(null);
-      setShowLinks(true);
-      return;
-    }
+//     if (!token || userId === -1) {
+//       setResolvedUser(null);
+//       setShowLinks(true);
+//       return;
+//     }
 
-    const fetchAndSetUser = async () => {
-      try {
-        const userData = await apiService.get(
-          `/users/${Number(userId)}`,
-          {
-            headers: { token: token },
-          }) as MyUserDTO | UserDTO;
-        if ("email" in userData) {
-          setResolvedUser({ userId: userId, username: userData.username });
-        } else {
-          setResolvedUser(null);
-        }
-      }
-      catch (error) {
-        //console.error("Error fetching user data in Navbar:", error);
-        setResolvedUser(null);
-      }
+//     const fetchAndSetUser = async () => {
+//       try {
+//         const userData = await apiService.get(
+//           `/users/${Number(userId)}`,
+//           {
+//             headers: { token: token },
+//           }) as MyUserDTO | UserDTO;
+//         if ("email" in userData) {
+//           setResolvedUser({ userId: userId, username: userData.username });
+//         } else {
+//           setResolvedUser(null);
+//         }
+//       }
+//       catch (error) {
+//         //console.error("Error fetching user data in Navbar:", error);
+//         setResolvedUser(null);
+//       }
 
-    };
+//     };
 
-    fetchAndSetUser();
-    setShowLinks(true);
-  }, []);
+//     fetchAndSetUser();
+//     setShowLinks(true);
+//   }, []);
 
 
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("userId");
 
-    setResolvedUser(null);
+  //   setResolvedUser(null);
 
-    router.push("/login");
-  };
+  //   router.push("/login");
+  // };
 
 
   function handleLobbySearch(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -111,13 +110,13 @@ const userId = JSON.parse(localStorage.getItem("userId") || "-1");
       <Link href="/" className="navbar-brand">
         <LogoMark />
         <span className="navbar-brand-text">
-          Guess<span>SBB</span>
+          Gues<span>SBB</span>
         </span>
       </Link>
 
       {/* Primary links */}
-      {showLinks && <div className="navbar-links">
-        {resolvedUser && <Badge count={notificationCount} size="small" offset={[4, -2]}>
+      {!isLoading && <div className="navbar-links">
+        {user && <Badge count={notificationCount} size="small" offset={[4, -2]}>
           <button className="navbar-link" aria-label="Notifications">
             <Bell size={20} /> {/* Hier wird das Icon angezeigt */}
           </button>
@@ -131,31 +130,31 @@ const userId = JSON.parse(localStorage.getItem("userId") || "-1");
           Leaderboard
         </Link>
 
-        {resolvedUser && (
+        {user && (
           <Link
-            href={`/users/${resolvedUser.userId}`}
-            className={linkClass(`/users/${resolvedUser.userId}`)}
+            href={`/users/${user.userId}`}
+            className={linkClass(`/users/${user.userId}`)}
           >
-            {resolvedUser.username}
+            {user.username}
           </Link>
         )}
 
-        {!resolvedUser && (
+        {!user && (
           <Link href="/login" className={linkClass("/login")}>
             Login
           </Link>
         )}
 
-        {!resolvedUser && (
+        {!user && (
           <Link href="/register" className={linkClass("/register")}>
             Register
           </Link>
         )}
 
-        {resolvedUser && (
+        {user && (
           <button
             className="navbar-link"
-            onClick={handleLogout}
+            onClick={logout}
             aria-label="Logout"
             title="Abmelden" // Zeigt Text an, wenn man mit der Maus drüberfährt
             style={{ display: 'flex', alignItems: 'center', gap: '8px' }} // Optional: Styling für Ausrichtung
