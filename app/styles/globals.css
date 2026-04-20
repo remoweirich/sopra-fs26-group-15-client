@@ -2021,3 +2021,267 @@ html, body {
     font-size: 13px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   18. LEADERBOARD PAGE  (/leaderboard)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .leaderboard-wrapper         – max-width content column
+   .leaderboard-title           – "🏆 Leaderboard" h1
+   .leaderboard-subtitle        – muted p below title
+   .leaderboard-search          – white pill input for player search
+   .leaderboard-search-icon     – magnifier icon inside the pill
+   .leaderboard-search-input    – raw <input> inside the pill
+   .leaderboard-guest-banner    – red-tinted banner prompting guest to sign up
+   .leaderboard-guest-banner-link – red "Sign up →" link inside the banner
+
+   .leaderboard-list            – white rounded container wrapping the rows
+   .leaderboard-empty           – empty-state message inside the list
+
+   .leaderboard-row             – one player row (to be filled by Claude Stark)
+   .leaderboard-row--you        – variant: red-tinted row for the current user
+   .leaderboard-rank            – rank number cell (plain, for rank ≥ 4)
+   .leaderboard-rank--medal     – bigger rank cell (for top 3 with emoji)
+   .leaderboard-player-info     – flex column with name + meta
+   .leaderboard-name            – player username
+   .leaderboard-meta            – "47 games · Ø 892 pts" mono line
+   .leaderboard-score           – right-aligned total points
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.leaderboard-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--sp-xl) 0 var(--sp-2xl);
+}
+
+.leaderboard-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--black);
+  margin: 0 0 var(--sp-xs);
+  letter-spacing: -0.02em;
+}
+
+.leaderboard-subtitle {
+  font-size: 15px;
+  color: var(--gray-mid);
+  margin: 0 0 var(--sp-lg);
+}
+
+/* ── Search pill ─────────────────────────────────────────────────────── */
+.leaderboard-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--gray-border);
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+  margin-bottom: var(--sp-md);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s;
+  cursor: text;
+}
+
+.leaderboard-search:focus-within {
+  border-color: var(--gray-mid);
+}
+
+.leaderboard-search-icon {
+  color: var(--gray-light);
+  flex-shrink: 0;
+}
+
+.leaderboard-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  color: var(--black);
+  font-family: inherit;
+}
+
+.leaderboard-search-input::placeholder {
+  color: var(--gray-light);
+}
+
+/* ── Guest banner ─────────────────────────────────────────────────────── */
+.leaderboard-guest-banner {
+  padding: var(--sp-md) var(--sp-lg);
+  background: var(--red-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-md);
+  text-align: center;
+  font-size: 14px;
+  color: var(--gray-dark);
+}
+
+.leaderboard-guest-banner-link {
+  color: var(--red);
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 4px;
+  text-decoration: none;
+}
+
+.leaderboard-guest-banner-link:hover {
+  color: var(--red);
+  text-decoration: underline;
+}
+
+/* ── List container ───────────────────────────────────────────────────── */
+.leaderboard-list {
+  background: var(--bg-surface);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.leaderboard-empty {
+  padding: var(--sp-2xl) var(--sp-lg);
+  text-align: center;
+  color: var(--gray-light);
+  font-size: 14px;
+}
+
+/* ── Single player row ─────────────────────────────────────────────────
+   Classes used by Claude Stark when he maps over fetched data.
+   ──────────────────────────────────────────────────────────────────── */
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-md) var(--sp-lg);
+  gap: var(--sp-md);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-top: 1px solid var(--gray-border);
+}
+
+/* First row has no top border */
+.leaderboard-row:first-child {
+  border-top: none;
+}
+
+.leaderboard-row:hover {
+  background: var(--bg-subtle);
+}
+
+/* Highlighted row for current user */
+.leaderboard-row--you {
+  background: var(--red-light);
+}
+
+.leaderboard-row--you:hover {
+  background: var(--red-light);
+}
+
+.leaderboard-rank {
+  width: 40px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gray-light);
+  flex-shrink: 0;
+}
+
+/* Bigger variant for top 3 with medal emoji */
+.leaderboard-rank--medal {
+  font-size: 22px;
+}
+
+.leaderboard-player-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+}
+
+.leaderboard-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.leaderboard-meta {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  color: var(--gray-light);
+  margin-top: 2px;
+}
+
+.leaderboard-score {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--black);
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   19. LEADERBOARD RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet (≤ 768px) */
+@media (max-width: 768px) {
+  .leaderboard-wrapper {
+    padding: var(--sp-lg) 0 var(--sp-xl);
+  }
+
+  .leaderboard-title {
+    font-size: 28px;
+  }
+
+  .leaderboard-subtitle {
+    font-size: 14px;
+  }
+
+  .leaderboard-row {
+    padding: var(--sp-sm) var(--sp-md);
+    gap: var(--sp-sm);
+  }
+
+  .leaderboard-rank {
+    width: 32px;
+  }
+
+  .leaderboard-score {
+    font-size: 15px;
+  }
+}
+
+/* Mobile (≤ 480px) — stack name info under the rank */
+@media (max-width: 480px) {
+  .leaderboard-title {
+    font-size: 24px;
+  }
+
+  .leaderboard-search {
+    padding: 8px 14px;
+  }
+
+  .leaderboard-player-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .leaderboard-name {
+    font-size: 14px;
+  }
+
+  .leaderboard-meta {
+    font-size: 10px;
+  }
+
+  .leaderboard-rank--medal {
+    font-size: 20px;
+  }
+}
