@@ -606,10 +606,21 @@ html, body {
   border-radius: var(--radius-md);
   border: 1px solid var(--gray-border);
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.15s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 
-.lobby-row:hover { box-shadow: var(--shadow-elevated); }
+.lobby-row:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.lobby-row--ingame {
+  opacity: 0.55;
+}
+.lobby-row--ingame:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
 
 .lobby-row-left {
   display: flex;
@@ -632,15 +643,12 @@ html, body {
 .lobby-row-info { min-width: 0; }
 
 .lobby-row-name {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--black);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-sm);
 }
 
 .lobby-row-meta {
@@ -657,12 +665,55 @@ html, body {
 }
 
 .lobby-row-players {
-  font-size: 13px;
-  color: var(--gray-mid);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  white-space: nowrap;
+}
+
+/* Header row inside .lobby-row-info: emoji + name + badge */
+.lobby-row-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  white-space: nowrap;
+  gap: var(--sp-sm);
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.lobby-row-visibility {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Private-lobby code input (replaces inline styles from old JSX) */
+.lobby-code-input {
+  border: 1px solid var(--gray-border);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  color: var(--gray-dark);
+  outline: none;
+  width: 140px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.lobby-code-input:focus {
+  border-color: var(--gray-mid);
+  background: var(--bg-surface);
+}
+
+.lobby-code-input::placeholder {
+  color: var(--gray-light);
+}
+
+/* Pill-shaped Join + "New Lobby" buttons */
+.lobby-row-join-btn.ant-btn,
+.lobby-new-btn.ant-btn {
+  border-radius: var(--radius-pill) !important;
 }
 
 
@@ -687,7 +738,7 @@ html, body {
 
 .wait-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--sp-sm);
   margin-bottom: var(--sp-sm);
@@ -799,6 +850,50 @@ html, body {
   flex-direction: column;
   gap: var(--sp-sm);
   margin-top: var(--sp-md);
+}
+
+/* Meta badge row below the header (rounds + visibility) */
+.wait-meta-row {
+  display: flex;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-lg);
+  flex-wrap: wrap;
+}
+
+/* Avatar colour variants */
+.wait-player-avatar--host {
+  background: var(--red);
+  color: #ffffff;
+}
+
+.wait-player-avatar--guest {
+  background: var(--gray-border);
+  color: var(--gray-dark);
+}
+
+/* Info box shown to non-host players ("Waiting for host…") */
+.wait-waiting-box {
+  padding: var(--sp-md);
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 14px;
+  color: var(--gray-mid);
+  font-weight: 500;
+}
+
+/* Pill-shape Copy button inside the invite box */
+.wait-invite-copy-btn.ant-btn {
+  border-radius: var(--radius-pill) !important;
+  min-width: 80px;
+  font-weight: 600;
+}
+
+/* Start-game button: slightly more prominent height + weight */
+.wait-start-btn.ant-btn {
+  height: 48px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
 }
 
 
@@ -1384,6 +1479,11 @@ html, body {
 .badge-host    { background: var(--red-light); color: var(--red);    }
 .badge-public  { background: var(--blue-bg);   color: var(--blue);   }
 .badge-private { background: #F3F3F3;           color: var(--gray-mid); }
+/* Inactive / dimmed variant (e.g. "In Game" lobbies) */
+.badge-inactive {
+  background: #F3F3F3;
+  color: var(--gray-mid);
+}
 
 .badge-online {
   background: var(--green-bg);
@@ -1594,14 +1694,15 @@ html, body {
   overflow: hidden;
 }
 
+/* Mountains: dekorativer Hintergrund unten */
 .home-hero-mountains {
   position: absolute;
-  bottom: -20px;
+  bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
-  height: auto;
-  opacity: 0.8;
+  height: 180px;              /* feste Höhe statt aspect-ratio-Verzerrung */
+  opacity: 0.85;
   pointer-events: none;
   z-index: 0;
 }
@@ -1611,21 +1712,72 @@ html, body {
   z-index: 1;
 }
 
+/* Illustration: Pin + Train nebeneinander, zentriert */
 .home-hero-illustration {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  gap: var(--sp-md);
+  margin: 0 auto var(--sp-lg);
   position: relative;
-  margin-bottom: var(--sp-md);
 }
 
+/* Pin-Wrapper: hübsche Bounce-Animation */
+.home-hero-pin {
+  animation:
+    home-pin-drop   0.6s ease-out 1.7s both,
+    home-pin-bounce 2.4s ease-in-out 2.3s infinite;
+  filter: drop-shadow(0 6px 8px rgba(227, 6, 19, 0.25));
+  flex-shrink: 0;
+}
+
+@keyframes home-pin-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* Sonne: fadet von unten nach oben ein */
+.home-hero-sun {
+  animation: home-sun-rise 0.8s ease-out 0s both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes home-sun-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Zug: fährt von links herein */
+@keyframes home-train-drive {
+  from { opacity: 0; transform: translateX(-180px) rotate(-4deg); }
+  to   { opacity: 1; transform: translateX(0)      rotate(-4deg); }
+}
+
+/* Pin: fällt von oben herunter, mit kleinem Overshoot */
+@keyframes home-pin-drop {
+  0%   { opacity: 0; transform: translateY(-60px); }
+  70%  { opacity: 1; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Train: jetzt inline-item, kein absolute mehr */
 .home-hero-train {
-  width: 120px;
+  width: 160px;
   height: auto;
-  position: absolute;
-  top: -10px;
-  right: -70px;
-  transform: rotate(-5deg);
-  opacity: 0.9;
+  flex-shrink: 0;
+  transform: rotate(-4deg);
+  animation: home-train-drive 0.9s ease-out 0.8s both;
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-pin,
+  .home-hero-train,
+  .home-hero-sun {
+    animation: none;
+  }
 }
 
 .home-hero-title {
@@ -1774,9 +1926,8 @@ html, body {
     font-size: 56px;
   }
 
-  .home-hero-train {
-    width: 90px;
-    right: -50px;
+    .home-hero-train {
+    width: 130px;
   }
 }
 
@@ -1799,9 +1950,17 @@ html, body {
     margin-bottom: var(--sp-md);
   }
 
-  /* Hide the train illustration — it overflows on narrow screens */
+ /* Train wird kleiner, aber bleibt sichtbar */
   .home-hero-train {
-    display: none;
+    width: 100px;
+  }
+
+  .home-hero-illustration {
+    gap: var(--sp-sm);
+  }
+
+  .home-hero-mountains {
+    height: 120px;
   }
 
   /* Stats bar: stack vertically */
@@ -2284,4 +2443,118 @@ html, body {
   .leaderboard-rank--medal {
     font-size: 20px;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   20. NEW LOBBY FORM (/lobbies/newlobby)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .card--lobby-form   – more generous padding than the base .card--form
+   .lobby-form-number  – constrain InputNumber to a reasonable width
+   .lobby-form-tiles   – flex row of radio-tile buttons
+   .lobby-form-tile    – single tile (overrides AntD's default radio styling)
+   .lobby-form-tile--round – round-number tile (mono font, large)
+   .lobby-form-tile--vis   – visibility tile (emoji + label + desc stacked)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* More generous padding for this specific form (prototype uses ~44px) */
+.card--lobby-form {
+  padding: var(--sp-xl) var(--sp-lg);
+}
+
+/* InputNumber: same visual weight as the text Input above it */
+.lobby-form-number.ant-input-number {
+  width: 100%;
+}
+
+/* Tiles wrapper: equal-width flex row */
+.lobby-form-tiles.ant-radio-group {
+  display: flex !important;
+  gap: var(--sp-sm);
+  width: 100%;
+}
+
+/* ── Tile base (overrides AntD Radio defaults) ───────────────────────────── */
+.lobby-form-tile.ant-radio-wrapper {
+  flex: 1;
+  margin: 0 !important;              /* kill AntD's inline margin */
+  padding: var(--sp-md);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--gray-border);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide the actual radio circle — the whole tile is the click target */
+.lobby-form-tile.ant-radio-wrapper .ant-radio {
+  display: none !important;
+}
+
+/* The label span inside AntD Radio: make it fill the tile */
+.lobby-form-tile.ant-radio-wrapper > span:not(.ant-radio) {
+  padding: 0 !important;
+  width: 100%;
+  display: block;
+}
+
+/* Hover lift for un-selected tiles */
+.lobby-form-tile.ant-radio-wrapper:hover {
+  border-color: var(--gray-mid);
+}
+
+/* Selected state: red border + red-tinted background */
+.lobby-form-tile.ant-radio-wrapper-checked {
+  border-color: var(--red) !important;
+  background: var(--red-light) !important;
+}
+
+/* ── Round-number tile variant ───────────────────────────────────────────── */
+.lobby-form-tile--round > span:not(.ant-radio) {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.lobby-form-tile--round.ant-radio-wrapper-checked > span:not(.ant-radio) {
+  color: var(--red);
+}
+
+/* ── Visibility tile variant (emoji + label + desc stacked) ──────────────── */
+.lobby-form-tile--vis {
+  padding: var(--sp-md) var(--sp-sm) !important;
+}
+
+.lobby-form-tile--vis > span:not(.ant-radio) {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.lobby-form-tile-emoji {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.lobby-form-tile-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.lobby-form-tile--vis.ant-radio-wrapper-checked .lobby-form-tile-label {
+  color: var(--red);
+}
+
+.lobby-form-tile-desc {
+  font-size: 11px;
+  color: var(--gray-light);
+  font-weight: 500;
 }

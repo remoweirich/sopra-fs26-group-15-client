@@ -17,35 +17,155 @@ import { Button } from "antd";
 
 // ─── SVG Illustrations (inline, decorative only) ────────────────────────────
 const PinIcon = ({ size = 64 }: { size?: number }) => (
-  <svg width={size} height={size * 1.25} viewBox="0 0 24 30" fill="none" aria-hidden="true">
-    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 18 12 18s12-9 12-18C24 5.37 18.63 0 12 0z" fill="#E30613" />
-    <circle cx="12" cy="12" r="5" fill="#FFFFFF" />
-    <circle cx="12" cy="12" r="2.5" fill="#E30613" />
+  <svg
+    width={size}
+    height={size * 1.25}
+    viewBox="0 0 48 60"
+    fill="none"
+    aria-hidden="true"
+  >
+    <defs>
+      <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#FF1A2B" />
+        <stop offset="100%" stopColor="#C00010" />
+      </linearGradient>
+    </defs>
+    {/* Bodenschatten – lässt den Pin "stehen" */}
+    <ellipse cx="24" cy="57" rx="7" ry="1.8" fill="rgba(0,0,0,0.2)" />
+    {/* Pin-Körper mit Gradient */}
+    <path
+      d="M24 2C13.5 2 5 10.5 5 21c0 13 19 33 19 33s19-20 19-33c0-10.5-8.5-19-19-19z"
+      fill="url(#pinGrad)"
+    />
+    {/* Weißer Ring */}
+    <circle cx="24" cy="21" r="7.5" fill="#FFFFFF" />
+    {/* Roter Punkt in der Mitte */}
+    <circle cx="24" cy="21" r="3.5" fill="#E30613" />
+    {/* Subtiler Glanz oben links */}
+    <path
+      d="M15 12 Q14 8, 19 6"
+      stroke="rgba(255,255,255,0.45)"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      fill="none"
+    />
   </svg>
 );
 
 const TrainIllustration = () => (
-  <svg viewBox="0 0 120 80" fill="none" aria-hidden="true" className="home-hero-train">
-    <rect x="10" y="20" width="100" height="40" rx="8" fill="#E30613" />
-    <rect x="14" y="26" width="22" height="16" rx="4" fill="#FFFFFF" opacity="0.9" />
-    <rect x="42" y="26" width="22" height="16" rx="4" fill="#FFFFFF" opacity="0.9" />
-    <rect x="70" y="26" width="22" height="16" rx="4" fill="#FFFFFF" opacity="0.9" />
-    <rect x="96" y="30" width="12" height="8" rx="2" fill="#FFFFFF" opacity="0.6" />
-    <circle cx="30" cy="64" r="6" fill="#2D2D2D" />
-    <circle cx="30" cy="64" r="3" fill="#C4C4C4" />
-    <circle cx="80" cy="64" r="6" fill="#2D2D2D" />
-    <circle cx="80" cy="64" r="3" fill="#C4C4C4" />
-    <rect x="5" y="58" width="110" height="4" rx="2" fill="#2D2D2D" />
-    <path d="M2 16L10 20" stroke="#E30613" strokeWidth="2" strokeLinecap="round" />
-    <path d="M6 10L10 22" stroke="#E30613" strokeWidth="2" strokeLinecap="round" />
+  <svg
+    viewBox="0 0 160 100"
+    fill="none"
+    aria-hidden="true"
+    className="home-hero-train"
+    preserveAspectRatio="xMidYMid meet"
+  >
+    <defs>
+      <linearGradient id="trainBody" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#FF1A2B" />
+        <stop offset="100%" stopColor="#C00010" />
+      </linearGradient>
+      <linearGradient id="windowGlass" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#E8F4FF" />
+        <stop offset="100%" stopColor="#B8D8F0" />
+      </linearGradient>
+    </defs>
+
+    {/* Motion Lines links (Speed-Effekt) */}
+    <g opacity="0.5" stroke="#E30613" strokeLinecap="round">
+      <path d="M2 35 L14 35" strokeWidth="2" />
+      <path d="M0 48 L12 48" strokeWidth="2.5" />
+      <path d="M4 61 L16 61" strokeWidth="2" />
+    </g>
+
+    {/* Schatten unter Zug */}
+    <ellipse cx="88" cy="88" rx="60" ry="3" fill="rgba(0,0,0,0.15)" />
+
+    {/* Hauptkorpus */}
+    <rect x="24" y="28" width="120" height="50" rx="10" fill="url(#trainBody)" />
+
+    {/* Abgerundete Nase vorne (rechts) */}
+    <path d="M144 35 Q156 52, 144 72 Z" fill="#B80010" />
+
+    {/* Oberer dunkler Streifen (SBB-Dach) */}
+    <rect x="24" y="28" width="120" height="6" rx="10" fill="rgba(0,0,0,0.18)" />
+
+    {/* Drei Passagierfenster */}
+    <rect x="34" y="42" width="26" height="16" rx="2" fill="url(#windowGlass)" />
+    <rect x="64" y="42" width="26" height="16" rx="2" fill="url(#windowGlass)" />
+    <rect x="94" y="42" width="26" height="16" rx="2" fill="url(#windowGlass)" />
+    {/* Führerstand-Fenster (schräg) */}
+    <path d="M126 42 L138 42 Q142 48, 138 58 L126 58 Z" fill="url(#windowGlass)" />
+
+    {/* SBB-Logo-Quadrat */}
+    <rect x="40" y="64" width="14" height="10" rx="1.5" fill="#FFFFFF" />
+    <text x="47" y="72" textAnchor="middle" fontSize="6" fontWeight="900" fill="#E30613">
+      SBB
+    </text>
+
+    {/* Türlinien */}
+    <line x1="92" y1="60" x2="92" y2="75" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
+    <line x1="122" y1="60" x2="122" y2="75" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
+
+    {/* Zwei Drehgestelle mit Rädern */}
+    <g>
+      <circle cx="48" cy="82" r="7" fill="#1A1A1A" />
+      <circle cx="48" cy="82" r="3.5" fill="#888" />
+      <circle cx="68" cy="82" r="7" fill="#1A1A1A" />
+      <circle cx="68" cy="82" r="3.5" fill="#888" />
+      <circle cx="108" cy="82" r="7" fill="#1A1A1A" />
+      <circle cx="108" cy="82" r="3.5" fill="#888" />
+      <circle cx="128" cy="82" r="7" fill="#1A1A1A" />
+      <circle cx="128" cy="82" r="3.5" fill="#888" />
+    </g>
+
+    {/* Gleis + Schwellen */}
+    <rect x="20" y="92" width="132" height="2" fill="#2D2D2D" />
+    <g fill="#8B6F47">
+      <rect x="24" y="95" width="8" height="2.5" />
+      <rect x="44" y="95" width="8" height="2.5" />
+      <rect x="64" y="95" width="8" height="2.5" />
+      <rect x="84" y="95" width="8" height="2.5" />
+      <rect x="104" y="95" width="8" height="2.5" />
+      <rect x="124" y="95" width="8" height="2.5" />
+      <rect x="140" y="95" width="8" height="2.5" />
+    </g>
+
+    {/* Scheinwerfer vorne */}
+    <circle cx="140" cy="60" r="2" fill="#FFF9C4" />
   </svg>
 );
 
 const MountainScene = () => (
-  <svg viewBox="0 0 600 140" fill="none" aria-hidden="true" className="home-hero-mountains" preserveAspectRatio="none">
-    <path d="M0 140L80 50L120 80L200 20L280 70L340 30L420 60L500 10L560 50L600 30V140H0Z" fill="#E30613" opacity="0.06" />
-    <path d="M0 140L60 80L100 100L180 50L260 90L320 60L400 80L480 40L540 70L600 50V140H0Z" fill="#E30613" opacity="0.04" />
-    <circle cx="520" cy="30" r="20" fill="#E8B927" opacity="0.15" />
+  <svg
+    viewBox="0 0 600 140"
+    fill="none"
+    aria-hidden="true"
+    className="home-hero-mountains"
+    preserveAspectRatio="xMidYMax slice"
+  >
+    {/* Hintere Bergkette */}
+    <path
+      d="M0 140 L70 55 L130 85 L210 25 L290 75 L360 40 L440 65 L510 20 L570 50 L600 35 V140 Z"
+      fill="#E30613"
+      opacity="0.08"
+    />
+    {/* Schneekappen auf den höchsten Peaks */}
+    <path d="M200 30 L210 25 L222 32 L215 35 L210 30 L205 35 Z" fill="#FFFFFF" opacity="0.7" />
+    <path d="M502 25 L510 20 L520 28 L513 30 L510 25 L506 30 Z" fill="#FFFFFF" opacity="0.7" />
+    {/* Vordere Hügelkette (dunkler, mehr Tiefe) */}
+    <path
+      d="M0 140 L50 90 L110 105 L190 60 L270 95 L340 70 L420 90 L500 50 L560 80 L600 65 V140 Z"
+      fill="#E30613"
+      opacity="0.05"
+    />
+
+    {/* Sonne – nach den Bergen gerendert, damit sie nicht verdeckt wird */}
+    {/* Sonne – in <g> eingewickelt, damit wir sie mit CSS animieren können */}
+    <g className="home-hero-sun">
+      <circle cx="100" cy="45" r="18" fill="#F4C862" opacity="0.55" />
+      <circle cx="100" cy="45" r="12" fill="#F4B84A" opacity="0.9" />
+    </g>
   </svg>
 );
 
@@ -71,7 +191,11 @@ const MainPage: React.FC = () => {
 
         <div className="home-hero-content">
           <div className="home-hero-illustration">
-            <PinIcon size={64} />
+            <div className="home-hero-pin">
+              <div className="home-hero-pin-inner">
+                <PinIcon size={64} />
+              </div>
+            </div>
             <TrainIllustration />
           </div>
 
