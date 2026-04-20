@@ -79,16 +79,16 @@ const MainPage: React.FC = () => {
             Gues<span className="u-text-red">SBB</span>
           </h1>
 
-          <p className="home-hero-tagline">Wo ist der Zug gerade?</p>
+          <p className="home-hero-tagline">Where is the train right now?</p>
 
           <p className="home-hero-description">
-            Errate in Echtzeit, wo sich SBB-Züge auf dem Schweizer Schienennetz
-            befinden. Spiele gegen Freunde oder die Welt. Wer liegt am nächsten?
+            Guess in real time where SBB trains are on the Swiss rail network. 
+            Play against friends or the world. Who gets closest?
           </p>
 
           <div className="page-hero-actions">
             <Button type="primary" size="large" onClick={handlePlay}>
-              ▶ Jetzt spielen
+              ▶ Play now
             </Button>
 
             <Button
@@ -108,9 +108,9 @@ const MainPage: React.FC = () => {
           <div className="home-step-emoji-bg">🚂</div>
           <div className="home-step-emoji">🚂</div>
           <div className="home-step-number home-step-number--red">01</div>
-          <div className="home-step-title">Zug-Info lesen</div>
+          <div className="home-step-title">Read the train info</div>
           <div className="home-step-desc">
-            Du siehst Linie, Abfahrt und Ankunft eines echten SBB-Zuges.
+            You see the line, departure, and arrival of a real SBB train.
           </div>
         </div>
 
@@ -118,10 +118,10 @@ const MainPage: React.FC = () => {
           <div className="home-step-emoji-bg">📍</div>
           <div className="home-step-emoji">📍</div>
           <div className="home-step-number home-step-number--gold">02</div>
-          <div className="home-step-title">Position raten</div>
+          <div className="home-step-title">Position guess</div>
           <div className="home-step-desc">
-            Klicke auf die Schweizer Karte. Je näher an der echten Position,
-            desto mehr Punkte!
+            Click on the Swiss map. The closer you are to the real position,
+            the more points you get!
           </div>
         </div>
 
@@ -129,10 +129,10 @@ const MainPage: React.FC = () => {
           <div className="home-step-emoji-bg">🏆</div>
           <div className="home-step-emoji">🏆</div>
           <div className="home-step-number home-step-number--green">03</div>
-          <div className="home-step-title">Punkte sammeln</div>
+          <div className="home-step-title">Collect points</div>
           <div className="home-step-desc">
-            Nach jeder Runde siehst du das Ergebnis. Werde der beste Rater der
-            Schweiz!
+            After each round you see the result. Become the best guesser of
+            Switzerland!
           </div>
         </div>
       </section>
@@ -143,25 +143,25 @@ const MainPage: React.FC = () => {
           <div className="home-stat">
             <div className="home-stat-emoji">🎮</div>
             <div className="home-stat-value">2&apos;847</div>
-            <div className="home-stat-label">Spiele heute</div>
+            <div className="home-stat-label">Games today</div>
           </div>
 
           <div className="home-stat">
             <div className="home-stat-emoji">👥</div>
             <div className="home-stat-value">342</div>
-            <div className="home-stat-label">Spieler online</div>
+            <div className="home-stat-label">Players online</div>
           </div>
 
           <div className="home-stat">
             <div className="home-stat-emoji">🗺️</div>
             <div className="home-stat-value">12&apos;504</div>
-            <div className="home-stat-label">Züge geraten</div>
+            <div className="home-stat-label">Trains guessed</div>
           </div>
 
           <div className="home-stat">
             <div className="home-stat-emoji">🏅</div>
             <div className="home-stat-value home-stat-value--small">ZürichHB_Master</div>
-            <div className="home-stat-label">#1 weltweit</div>
+            <div className="home-stat-label">#1 worldwide</div>
           </div>
         </div>
       </div>
