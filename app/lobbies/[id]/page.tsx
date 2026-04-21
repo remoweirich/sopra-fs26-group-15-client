@@ -205,9 +205,9 @@ useEffect(() => {
         )}
 
         <Button
-          className="btn-ghost-muted btn-full"
+          className="wait-leave-btn"
           onClick={handleLeave}
-        >
+        > 
           <span aria-hidden="true">🚪</span> {isHost ? "Leave & Transfer Host" : "Leave Lobby"}
         </Button>
       </div>

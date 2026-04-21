@@ -429,7 +429,9 @@ html, body {
 /* Lobby wait / creation card */
 .card--lobby-wait {
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;           
+  padding: var(--sp-xl) var(--sp-lg); 
+  box-shadow: var(--shadow-elevated); 
 }
 
 /* Wide card (profile, lobby list wrapper) */
@@ -746,9 +748,13 @@ html, body {
 
 .wait-lobby-name {
   font-size: 24px;
-  font-weight: 900;
+  font-weight: 800;
   color: var(--black);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  letter-spacing: -0.01em;
 }
 
 .wait-meta {
@@ -779,32 +785,33 @@ html, body {
   display: flex;
   align-items: center;
   gap: var(--sp-sm);
-  padding: 10px var(--sp-md);
+  padding: 14px var(--sp-md);
   border-radius: var(--radius-md);
-  background: var(--bg-page);
-  border: 1px solid var(--gray-border);
+  background: var(--bg-subtle);         
+  border: 1px solid transparent;             
+  transition: background 0.15s;
 }
 
 /* Host player row gets a red tint */
 .wait-player-row--host {
-  background: var(--red-light);
-  border-color: #F5C0C0;
+  background: var(--bg-subtle);
+  border-color: rgba(227, 6, 19, 0.2);
 }
 
 .wait-player-avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #ffffff;
   flex-shrink: 0;
+}
   /* Background colour is set per-player via inline style on the element
      because it must be derived from the player's username dynamically */
-}
 
 .wait-player-name {
   flex: 1;
@@ -828,9 +835,10 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--sp-sm) var(--sp-md);
-  background: var(--bg-page);
-  border: 1px solid var(--gray-border);
+  gap: var(--sp-sm);
+  padding: 14px var(--sp-md);
+  background: var(--bg-subtle);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   margin-top: var(--sp-sm);
 }
@@ -894,6 +902,23 @@ html, body {
   height: 48px !important;
   font-size: 15px !important;
   font-weight: 700 !important;
+}
+
+/* Leave-Lobby button: ghost style but with card-matching radius */
+.wait-leave-btn.ant-btn {
+  width: 100% !important;
+  height: 44px !important;
+  border-radius: var(--radius-md) !important;
+  background: transparent !important;
+  color: var(--gray-mid) !important;
+  border: none !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+}
+
+.wait-leave-btn.ant-btn:hover {
+  color: var(--black) !important;
+  background: var(--bg-subtle) !important;
 }
 
 
