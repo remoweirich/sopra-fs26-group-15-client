@@ -140,8 +140,9 @@ html, body {
   align-items: center;
   gap: var(--sp-sm);
   text-decoration: none;
-  margin-right: var(--sp-xl);
   flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .navbar-brand-text {
@@ -211,10 +212,11 @@ html, body {
   display: flex;
   align-items: center;
   gap: var(--sp-sm);
-  margin-left: auto;
+  flex: 1;               /* claim equal share on the right */
+  justify-content: flex-end;
 }
 
-/* Lobby-ID search pill */
+/* Lobby-ID search pill — CENTERED in navbar */
 .navbar-search {
   display: flex;
   align-items: center;
@@ -223,12 +225,20 @@ html, body {
   border: 1px solid var(--gray-border);
   border-radius: var(--radius-pill);
   padding: 6px 14px;
-  min-width: 170px;
+  min-width: 200px;
+  max-width: 240px;
   cursor: text;
   transition: border-color 0.15s;
+  margin: 0 auto;  /* pushes the search into the centre */
 }
 
 .navbar-search:focus-within { border-color: var(--gray-mid); }
+
+/* Magnifier icon inside the search pill */
+.navbar-search-icon {
+  color: var(--gray-light);
+  flex-shrink: 0;
+}
 
 /* Raw <input> inside .navbar-search – Ant Design not used here */
 .navbar-search-input {
@@ -243,11 +253,22 @@ html, body {
 
 .navbar-search-input::placeholder { color: var(--gray-light); }
 
-.navbar-right{
-  display: flex;
+/* Register pill — the red "Registration" button in navbar (for guests) */
+.navbar-register-pill {
+  display: inline-flex;
   align-items: center;
-  gap: var(--sp-sm);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--red);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+  white-space: nowrap;
 }
+
+.navbar-register-pill:hover { background: var(--red-hover); color: #ffffff; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -359,7 +380,7 @@ html, body {
   gap: var(--sp-md);
   max-width: 900px;
   margin: 0 auto;
-  padding: 0 var(--sp-lg) var(--sp-xl);
+  padding: var(--sp-xl) var(--sp-lg) var(--sp-xl);
 }
 
 @media (max-width: 640px) {
@@ -408,7 +429,9 @@ html, body {
 /* Lobby wait / creation card */
 .card--lobby-wait {
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;           
+  padding: var(--sp-xl) var(--sp-lg); 
+  box-shadow: var(--shadow-elevated); 
 }
 
 /* Wide card (profile, lobby list wrapper) */
@@ -585,10 +608,21 @@ html, body {
   border-radius: var(--radius-md);
   border: 1px solid var(--gray-border);
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.15s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 
-.lobby-row:hover { box-shadow: var(--shadow-elevated); }
+.lobby-row:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.lobby-row--ingame {
+  opacity: 0.55;
+}
+.lobby-row--ingame:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+}
 
 .lobby-row-left {
   display: flex;
@@ -611,15 +645,12 @@ html, body {
 .lobby-row-info { min-width: 0; }
 
 .lobby-row-name {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--black);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-sm);
 }
 
 .lobby-row-meta {
@@ -636,12 +667,55 @@ html, body {
 }
 
 .lobby-row-players {
-  font-size: 13px;
-  color: var(--gray-mid);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  white-space: nowrap;
+}
+
+/* Header row inside .lobby-row-info: emoji + name + badge */
+.lobby-row-header {
   display: flex;
   align-items: center;
-  gap: 4px;
-  white-space: nowrap;
+  gap: var(--sp-sm);
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.lobby-row-visibility {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Private-lobby code input (replaces inline styles from old JSX) */
+.lobby-code-input {
+  border: 1px solid var(--gray-border);
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  color: var(--gray-dark);
+  outline: none;
+  width: 140px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.lobby-code-input:focus {
+  border-color: var(--gray-mid);
+  background: var(--bg-surface);
+}
+
+.lobby-code-input::placeholder {
+  color: var(--gray-light);
+}
+
+/* Pill-shaped Join + "New Lobby" buttons */
+.lobby-row-join-btn.ant-btn,
+.lobby-new-btn.ant-btn {
+  border-radius: var(--radius-pill) !important;
 }
 
 
@@ -666,7 +740,7 @@ html, body {
 
 .wait-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--sp-sm);
   margin-bottom: var(--sp-sm);
@@ -674,9 +748,13 @@ html, body {
 
 .wait-lobby-name {
   font-size: 24px;
-  font-weight: 900;
+  font-weight: 800;
   color: var(--black);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  letter-spacing: -0.01em;
 }
 
 .wait-meta {
@@ -707,32 +785,33 @@ html, body {
   display: flex;
   align-items: center;
   gap: var(--sp-sm);
-  padding: 10px var(--sp-md);
+  padding: 14px var(--sp-md);
   border-radius: var(--radius-md);
-  background: var(--bg-page);
-  border: 1px solid var(--gray-border);
+  background: var(--bg-subtle);         
+  border: 1px solid transparent;             
+  transition: background 0.15s;
 }
 
 /* Host player row gets a red tint */
 .wait-player-row--host {
-  background: var(--red-light);
-  border-color: #F5C0C0;
+  background: var(--bg-subtle);
+  border-color: rgba(227, 6, 19, 0.2);
 }
 
 .wait-player-avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #ffffff;
   flex-shrink: 0;
+}
   /* Background colour is set per-player via inline style on the element
      because it must be derived from the player's username dynamically */
-}
 
 .wait-player-name {
   flex: 1;
@@ -756,9 +835,10 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--sp-sm) var(--sp-md);
-  background: var(--bg-page);
-  border: 1px solid var(--gray-border);
+  gap: var(--sp-sm);
+  padding: 14px var(--sp-md);
+  background: var(--bg-subtle);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   margin-top: var(--sp-sm);
 }
@@ -778,6 +858,67 @@ html, body {
   flex-direction: column;
   gap: var(--sp-sm);
   margin-top: var(--sp-md);
+}
+
+/* Meta badge row below the header (rounds + visibility) */
+.wait-meta-row {
+  display: flex;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-lg);
+  flex-wrap: wrap;
+}
+
+/* Avatar colour variants */
+.wait-player-avatar--host {
+  background: var(--red);
+  color: #ffffff;
+}
+
+.wait-player-avatar--guest {
+  background: var(--gray-border);
+  color: var(--gray-dark);
+}
+
+/* Info box shown to non-host players ("Waiting for host…") */
+.wait-waiting-box {
+  padding: var(--sp-md);
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 14px;
+  color: var(--gray-mid);
+  font-weight: 500;
+}
+
+/* Pill-shape Copy button inside the invite box */
+.wait-invite-copy-btn.ant-btn {
+  border-radius: var(--radius-pill) !important;
+  min-width: 80px;
+  font-weight: 600;
+}
+
+/* Start-game button: slightly more prominent height + weight */
+.wait-start-btn.ant-btn {
+  height: 48px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+/* Leave-Lobby button: ghost style but with card-matching radius */
+.wait-leave-btn.ant-btn {
+  width: 100% !important;
+  height: 44px !important;
+  border-radius: var(--radius-md) !important;
+  background: transparent !important;
+  color: var(--gray-mid) !important;
+  border: none !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+}
+
+.wait-leave-btn.ant-btn:hover {
+  color: var(--black) !important;
+  background: var(--bg-subtle) !important;
 }
 
 
@@ -1363,6 +1504,11 @@ html, body {
 .badge-host    { background: var(--red-light); color: var(--red);    }
 .badge-public  { background: var(--blue-bg);   color: var(--blue);   }
 .badge-private { background: #F3F3F3;           color: var(--gray-mid); }
+/* Inactive / dimmed variant (e.g. "In Game" lobbies) */
+.badge-inactive {
+  background: #F3F3F3;
+  color: var(--gray-mid);
+}
 
 .badge-online {
   background: var(--green-bg);
@@ -1532,4 +1678,908 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--gray-light);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   14. HOME PAGE  (app/page.tsx)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .home-hero                – full hero section with mountains backdrop
+   .home-hero-mountains      – decorative SVG positioned behind hero content
+   .home-hero-content        – relative wrapper sitting above the mountains
+   .home-hero-illustration   – pin icon + train SVG row at top of hero
+   .home-hero-train          – small train SVG positioned next to the pin
+   .home-hero-title          – giant "GuessSBB" h1 (72px desktop)
+   .home-hero-tagline        – mono uppercase subtitle "Wo ist der Zug…"
+   .home-hero-description    – body paragraph under the tagline
+
+   .home-step-card           – one of the 3 how-it-works cards
+   .home-step-emoji-bg       – huge watermark emoji in card corner
+   .home-step-emoji          – visible emoji above the step number
+   .home-step-number         – "01" / "02" / "03" mono label
+   .home-step-number--red/gold/green – accent colour per step
+   .home-step-title          – card heading
+   .home-step-desc           – muted card body text
+
+   .home-stats-bar           – horizontal stats strip below the cards
+   .home-stat                – individual stat cell
+   .home-stat-emoji          – emoji above the value
+   .home-stat-value          – mono numeric value
+   .home-stat-value--small   – smaller variant (for text values like usernames)
+   .home-stat-label          – muted label below the value
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero section ──────────────────────────────────────────────────────── */
+.home-hero {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--sp-2xl) var(--sp-lg) var(--sp-xl);
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Mountains: dekorativer Hintergrund unten */
+.home-hero-mountains {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 180px;              /* feste Höhe statt aspect-ratio-Verzerrung */
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Illustration: Pin + Train nebeneinander, zentriert */
+.home-hero-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-md);
+  margin: 0 auto var(--sp-lg);
+  position: relative;
+}
+
+/* Pin-Wrapper: hübsche Bounce-Animation */
+.home-hero-pin {
+  animation:
+    home-pin-drop   0.6s ease-out 1.7s both,
+    home-pin-bounce 2.4s ease-in-out 2.3s infinite;
+  filter: drop-shadow(0 6px 8px rgba(227, 6, 19, 0.25));
+  flex-shrink: 0;
+}
+
+@keyframes home-pin-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* Sonne: fadet von unten nach oben ein */
+.home-hero-sun {
+  animation: home-sun-rise 0.8s ease-out 0s both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes home-sun-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Zug: fährt von links herein */
+@keyframes home-train-drive {
+  from { opacity: 0; transform: translateX(-180px) rotate(-4deg); }
+  to   { opacity: 1; transform: translateX(0)      rotate(-4deg); }
+}
+
+/* Pin: fällt von oben herunter, mit kleinem Overshoot */
+@keyframes home-pin-drop {
+  0%   { opacity: 0; transform: translateY(-60px); }
+  70%  { opacity: 1; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Train: jetzt inline-item, kein absolute mehr */
+.home-hero-train {
+  width: 160px;
+  height: auto;
+  flex-shrink: 0;
+  transform: rotate(-4deg);
+  animation: home-train-drive 0.9s ease-out 0.8s both;
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-pin,
+  .home-hero-train,
+  .home-hero-sun {
+    animation: none;
+  }
+}
+
+.home-hero-title {
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--black);
+  margin: 0 0 var(--sp-sm);
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+}
+
+.home-hero-tagline {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 14px;
+  color: var(--gray-light);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 var(--sp-md);
+}
+
+.home-hero-description {
+  font-size: 19px;
+  color: var(--gray-mid);
+  max-width: 520px;
+  margin: 0 auto var(--sp-lg);
+  line-height: 1.7;
+}
+
+/* ── How-it-works step cards ───────────────────────────────────────────── */
+.home-step-card {
+  padding: var(--sp-lg);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+  cursor: default;
+  border: 1px solid var(--gray-border);
+}
+
+.home-step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.home-step-emoji-bg {
+  position: absolute;
+  top: -20px;
+  right: -10px;
+  font-size: 80px;
+  opacity: 0.08;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.home-step-emoji {
+  font-size: 36px;
+  margin-bottom: var(--sp-sm);
+  line-height: 1;
+}
+
+.home-step-number {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: var(--sp-sm);
+  letter-spacing: 0.05em;
+}
+
+.home-step-number--red   { color: var(--red); }
+.home-step-number--gold  { color: #E8B927; }
+.home-step-number--green { color: var(--green); }
+
+.home-step-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: var(--sp-sm);
+}
+
+.home-step-desc {
+  font-size: 14px;
+  color: var(--gray-mid);
+  line-height: 1.7;
+}
+
+/* ── Stats bar ─────────────────────────────────────────────────────────── */
+.home-stats-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-lg) var(--sp-xl);
+  margin-top: var(--sp-lg);
+}
+
+.home-stat {
+  text-align: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-stat-emoji {
+  font-size: 20px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.home-stat-value {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-stat-value--small {
+  font-size: 14px;
+}
+
+.home-stat-label {
+  font-size: 12px;
+  color: var(--gray-mid);
+  margin-top: 4px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   15. RESPONSIVE  –  Tablet & Mobile
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Breakpoints:
+     ≤ 1024px  tablet
+     ≤ 640px   mobile
+     ≤ 380px   very small phones
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .home-hero {
+    padding: var(--sp-xl) var(--sp-lg);
+  }
+
+  .home-hero-title {
+    font-size: 56px;
+  }
+
+    .home-hero-train {
+    width: 130px;
+  }
+}
+
+/* Mobile (≤ 640px) */
+@media (max-width: 640px) {
+  .home-hero {
+    padding: var(--sp-lg) var(--sp-md) var(--sp-xl);
+  }
+
+  .home-hero-title {
+    font-size: 44px;
+  }
+
+  .home-hero-tagline {
+    font-size: 12px;
+  }
+
+  .home-hero-description {
+    font-size: 16px;
+    margin-bottom: var(--sp-md);
+  }
+
+ /* Train wird kleiner, aber bleibt sichtbar */
+  .home-hero-train {
+    width: 100px;
+  }
+
+  .home-hero-illustration {
+    gap: var(--sp-sm);
+  }
+
+  .home-hero-mountains {
+    height: 120px;
+  }
+
+  /* Stats bar: stack vertically */
+  .home-stats-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--sp-md);
+    gap: var(--sp-md);
+  }
+
+  .home-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-sm);
+    text-align: left;
+  }
+
+  .home-stat-emoji {
+    margin-bottom: 0;
+    font-size: 22px;
+  }
+
+  .home-stat-value {
+    flex: 1;
+    text-align: left;
+  }
+
+  .home-stat-label {
+    margin-top: 0;
+    font-size: 11px;
+    color: var(--gray-light);
+  }
+}
+
+/* Very small phones (≤ 380px) */
+@media (max-width: 380px) {
+  .home-hero-title {
+    font-size: 36px;
+  }
+
+  .page-hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .page-hero-actions .ant-btn {
+    width: 100%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   16. BURGER MENU (mobile/tablet)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Burger button — hidden on desktop, shown on mobile */
+.navbar-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--black);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.navbar-burger:hover {
+  background: var(--bg-page);
+}
+
+/* Full-screen mobile menu overlay */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-surface);
+  z-index: 99;
+  padding: var(--sp-xl) var(--sp-lg);
+  flex-direction: column;
+  gap: var(--sp-md);
+  overflow-y: auto;
+  animation: mobile-menu-slide-in 0.25s ease-out;
+}
+
+@keyframes mobile-menu-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Search pill inside mobile menu — slightly larger */
+.mobile-menu-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  background: var(--bg-page);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-pill);
+  padding: 12px 18px;
+  width: 100%;
+}
+
+.mobile-menu-search:focus-within {
+  border-color: var(--gray-mid);
+}
+
+.mobile-menu-search .navbar-search-input {
+  font-size: 15px;
+}
+
+/* Each link in the mobile menu — full-width row */
+.mobile-menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: var(--sp-md) var(--sp-lg);
+  background: var(--bg-page);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-md);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--black);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+  text-align: left;
+}
+
+.mobile-menu-link:hover {
+  background: var(--red-light);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.mobile-menu-link--primary {
+  background: var(--red);
+  border-color: var(--red);
+  color: #ffffff;
+  justify-content: center;
+}
+
+.mobile-menu-link--primary:hover {
+  background: var(--red-hover);
+  border-color: var(--red-hover);
+  color: #ffffff;
+}
+
+.mobile-menu-link--muted {
+  color: var(--gray-mid);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   17. NAVBAR RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet (≤ 1024px) — shrink search */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0 var(--sp-md);
+  }
+
+  .navbar-search {
+    min-width: 140px;
+    max-width: 180px;
+  }
+
+  .navbar-brand {
+    margin-right: var(--sp-md);
+  }
+}
+
+/* Mobile (≤ 768px) — switch to burger menu */
+@media (max-width: 768px) {
+  /* Hide desktop search and actions */
+
+  
+  .navbar .navbar-search {
+    display: none;
+  }
+
+  .navbar .navbar-actions {
+    display: none;
+  }
+
+  /* Show the burger button */
+  .navbar-burger {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  /* Show the mobile menu (toggled by JS state, the component conditionally
+     renders it, so this just makes sure the display flex kicks in) */
+  .mobile-menu {
+    display: flex;
+  }
+
+  .navbar-brand-text {
+    font-size: 18px;
+  }
+}
+
+/* Very small phones (≤ 480px) — hide secondary links, keep auth */
+@media (max-width: 480px) {
+  .navbar-actions > a[href="/lobbies"],
+  .navbar-actions > a[href="/leaderboard"] {
+    display: none;
+  }
+
+  .navbar-register-pill {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   18. LEADERBOARD PAGE  (/leaderboard)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .leaderboard-wrapper         – max-width content column
+   .leaderboard-title           – "🏆 Leaderboard" h1
+   .leaderboard-subtitle        – muted p below title
+   .leaderboard-search          – white pill input for player search
+   .leaderboard-search-icon     – magnifier icon inside the pill
+   .leaderboard-search-input    – raw <input> inside the pill
+   .leaderboard-guest-banner    – red-tinted banner prompting guest to sign up
+   .leaderboard-guest-banner-link – red "Sign up →" link inside the banner
+
+   .leaderboard-list            – white rounded container wrapping the rows
+   .leaderboard-empty           – empty-state message inside the list
+
+   .leaderboard-row             – one player row (to be filled by Claude Stark)
+   .leaderboard-row--you        – variant: red-tinted row for the current user
+   .leaderboard-rank            – rank number cell (plain, for rank ≥ 4)
+   .leaderboard-rank--medal     – bigger rank cell (for top 3 with emoji)
+   .leaderboard-player-info     – flex column with name + meta
+   .leaderboard-name            – player username
+   .leaderboard-meta            – "47 games · Ø 892 pts" mono line
+   .leaderboard-score           – right-aligned total points
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.leaderboard-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--sp-xl) 0 var(--sp-2xl);
+}
+
+.leaderboard-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--black);
+  margin: 0 0 var(--sp-xs);
+  letter-spacing: -0.02em;
+}
+
+.leaderboard-subtitle {
+  font-size: 15px;
+  color: var(--gray-mid);
+  margin: 0 0 var(--sp-lg);
+}
+
+/* ── Search pill ─────────────────────────────────────────────────────── */
+.leaderboard-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  background: var(--bg-surface);
+  border: 1.5px solid var(--gray-border);
+  border-radius: var(--radius-pill);
+  padding: 10px 20px;
+  margin-bottom: var(--sp-md);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s;
+  cursor: text;
+}
+
+.leaderboard-search:focus-within {
+  border-color: var(--gray-mid);
+}
+
+.leaderboard-search-icon {
+  color: var(--gray-light);
+  flex-shrink: 0;
+}
+
+.leaderboard-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  color: var(--black);
+  font-family: inherit;
+}
+
+.leaderboard-search-input::placeholder {
+  color: var(--gray-light);
+}
+
+/* ── Guest banner ─────────────────────────────────────────────────────── */
+.leaderboard-guest-banner {
+  padding: var(--sp-md) var(--sp-lg);
+  background: var(--red-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--sp-md);
+  text-align: center;
+  font-size: 14px;
+  color: var(--gray-dark);
+}
+
+.leaderboard-guest-banner-link {
+  color: var(--red);
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 4px;
+  text-decoration: none;
+}
+
+.leaderboard-guest-banner-link:hover {
+  color: var(--red);
+  text-decoration: underline;
+}
+
+/* ── List container ───────────────────────────────────────────────────── */
+.leaderboard-list {
+  background: var(--bg-surface);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.leaderboard-empty {
+  padding: var(--sp-2xl) var(--sp-lg);
+  text-align: center;
+  color: var(--gray-light);
+  font-size: 14px;
+}
+
+/* ── Single player row ─────────────────────────────────────────────────
+   Classes used by Claude Stark when he maps over fetched data.
+   ──────────────────────────────────────────────────────────────────── */
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-md) var(--sp-lg);
+  gap: var(--sp-md);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-top: 1px solid var(--gray-border);
+}
+
+/* First row has no top border */
+.leaderboard-row:first-child {
+  border-top: none;
+}
+
+.leaderboard-row:hover {
+  background: var(--bg-subtle);
+}
+
+/* Highlighted row for current user */
+.leaderboard-row--you {
+  background: var(--red-light);
+}
+
+.leaderboard-row--you:hover {
+  background: var(--red-light);
+}
+
+.leaderboard-rank {
+  width: 40px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gray-light);
+  flex-shrink: 0;
+}
+
+/* Bigger variant for top 3 with medal emoji */
+.leaderboard-rank--medal {
+  font-size: 22px;
+}
+
+.leaderboard-player-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+}
+
+.leaderboard-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+.leaderboard-meta {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  color: var(--gray-light);
+  margin-top: 2px;
+}
+
+.leaderboard-score {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--black);
+  flex-shrink: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   19. LEADERBOARD RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet (≤ 768px) */
+@media (max-width: 768px) {
+  .leaderboard-wrapper {
+    padding: var(--sp-lg) 0 var(--sp-xl);
+  }
+
+  .leaderboard-title {
+    font-size: 28px;
+  }
+
+  .leaderboard-subtitle {
+    font-size: 14px;
+  }
+
+  .leaderboard-row {
+    padding: var(--sp-sm) var(--sp-md);
+    gap: var(--sp-sm);
+  }
+
+  .leaderboard-rank {
+    width: 32px;
+  }
+
+  .leaderboard-score {
+    font-size: 15px;
+  }
+}
+
+/* Mobile (≤ 480px) — stack name info under the rank */
+@media (max-width: 480px) {
+  .leaderboard-title {
+    font-size: 24px;
+  }
+
+  .leaderboard-search {
+    padding: 8px 14px;
+  }
+
+  .leaderboard-player-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .leaderboard-name {
+    font-size: 14px;
+  }
+
+  .leaderboard-meta {
+    font-size: 10px;
+  }
+
+  .leaderboard-rank--medal {
+    font-size: 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   20. NEW LOBBY FORM (/lobbies/newlobby)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   .card--lobby-form   – more generous padding than the base .card--form
+   .lobby-form-number  – constrain InputNumber to a reasonable width
+   .lobby-form-tiles   – flex row of radio-tile buttons
+   .lobby-form-tile    – single tile (overrides AntD's default radio styling)
+   .lobby-form-tile--round – round-number tile (mono font, large)
+   .lobby-form-tile--vis   – visibility tile (emoji + label + desc stacked)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* More generous padding for this specific form (prototype uses ~44px) */
+.card--lobby-form {
+  padding: var(--sp-xl) var(--sp-lg);
+}
+
+/* InputNumber: same visual weight as the text Input above it */
+.lobby-form-number.ant-input-number {
+  width: 100%;
+}
+
+/* Tiles wrapper: equal-width flex row */
+.lobby-form-tiles.ant-radio-group {
+  display: flex !important;
+  gap: var(--sp-sm);
+  width: 100%;
+}
+
+/* ── Tile base (overrides AntD Radio defaults) ───────────────────────────── */
+.lobby-form-tile.ant-radio-wrapper {
+  flex: 1;
+  margin: 0 !important;              /* kill AntD's inline margin */
+  padding: var(--sp-md);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--gray-border);
+  background: var(--bg-surface);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide the actual radio circle — the whole tile is the click target */
+.lobby-form-tile.ant-radio-wrapper .ant-radio {
+  display: none !important;
+}
+
+/* The label span inside AntD Radio: make it fill the tile */
+.lobby-form-tile.ant-radio-wrapper > span:not(.ant-radio) {
+  padding: 0 !important;
+  width: 100%;
+  display: block;
+}
+
+/* Hover lift for un-selected tiles */
+.lobby-form-tile.ant-radio-wrapper:hover {
+  border-color: var(--gray-mid);
+}
+
+/* Selected state: red border + red-tinted background */
+.lobby-form-tile.ant-radio-wrapper-checked {
+  border-color: var(--red) !important;
+  background: var(--red-light) !important;
+}
+
+/* ── Round-number tile variant ───────────────────────────────────────────── */
+.lobby-form-tile--round > span:not(.ant-radio) {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.lobby-form-tile--round.ant-radio-wrapper-checked > span:not(.ant-radio) {
+  color: var(--red);
+}
+
+/* ── Visibility tile variant (emoji + label + desc stacked) ──────────────── */
+.lobby-form-tile--vis {
+  padding: var(--sp-md) var(--sp-sm) !important;
+}
+
+.lobby-form-tile--vis > span:not(.ant-radio) {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.lobby-form-tile-emoji {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.lobby-form-tile-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-dark);
+}
+
+.lobby-form-tile--vis.ant-radio-wrapper-checked .lobby-form-tile-label {
+  color: var(--red);
+}
+
+.lobby-form-tile-desc {
+  font-size: 11px;
+  color: var(--gray-light);
+  font-weight: 500;
 }

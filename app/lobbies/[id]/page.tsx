@@ -137,68 +137,101 @@ useEffect(() => {
 
   
 
-  // ── Render ───────────────────────────────────────────────────────────────
-
   return (
-      <div className="page-center page-content">
-        <div className="card card--lobby-wait card--wide">
+  <div className="page-center page-content">
+    <div className="card card--lobby-wait">
 
-          {/* Header: Name + Status */}
-          <div className="wait-header">
-            <h2 className="wait-lobby-name">{lobby.lobbyName}</h2>
-            <span className="badge badge-waiting">Waiting...</span>
-          </div>
-
-          {/* Player List Section */}
-          <div className="wait-section-label">
-            PLAYERS ({lobby.users?.length || 0} / {lobby.size})
-          </div>
-
-          <div className="wait-player-list">
-            {lobby.users?.map((userDTO) => (
-                <div key={userDTO.username} className={`wait-player-row`}>
-                  {userDTO.username}
-                </div>
-            ))}
-          </div>
-
-          <div className="u-divider" />
-
-          {/* Invite Section */}
-          <div className="wait-section-label">INVITE FRIENDS</div>
-          <div className="wait-invite-box">
-            <code className="wait-invite-code">{lobby.lobbyCode}</code>
-            <Button
-                size="small"
-                onClick={() => navigator.clipboard.writeText(lobby.lobbyCode)}
-            >
-              Copy
-            </Button>
-          </div>
-
-          {/* Action buttons */}
-          <div className="wait-actions">
-            {isHost && (
-                <Button
-                    type="primary"
-                    className="btn-full"
-                    onClick={handleStartGame}
-                >
-                  Start Game
-                </Button>
-            )}
-
-            <Button
-                className="btn-ghost-muted btn-full"
-                onClick={handleLeave}
-            >
-              {isHost ? "Leave & Transfer Host" : "Leave Lobby"}
-            </Button>
-          </div>
-
-        </div>
+      {/* Header: Name + Status */}
+      <div className="wait-header">
+        <h2 className="wait-lobby-name">
+          <span aria-hidden="true">🎮</span> {lobby.lobbyName}
+        </h2>
+        <span className="badge badge-waiting">Waiting...</span>
       </div>
-  );
-};
+
+      {/* Meta badges: rounds + visibility */}
+      <div className="wait-meta-row">
+        <span className="badge badge-inactive">
+          {lobby.rounds?.length || 0} rounds
+        </span>
+        <span className={`badge ${lobby.visibility === "PUBLIC" ? "badge-public" : "badge-private"}`}>
+          {lobby.visibility === "PUBLIC" ? "🌍 Public" : "🔒 Private"}
+        </span>
+      </div>
+
+      {/* Player List Section */}
+      <div className="wait-section-label">
+        Players ({lobby.users?.length || 0} / {lobby.size})
+      </div>
+
+      <div className="wait-player-list">
+        {lobby.users?.map((userDTO) => {
+          // Limitation: UserDTO has no userId, so we can only match by username.
+          // We know the current user's host status via `isHost`; for other players
+          // we can't determine host without a backend DTO change.
+          const isMe = userDTO.username === currentUser?.username;
+          const isPlayerHost = isMe && isHost;
+          return (
+            <div
+              key={userDTO.username}
+              className={`wait-player-row ${isPlayerHost ? "wait-player-row--host" : ""}`}
+            >
+              <div
+                className={`wait-player-avatar wait-player-avatar--${isPlayerHost ? "host" : "guest"}`}
+              >
+                {userDTO.username?.[0]?.toUpperCase() ?? "?"}
+              </div>
+              <span className="wait-player-name">{userDTO.username}</span>
+              {isPlayerHost && <span className="badge badge-host">Host</span>}
+              {isMe && !isPlayerHost && <span className="badge badge-public">You</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="u-divider" />
+
+      {/* Invite Section */}
+      <div className="wait-section-label">Invite Friends</div>
+      <div className="wait-invite-box">
+        <code className="wait-invite-code">
+          <span aria-hidden="true">🔗</span> {lobby.lobbyCode}
+        </code>
+        <Button
+          size="small"
+          className="wait-invite-copy-btn"
+          onClick={() => navigator.clipboard.writeText(lobby.lobbyCode)}
+        >
+          Copy
+        </Button>
+      </div>
+
+      {/* Action buttons */}
+      <div className="wait-actions">
+        {isHost ? (
+          <Button
+            type="primary"
+            className="btn-full wait-start-btn"
+            onClick={handleStartGame}
+          >
+            ▶ Start Game ({lobby.rounds?.length || 0} rounds)
+          </Button>
+        ) : (
+          <div className="wait-waiting-box">
+            Waiting for host to start...
+          </div>
+        )}
+
+        <Button
+          className="wait-leave-btn"
+          onClick={handleLeave}
+        > 
+          <span aria-hidden="true">🚪</span> {isHost ? "Leave & Transfer Host" : "Leave Lobby"}
+        </Button>
+      </div>
+
+    </div>
+  </div>
+)};
 
 export default LobbyWaitPage;

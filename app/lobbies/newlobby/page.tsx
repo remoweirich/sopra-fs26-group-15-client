@@ -65,84 +65,95 @@ const NewLobbyPage: React.FC = () => {
 
   };
 
-  // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <div className="page-center page-content">
-      <div className="card card--form">
+  <div className="page-center page-content">
+    <div className="card card--form card--lobby-form">
 
-        {/* Card header */}
-        <h2 className="form-title">
-          {/* TODO: target/dart icon */}
-          New Lobby
-        </h2>
-        <p className="form-subtitle">Create a new lobby</p>
+      {/* Card header */}
+      <h2 className="form-title">
+        <span aria-hidden="true">🎯</span> New Lobby
+      </h2>
+      <p className="form-subtitle">Set up your game.</p>
 
-        <Form
-          form={form}
-          name="lobby-creation"
-          size="large"
-          variant="outlined"
-          layout="vertical"
-          onFinish={handleCreate}
+      <Form
+        form={form}
+        name="lobby-creation"
+        size="large"
+        variant="outlined"
+        layout="vertical"
+        onFinish={handleCreate}
+      >
+        <Form.Item
+          name="lobbyName"
+          label="Lobby Name"
+          rules={[{ required: true, message: "Please enter a lobby name!" }]}
         >
-          {/*To Do: add Form.Item for all items */}
+          <Input placeholder="e.g. Pendler-Challenge" />
+        </Form.Item>
 
-          <Form.Item
-            name="lobbyName"
-            label="Lobby Name"
-            rules={[{ required: true, message: "Please enter a lobby name!" }]}
+        <Form.Item
+          name="size"
+          label="Amount of Players"
+          rules={[{ required: true, message: "Please enter the amount of players!" }]}
+        >
+          <InputNumber
+            placeholder="e.g. 5"
+            min={2}
+            max={20}
+            className="lobby-form-number"
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="maxRounds"
+          label="Rounds"
+          rules={[{ required: true, message: "Please select amount of rounds to be played!" }]}
+        >
+          <Radio.Group className="lobby-form-tiles lobby-form-tiles--rounds">
+            {[1, 3, 5, 10].map((r) => (
+              <Radio
+                key={r}
+                value={r}
+                className="lobby-form-tile lobby-form-tile--round"
+              >
+                {r}
+              </Radio>
+            ))}
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item
+          name="visibility"
+          label="Lobby Visibility"
+          rules={[{ required: true, message: "Please select a visibility option!" }]}
+        >
+          <Radio.Group className="lobby-form-tiles lobby-form-tiles--vis">
+            <Radio value="PUBLIC" className="lobby-form-tile lobby-form-tile--vis">
+              <span className="lobby-form-tile-emoji" aria-hidden="true">🌍</span>
+              <span className="lobby-form-tile-label">Public</span>
+              <span className="lobby-form-tile-desc">Anyone can join</span>
+            </Radio>
+            <Radio value="PRIVATE" className="lobby-form-tile lobby-form-tile--vis">
+              <span className="lobby-form-tile-emoji" aria-hidden="true">🔒</span>
+              <span className="lobby-form-tile-label">Private</span>
+              <span className="lobby-form-tile-desc">Invite only</span>
+            </Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="form-submit-btn btn-full"
           >
-            <Input placeholder="e.g. Pendler-Challenge" />
-          </Form.Item>
+            Create Lobby
+          </Button>
+        </Form.Item>
 
-          <Form.Item
-            name="size"
-            label="Amount of Players"
-            rules={[{ required: true, message: "Please enter the amount of players!" }]}
-          >
-            <InputNumber placeholder="e.g. 5" />
-          </Form.Item>
-
-          <Form.Item
-            name="maxRounds"
-            label="Rounds"
-            rules={[{ required: true, message: "Please select amount of rounds to be played!" }]}
-          >
-            <Radio.Group>
-              <Radio value={1}>1</Radio>
-              <Radio value={3}>3</Radio>
-              <Radio value={5}>5</Radio>
-              <Radio value={10}>10</Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          <Form.Item
-            name="visibility"
-            label="Lobby Visibility"
-            rules={[{ required: true, message: "Please select a visibility option!" }]}
-          >
-            <Radio.Group>
-              <Radio value={"PRIVATE"}>Private</Radio>
-              <Radio value={"PUBLIC"}>Public</Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="form-submit-btn btn-full"
-            >
-              Create Lobby
-            </Button>
-          </Form.Item>
-
-
-
-        </Form>
-      </div>
+      </Form>
     </div>
-  );
-};
+  </div>
+)};
 
 export default NewLobbyPage;

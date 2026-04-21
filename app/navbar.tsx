@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Badge, Input } from "antd";
 import { ApiService } from "./api/apiService";
 import { MyUserDTO, UserDTO } from "./types/user";
-import { Bell, LogOut } from "lucide-react";
+import { Bell, LogOut, Search, Menu, X } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
 // ---------------------------------------------------------------------------
@@ -104,88 +104,180 @@ export default function Navbar() {
     return `navbar-link${active ? " active" : ""}`;
   }
 
+const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close the menu automatically on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll while the mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  // Helper: route + close menu (for mobile menu links)
+  const go = (href: string) => {
+    setMenuOpen(false);
+    router.push(href);
+  };
+
   return (
-    <nav className="navbar">
-      {/* Brand */}
-      <Link href="/" className="navbar-brand">
-        <LogoMark />
-        <span className="navbar-brand-text">
-          Gues<span>SBB</span>
-        </span>
-      </Link>
-
-      {/* Primary links */}
-      {!isLoading && <div className="navbar-links">
-        {user && <Badge count={notificationCount} size="small" offset={[4, -2]}>
-          <button className="navbar-link" aria-label="Notifications">
-            <Bell size={20} /> {/* Hier wird das Icon angezeigt */}
-          </button>
-        </Badge>}
-
-        <Link href="/lobbies" className={linkClass("/lobbies")}>
-          Lobbies
+    <>
+      <nav className="navbar">
+        {/* ── Brand ──────────────────────────────────────────────────────── */}
+        <Link href="/" className="navbar-brand">
+          <LogoMark />
+          <span className="navbar-brand-text">
+            Gues<span>SBB</span>
+          </span>
         </Link>
 
-        <Link href="/leaderboard" className={linkClass("/leaderboard")}>
-          Leaderboard
-        </Link>
-
-        {user && (
-          <Link
-            href={`/users/${user.userId}`}
-            className={linkClass(`/users/${user.userId}`)}
-          >
-            {user.username}
-          </Link>
-        )}
-
-        {!user && (
-          <Link href="/login" className={linkClass("/login")}>
-            Login
-          </Link>
-        )}
-
-        {!user && (
-          <Link href="/register" className={linkClass("/register")}>
-            Register
-          </Link>
-        )}
-
-        {user && (
-          <button
-            className="navbar-link"
-            onClick={logout}
-            aria-label="Logout"
-            title="Abmelden" // Zeigt Text an, wenn man mit der Maus drüberfährt
-            style={{ display: 'flex', alignItems: 'center', gap: '8px' }} // Optional: Styling für Ausrichtung
-          >
-            <LogOut size={20} />
-            {/* Wenn du NUR das Icon willst, lösch das Wort "Logout" hier einfach */}
-          </button>
-        )}
-
-      </div>}
-
-      {/* Right side */}
-      <div className="navbar-right">
-        
-        <label className="navbar-lobby-search" htmlFor="lobby-id-search">
-
+        {/* ── Center: Lobby ID search (desktop only) ─────────────────────── */}
+        <label className="navbar-search" htmlFor="lobby-id-search">
+          <Search size={16} className="navbar-search-icon" />
           <input
             id="lobby-id-search"
+            className="navbar-search-input"
             placeholder="Enter Lobby ID"
             onKeyDown={handleLobbySearch}
-            style={{
-              border: "none",
-              background: "transparent",
-              outline: "none",
-              fontSize: 13,
-              color: "var(--sbb-mid-gray)",
-              width: "100%",
-            }}
           />
         </label>
-      </div>
-    </nav>
+
+        {/* ── Right: desktop actions ─────────────────────────────────────── */}
+        {!isLoading && (
+          <div className="navbar-actions">
+
+            {user && (
+              <Badge count={notificationCount} size="small" offset={[4, -2]}>
+                <button className="navbar-icon-btn" aria-label="Notifications">
+                  <Bell size={20} />
+                </button>
+              </Badge>
+            )}
+
+            <Link href="/lobbies" className={linkClass("/lobbies")}>
+              Lobbies
+            </Link>
+
+            <Link href="/leaderboard" className={linkClass("/leaderboard")}>
+              Leaderboard
+            </Link>
+
+            {user ? (
+              <>
+                <Link
+                  href={`/users/${user.userId}`}
+                  className={linkClass(`/users/${user.userId}`)}
+                >
+                  {user.username}
+                </Link>
+                <button
+                  className="navbar-icon-btn"
+                  onClick={logout}
+                  aria-label="Logout"
+                  title="Abmelden"
+                >
+                  <LogOut size={20} />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className={linkClass("/login")}>
+                  Login
+                </Link>
+                <Link href="/register" className="navbar-register-pill">
+                  Registration
+                </Link>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── Burger button (mobile/tablet only) ─────────────────────────── */}
+        <button
+          className="navbar-burger"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </nav>
+
+      {/* ── Full-screen mobile menu overlay ──────────────────────────────── */}
+      {menuOpen && (
+        <div className="mobile-menu">
+
+          <label className="mobile-menu-search" htmlFor="mobile-lobby-id-search">
+            <Search size={18} className="navbar-search-icon" />
+            <input
+              id="mobile-lobby-id-search"
+              className="navbar-search-input"
+              placeholder="Enter Lobby ID"
+              onKeyDown={handleLobbySearch}
+            />
+          </label>
+
+          <button
+            className="mobile-menu-link"
+            onClick={() => go("/lobbies")}
+          >
+            Lobbies
+          </button>
+
+          <button
+            className="mobile-menu-link"
+            onClick={() => go("/leaderboard")}
+          >
+            Leaderboard
+          </button>
+
+          {!isLoading && user && (
+            <>
+              <button
+                className="mobile-menu-link"
+                onClick={() => go(`/users/${user.userId}`)}
+              >
+                {user.username}
+              </button>
+              <button
+                className="mobile-menu-link mobile-menu-link--muted"
+                onClick={() => {
+                  setMenuOpen(false);
+                  logout();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+          {!isLoading && !user && (
+            <>
+              <button
+                className="mobile-menu-link"
+                onClick={() => go("/login")}
+              >
+                Login
+              </button>
+              <button
+                className="mobile-menu-link mobile-menu-link--primary"
+                onClick={() => go("/register")}
+              >
+                Registration
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </>
   );
 }
