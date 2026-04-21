@@ -72,14 +72,14 @@ import { MapLayerMouseEvent, MapLayerTouchEvent } from "maplibre-gl";
 import RoundOverview from "./RoundOverview";
 import LoadingScreen from "./LoadingScreen";
 import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
+import {useAuth} from "@/context/AuthContext";
 
 const GamePage: React.FC = () => {
   const router    = useRouter();
   const { id: gameId } = useParams<{ id: string }>();
   const apiService = useApi();
-  const { value: token } = useLocalStorage<string>("token", "");
-  const { value: userId } = useLocalStorage<string>("userId", "");//hardcoded for testing, needs to be set later with login
-  const { connect, disconnect, subscribe, publish, isConnected } = useWebSocket();
+  const {user:currentUser, token} = useAuth();
+  const  webSocket  = useWebSocket();
 
 
  type GameState = 
@@ -90,7 +90,7 @@ const GamePage: React.FC = () => {
   ;
 
   type UserResult = {
-    userId: string;
+    userId: number;
     score: string;
     totalscore: string;
     xCoordinate: number;
@@ -100,7 +100,7 @@ const GamePage: React.FC = () => {
 
   type GuessMessagePayload = {
     lobbyId: string;
-    userId: string;
+    userId: number;
     token: string;
     Xcoordinate: number;
     Ycoordinate: number;
@@ -124,7 +124,7 @@ const GamePage: React.FC = () => {
   const [currentRound, setCurrentRound] = useState<number | null>(null);
   const [maxRounds, setMaxRounds] = useState<number | null>(null);
   const [results, setResults] = useState<{currentRound: number; userResults: [UserResult]; train: Train} | null>(null); 
-  const [totalResults, setTotalResults] = useState<[{userId: string; score: number}] | null>(null); 
+  const [totalResults, setTotalResults] = useState<[{userId: number; score: number}] | null>(null);
   const [stationPins, setStationPins] = useState<[[number, number], [number,number]] | null>(null); //[lat, long]
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -135,6 +135,14 @@ const GamePage: React.FC = () => {
     }
     return new Date(epoch).toLocaleTimeString('de-CH', { timeZone: 'Europe/Zurich', hour: '2-digit', minute: '2-digit' });
   }
+
+  useEffect(() => {
+    if (!webSocket.isConnected && token && currentUser) {
+      console.log("WebSocket not connected - starting reconnect...");
+      webSocket.connect(currentUser.userId.toString(), token);
+    }
+  }, [webSocket.isConnected, token, currentUser, webSocket]);
+
 
   //prevent hidration error
   const [mounted, setMounted] = useState(false);
@@ -152,32 +160,35 @@ const GamePage: React.FC = () => {
     //convert lat lon to other format
     const [x, y] = latLngToEpsg(lat, lon);
 
-    const payload: GuessMessagePayload = {
-      lobbyId: gameId!,
-      userId: userId!, 
-      token: token,
-      Xcoordinate: x, 
-      Ycoordinate: y 
-  };
-
-    console.log("Guess:", payload);
-  
-    if (!isConnected) {
-      console.warn("WebSocket not connected yet");
+    if (!currentUser || !token) {
       return;
+    } else {
+      const payload: GuessMessagePayload = {
+        lobbyId: gameId!,
+        userId: currentUser.userId!,
+        token: token,
+        Xcoordinate: x,
+        Ycoordinate: y
+      };
+
+      console.log("Guess:", payload);
+
+      if (!webSocket.isConnected) {
+        console.warn("WebSocket not connected yet");
+        return;
+      }
+
+
+      webSocket.publish(`/app/game/${gameId}/guess`, {
+        type: "GUESS_MESSAGE",
+        payload: payload
+      });
+      setGuessCoords([lat, lon]); // record for later use (e.g. showing pin)
+
+      setGuessSubmitted(true);
+      console.log("Guess submitted:", payload);
     }
-    
-    
-    publish(`/app/game/${gameId}/guess`, {
-      type: "GUESS_MESSAGE",
-      payload: payload
-    });
-    setGuessCoords([lat, lon]); // record for later use (e.g. showing pin)
-
-    setGuessSubmitted(true);
-    console.log("Guess submitted:", payload);
   }
-
 
   // added for fix with guess after time is up
   const gameStateRef = useRef({
@@ -219,22 +230,25 @@ const GamePage: React.FC = () => {
   
   // ── WebSocket – real-time game events ────────────────────────────────────
   useEffect(() => {
-    if (!isConnected) return;
+    if (!webSocket.isConnected) return;
 
-    const subscription = subscribe<Message>(`/topic/game/${gameId}`, (update) => {
+    const subscription = webSocket.subscribe<Message>(`/topic/game/${gameId}`, (update) => {
       console.log("Received WS message:", update);
       setMessages((prev) => [...prev, update]);
       handleMessage(update);
     });
 
     // Send initial ready message
-    publish(`/app/game/${gameId}/ready`, {
-      type: "READY_FOR_NEXT_ROUND",
-      payload: {
-        userId: userId,
-        isReady: true
-      }
-    });
+    if (!currentUser || !token) {return;}
+    else {
+      webSocket.publish(`/app/game/${gameId}/ready`, {
+        type: "READY_FOR_NEXT_ROUND",
+        payload: {
+          userId: currentUser.userId,
+          isReady: true
+        }
+      });
+    }
 
     console.log("Sent initial READY_FOR_NEXT_ROUND message");
 
@@ -242,7 +256,7 @@ const GamePage: React.FC = () => {
       if (subscription) subscription.unsubscribe();
       console.log("Unsubscribed from websockets topic")
     };
-  }, [isConnected, subscribe, publish, gameId, userId]);  
+  }, [webSocket.isConnected, webSocket.subscribe, webSocket.publish, gameId, currentUser?.userId]);
 
   const handleMessage = useCallback((message: Message) => {
     const {
@@ -472,7 +486,7 @@ const GamePage: React.FC = () => {
                 results={results?.userResults || []}
                 currentRound={currentRound}
                 maxRounds={maxRounds}
-                publish={publish}/>
+                publish={webSocket.publish}/>
                 
     }
     else {
