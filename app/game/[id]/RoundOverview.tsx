@@ -25,18 +25,12 @@
  */
 
 import { Button } from "antd";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-//import { useWebSocket } from "@/hooks/useWebSocket";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { RMap, RMarker } from "maplibre-react-components";
-//import { Message} from "@types/message";
 import { Train } from "@/types/train";
-import { Round } from "@/types/round";
-import type { MessageType } from "@/types/messageType";
-//import { User } from "@/types/user";
 import { Message } from "@/types/message";
 
 type UserResult = {
@@ -61,10 +55,9 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
     const router     = useRouter();  
     const { value: userId } = useLocalStorage<string>("userId", "1"); //hardcoded for testing, needs to be set later with login
     const { id: gameId } = useParams();
-    const [unsortedResults, setUnsortedResults] = useState<UserResult[]>(results);
     const [sortedRoundResults, setSortedRoundResults] = useState<UserResult[]>([]);
     const [sortedTotalResults, setSortedTotalResults] = useState<UserResult[]>([]);
-    const [currentTrain, setcurrentTrain] = useState<Train | null>(train);
+    const [currentTrain, setCurrentTrain] = useState<Train | null>(train);
     //prevent hidration error
     const [mounted, setMounted] = useState(false);
     const [readyForNextRound, setReadyForNextRound] = useState(false);
@@ -75,17 +68,17 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         
     useEffect(() => {
         //sort user results by score descending
-        console.log("unsorted results:", unsortedResults);
-        const sortedResults = [...unsortedResults].sort((a, b) => parseInt(b.roundPoints) - parseInt(a.totalPoints));
+        console.log("unsorted results:", results);
+        const sortedResults = [...results].sort((a, b) => parseInt(b.roundPoints) - parseInt(a.totalPoints));
         setSortedRoundResults(sortedResults);
         console.log("sorted results:", sortedResults);
 
         //sort total results by totalscore descending
-        const sortedTotalResults = [...unsortedResults].sort((a, b) => parseInt(b.totalPoints) - parseInt(a.roundPoints));
+        const sortedTotalResults = [...results].sort((a, b) => parseInt(b.totalPoints) - parseInt(a.roundPoints));
         setSortedTotalResults(sortedTotalResults);
         console.log("sorted total results:", sortedTotalResults);
 
-    }, [unsortedResults]);
+    }, [results]);
 
     const handleReadyForNextRound = async () => {
         if (readyForNextRound) {
@@ -175,7 +168,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
 
         
 
-        {sortedRoundResults.map((result, index) => (
+        {sortedRoundResults.map((result) => (
             result.userId == userId ? (
                 <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you">
                 <div className="result-player-avatar">
