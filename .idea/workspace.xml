@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix(icon): remove favicon.ico so firefox too sees the new icon">
+      <change beforePath="$PROJECT_DIR$/contributions.md" beforeDir="false" afterPath="$PROJECT_DIR$/contributions.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client" value="3BRDRiUIGYQN9IU52iwU206PbJs" />
+    </persistenceIdMap>
+  </component>
+  <component name="CopilotUserSelectedChatMode">
+    <option name="chatModeId" value="Ask" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Main-Preview" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;snowjademusic&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
+    &quot;accountId&quot;: &quot;6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="3BRDRiUIGYQN9IU52iwU206PbJs" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.localhost:3000.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "main",
+    "javascript.preferred.runtime.type.id": "node",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
+    "last_opened_file_path": "/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_interpreter_path": "/home/shadi/.config/JetBrains/WebStorm2025.3/node/versions/24.14.1/bin/node",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="localhost:3000" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:3000">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.localhost:3000" />
+        <item itemvalue="JavaScript Debug.localhost:3000" />
+        <item itemvalue="JavaScript Debug.localhost:3000" />
+        <item itemvalue="JavaScript Debug.localhost:3000" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="" />
+      <created>1774442982464</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1774442982464</updated>
+      <workItem from="1774442983701" duration="637000" />
+      <workItem from="1774988184008" duration="468000" />
+      <workItem from="1775218325976" duration="1278000" />
+      <workItem from="1775767482519" duration="352000" />
+      <workItem from="1775768357477" duration="1212000" />
+      <workItem from="1775825713784" duration="643000" />
+      <workItem from="1776233028795" duration="1111000" />
+      <workItem from="1776234974907" duration="147000" />
+      <workItem from="1776235315502" duration="1014000" />
+      <workItem from="1776249917098" duration="19000" />
+      <workItem from="1776250548756" duration="34000" />
+      <workItem from="1776250671723" duration="88000" />
+      <workItem from="1776251156162" duration="4011000" />
+      <workItem from="1776255602712" duration="10425000" />
+      <workItem from="1776335133191" duration="2184000" />
+      <workItem from="1776339692276" duration="2163000" />
+      <workItem from="1776343671762" duration="4373000" />
+      <workItem from="1776371485389" duration="225000" />
+      <workItem from="1776371733759" duration="1510000" />
+      <workItem from="1776411766039" duration="11349000" />
+      <workItem from="1776426551210" duration="8294000" />
+      <workItem from="1776500618663" duration="8596000" />
+      <workItem from="1776674476361" duration="3425000" />
+      <workItem from="1776680191021" duration="10536000" />
+      <workItem from="1776702584032" duration="3717000" />
+      <workItem from="1776775376427" duration="3659000" />
+    </task>
+    <task id="LOCAL-00001" summary="chore: add to contributions.md">
+      <option name="closed" value="true" />
+      <created>1776233724108</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1776233724108</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat(lobbies): handle joining and creating lobbies as guest with pop-up">
+      <option name="closed" value="true" />
+      <created>1776268004132</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1776268004132</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat(lobbies): add tooltip to button hover">
+      <option name="closed" value="true" />
+      <created>1776268563937</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1776268563937</updated>
+    </task>
+    <task id="LOCAL-00004" summary="ci(gitignore): .idea files ignored">
+      <option name="closed" value="true" />
+      <created>1776412534968</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1776412534968</updated>
+    </task>
+    <task id="LOCAL-00005" summary="ci(gitignore): remove duplicate .cache">
+      <option name="closed" value="true" />
+      <created>1776412577708</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1776412577708</updated>
+    </task>
+    <task id="LOCAL-00006" summary="ci(semantic-commits): add automatic versioning through semantic Commits">
+      <option name="closed" value="true" />
+      <created>1776419694727</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1776419694727</updated>
+    </task>
+    <task id="LOCAL-00007" summary="fix(WebSockets): disentangle WebSocket messages">
+      <option name="closed" value="true" />
+      <created>1776423552953</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1776423552953</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fix(WebSockets): header inclusion in publish and subscribe">
+      <option name="closed" value="true" />
+      <created>1776424869035</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1776424869035</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat(icon): change icon to fit our theme">
+      <option name="closed" value="true" />
+      <created>1776428691815</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1776428691815</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fix(useLobbyActions): conform to merged change">
+      <option name="closed" value="true" />
+      <created>1776430230457</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1776430230457</updated>
+    </task>
+    <task id="LOCAL-00011" summary="refactor(useLobbyActions): merge with remo_Lobby branch">
+      <option name="closed" value="true" />
+      <created>1776430478735</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1776430478735</updated>
+    </task>
+    <task id="LOCAL-00012" summary="refactor(useLobbyActions): rechange">
+      <option name="closed" value="true" />
+      <created>1776432720744</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1776432720744</updated>
+    </task>
+    <task id="LOCAL-00013" summary="fix(icon): have same icon in navbar and in tab head">
+      <option name="closed" value="true" />
+      <created>1776433546783</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1776433546783</updated>
+    </task>
+    <task id="LOCAL-00014" summary="feat(Game Leaderboard): display per game Leaderboard">
+      <option name="closed" value="true" />
+      <created>1776708100257</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1776708100257</updated>
+    </task>
+    <task id="LOCAL-00015" summary="fix(icon): remove favicon.ico so firefox too sees the new icon">
+      <option name="closed" value="true" />
+      <created>1776776854401</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1776776854401</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="chore: add to contributions.md" />
+    <MESSAGE value="feat(lobbies): handle joining and creating lobbies as guest with pop-up" />
+    <MESSAGE value="feat(lobbies): add tooltip to button hover" />
+    <MESSAGE value="ci(gitignore): .idea files ignored" />
+    <MESSAGE value="ci(gitignore): remove duplicate .cache" />
+    <MESSAGE value="ci(semantic-commits): add automatic versioning through semantic Commits" />
+    <MESSAGE value="fix(WebSockets): disentangle WebSocket messages" />
+    <MESSAGE value="fix(WebSockets): header inclusion in publish and subscribe" />
+    <MESSAGE value="feat(icon): change icon to fit our theme" />
+    <MESSAGE value="fix(useLobbyActions): conform to merged change" />
+    <MESSAGE value="refactor(useLobbyActions): merge with remo_Lobby branch" />
+    <MESSAGE value="refactor(useLobbyActions): rechange" />
+    <MESSAGE value="fix(icon): have same icon in navbar and in tab head" />
+    <MESSAGE value="feat(Game Leaderboard): display per game Leaderboard" />
+    <MESSAGE value="fix(icon): remove favicon.ico so firefox too sees the new icon" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(icon): remove favicon.ico so firefox too sees the new icon" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

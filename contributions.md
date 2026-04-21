@@ -91,6 +91,13 @@ reason).
 
 _Continue with the same table format as above._
 
+| **Student**        | **Date** | **Link to Commit** | **Description**                                                                                                  | **Relevance**                                                |
+| ------------------ |----------| ------------------ |------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| **@snowjademusic** | 21.4     | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/398295f638b682bdf9beb26b8f4c7897f4e69416 | Remove games and Lobbies from working memory by removing all references once game is done, persist stats into DB | Keep server memory clean so we don't use unnecessary compute |
+|                    | 21.4     | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/7f05f0de8c329bf86ef1822f9d8a915445c511aa | show Leaderboard and GameResult after each game played                                                           | Significant part of the game.                                |
+
+
+
 ---
 
 ## Contributions Week 5 - [Begin Date] to [End Date]
