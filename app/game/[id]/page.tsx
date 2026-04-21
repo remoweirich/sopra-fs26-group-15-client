@@ -133,8 +133,8 @@ const GamePage: React.FC = () => {
     if (!epoch) {
       return "";
     }
-    return new Date(epoch).toISOString().slice(11, 16)}
-  ;
+    return new Date(epoch).toLocaleTimeString('de-CH', { timeZone: 'Europe/Zurich', hour: '2-digit', minute: '2-digit' });
+  }
 
   //prevent hidration error
   const [mounted, setMounted] = useState(false);
