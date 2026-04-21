@@ -417,8 +417,8 @@ const GamePage: React.FC = () => {
             }
             {/*Markers for origin and destination stations*/}
             {
-              stationPins?.map((station) => (
-                <RMarker longitude={station[1]} latitude={station[0]} color="green"/>
+              stationPins?.map((station,idx) => (
+                <RMarker key={`station-${idx}-${station[0]}-${station[1]}`} longitude={station[1]} latitude={station[0]} color="green"/>
               ))
             }
             {/* Floating hint / submit button at map bottom */}

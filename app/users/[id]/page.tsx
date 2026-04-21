@@ -9,6 +9,12 @@ import { useApi } from "@/hooks/useApi";
 import { Button, Tabs, Input, Form, App } from "antd";
 import { useAuth } from "@/context/AuthContext";
 
+type ProfileFormValues = {
+  username: string;
+  userBio?: string;
+  password?: string;
+};
+
 // Dummy Game History
 const DUMMY_HISTORY = [
   { name: "Pendler-Challenge", date: "10. Mar", rounds: "5R", score: 4280 },
@@ -107,7 +113,7 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: ProfileFormValues) => {
     if (!token) return;
 
     try {
