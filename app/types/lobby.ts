@@ -7,6 +7,7 @@ export interface Lobby {
   lobbyCode: string;
   admin: Admin;
   rounds: Round[];
+  maxRounds: number;
   visibility: "PUBLIC" | "PRIVATE";
   lobbyState: "WAITING" | "IN_GAME" | "FINISHING";
   currentRound: number;

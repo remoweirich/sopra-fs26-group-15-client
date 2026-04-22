@@ -152,7 +152,7 @@ useEffect(() => {
       {/* Meta badges: rounds + visibility */}
       <div className="wait-meta-row">
         <span className="badge badge-inactive">
-          {lobby.rounds?.length || 0} rounds
+          {lobby.maxRounds || 0} rounds
         </span>
         <span className={`badge ${lobby.visibility === "PUBLIC" ? "badge-public" : "badge-private"}`}>
           {lobby.visibility === "PUBLIC" ? "🌍 Public" : "🔒 Private"}
@@ -214,7 +214,7 @@ useEffect(() => {
             className="btn-full wait-start-btn"
             onClick={handleStartGame}
           >
-            ▶ Start Game ({lobby.rounds?.length || 0} rounds)
+            ▶ Start Game ({lobby.maxRounds || 0} rounds)
           </Button>
         ) : (
           <div className="wait-waiting-box">
