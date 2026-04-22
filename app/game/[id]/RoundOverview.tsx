@@ -38,15 +38,9 @@ import { Round } from "@/types/round";
 import type { MessageType } from "@/types/messageType";
 //import { User } from "@/types/user";
 import { Message } from "@/types/message";
+import {UserResult} from "@/types/user";
 
-type UserResult = {
-    userId: string;
-    roundPoints: string;
-    totalPoints: string;
-    xCoordinate: number;
-    yCoordinate: number;
-    distance: number;
-  }
+
 
 interface RoundOverviewProps {
     train: Train | null;
@@ -76,12 +70,12 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
     useEffect(() => {
         //sort user results by score descending
         console.log("unsorted results:", unsortedResults);
-        const sortedResults = [...unsortedResults].sort((a, b) => parseInt(b.roundPoints) - parseInt(a.totalPoints));
+        const sortedResults = [...unsortedResults].sort((a, b) => b.roundPoints - a.totalPoints);
         setSortedRoundResults(sortedResults);
         console.log("sorted results:", sortedResults);
 
         //sort total results by totalscore descending
-        const sortedTotalResults = [...unsortedResults].sort((a, b) => parseInt(b.totalPoints) - parseInt(a.roundPoints));
+        const sortedTotalResults = [...unsortedResults].sort((a, b) => b.totalPoints - a.roundPoints);
         setSortedTotalResults(sortedTotalResults);
         console.log("sorted total results:", sortedTotalResults);
 
@@ -176,7 +170,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         
 
         {sortedRoundResults.map((result, index) => (
-            result.userId == userId ? (
+            result.userId == parseInt(userId) ? (
                 <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you">
                 <div className="result-player-avatar">
             {/* TODO: username initial */}
@@ -209,7 +203,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         {sortedTotalResults.map((result, index) => (
             <div key={`total-row-${result.userId}`} className="result-standings-row">
           <span className="result-standings-rank">{index+1}.</span>
-          <span className="result-standings-name">{result.userId == userId ? ("You"): result.userId}</span>
+          <span className="result-standings-name">{result.userId == parseInt(userId) ? ("You"): result.userId}</span>
           <span className="result-standings-score">{result.totalPoints}</span>
         </div>
         ))}

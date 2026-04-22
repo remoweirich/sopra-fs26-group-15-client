@@ -39,3 +39,12 @@ export interface UserDTO{
   creationDate: Date,
   friends: UserDTO[]
 }
+
+export interface UserResult {
+  userId: number;
+  totalPoints: number;
+  roundPoints: number;
+  xCoordinate: number;
+  yCoordinate: number;
+  distance: number;
+}

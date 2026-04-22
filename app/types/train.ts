@@ -16,7 +16,7 @@ export interface Train {
   
 }
 
-type Station = {
+export type Station = {
   stationName: string;
   xCoordinate: number;
   yCoordinate: number;

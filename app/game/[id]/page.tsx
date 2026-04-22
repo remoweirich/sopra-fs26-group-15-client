@@ -61,7 +61,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { Message} from "@/types/message";
-import { Train } from "@/types/train";
+import { Train, Station } from "@/types/train";
 import { Round } from "@/types/round";
 import type { MessageType } from "@/types/messageType";
 
@@ -72,6 +72,8 @@ import { MapLayerMouseEvent, MapLayerTouchEvent } from "maplibre-gl";
 import RoundOverview from "./RoundOverview";
 import LoadingScreen from "./LoadingScreen";
 import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
+import {GameMessage, ResultDTO} from "@/types/gameMessage";
+import {UserResult} from "@/types/user";
 
 const GamePage: React.FC = () => {
   const router    = useRouter();
@@ -89,14 +91,14 @@ const GamePage: React.FC = () => {
     | "GAME_ENDED"
   ;
 
-  type UserResult = {
+  /*type UserResult = {
     userId: string;
     score: string;
     totalscore: string;
     xCoordinate: number;
     yCoordinate: number;
     distance: number;
-  }
+  }*/
 
   type GuessMessagePayload = {
     lobbyId: string;
@@ -123,7 +125,7 @@ const GamePage: React.FC = () => {
   const [arrivalTime, setArrivalTime] = useState<string | null>(null);
   const [currentRound, setCurrentRound] = useState<number | null>(null);
   const [maxRounds, setMaxRounds] = useState<number | null>(null);
-  const [results, setResults] = useState<{currentRound: number; userResults: [UserResult]; train: Train} | null>(null); 
+  const [results, setResults] = useState<{roundNumber: number, userResults: UserResult[], train: Train} | null>(null);
   const [totalResults, setTotalResults] = useState<[{userId: string; score: number}] | null>(null); 
   const [stationPins, setStationPins] = useState<[[number, number], [number,number]] | null>(null); //[lat, long]
 
@@ -221,7 +223,7 @@ const GamePage: React.FC = () => {
   useEffect(() => {
     if (!isConnected) return;
 
-    const subscription = subscribe<Message>(`/topic/game/${gameId}`, (update) => {
+    const subscription = subscribe<GameMessage>(`/topic/game/${gameId}`, (update) => {
       console.log("Received WS message:", update);
       setMessages((prev) => [...prev, update]);
       handleMessage(update);
@@ -244,7 +246,7 @@ const GamePage: React.FC = () => {
     };
   }, [isConnected, subscribe, publish, gameId, userId]);  
 
-  const handleMessage = useCallback((message: Message) => {
+  const handleMessage = useCallback((message: GameMessage) => {
     const {
       clickPosition: currentClick,
       guessSubmitted: alreadySubmitted,
@@ -267,10 +269,6 @@ const GamePage: React.FC = () => {
         const destCoords = epsgToLatLng(destination.xCoordinate, destination.yCoordinate)
         setStationPins([originCoords, destCoords]);
 
-        setStationPins([message.payload.train.lineOrigin, message.payload.train.lineDestination].map((station) => 
-          epsgToLatLng(station.xCoordinate, station.yCoordinate)
-          
-        ))
 
         setCurrentRound(message.payload.roundNumber);
         setMaxRounds(message.payload.maxRounds);
@@ -321,11 +319,13 @@ const GamePage: React.FC = () => {
         setGameState("BETWEEN_ROUNDS");
         break;
 
-      case "GAME_END":
+        /*
+        case "GAME_END":
         setGameState("GAME_ENDED");
         // Teardown if needed
         router.push("/game/{gameId}/leaderboard");
         break;
+        */
     }
 
   }, [guessCoords, guessSubmitted, handleSubmitGuess, gameId, router]);
@@ -418,7 +418,16 @@ const GamePage: React.FC = () => {
             {/*Markers for origin and destination stations*/}
             {
               stationPins?.map((station,idx) => (
-                <RMarker key={`station-${idx}-${station[0]}-${station[1]}`} longitude={station[1]} latitude={station[0]} color="green"/>
+                <RMarker key={`station-${idx}-${station[0]}-${station[1]}`} longitude={station[1]} latitude={station[0]} >
+              <div style={{
+              width: '20px',
+              height: '20px',
+              backgroundColor: 'green',
+              borderRadius: '50%',
+              border: '2px solid white',
+              cursor: 'pointer'
+            }} />
+                </RMarker>
               ))
             }
             {/* Floating hint / submit button at map bottom */}
