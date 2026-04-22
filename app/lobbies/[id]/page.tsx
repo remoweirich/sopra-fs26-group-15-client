@@ -92,9 +92,16 @@ useEffect(() => {
 
     const destination = `/app/lobby/${lobbyId}/start`;
 
+    if (!currentUser || !token) return;
+
+    const payload: UserAuthDTO = {
+      userId: currentUser.userId,
+      token: token
+    }
+
     const messageBody: LobbyMessage = {
       type: "START_GAME",
-      payload: null
+      payload: payload
     }
 
     webSocket.publish(destination, messageBody);

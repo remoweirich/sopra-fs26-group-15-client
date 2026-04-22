@@ -34,7 +34,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
     credentials.current = {userId, token};
-
     const socket = new SockJS(`${getApiDomain()}/ws`);
     const client = new Client({
       webSocketFactory: () => socket,
