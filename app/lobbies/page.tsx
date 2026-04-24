@@ -21,6 +21,7 @@ type PendingAction =
 const LobbiesPage: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
+  const {connect} = useWebSocket();
   const { handleJoin } = useLobbyActions();
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
@@ -84,7 +85,7 @@ const LobbiesPage: React.FC = () => {
     };
 
     fetchLobbies();
-
+    connect("","")
     // const token = localStorage.getItem("token");
     // const userId = localStorage.getItem("userId");
 
