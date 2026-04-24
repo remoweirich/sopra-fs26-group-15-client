@@ -176,7 +176,7 @@ const MainPage: React.FC = () => {
 
   const handlePlay = () => {
     if (!token) {
-      router.push("/login");
+      router.push("/lobbies");
     } else {
       router.push("/lobbies");
     }
