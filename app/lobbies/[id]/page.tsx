@@ -22,7 +22,7 @@ const LobbyWaitPage: React.FC = () => {
 
   //const token = JSON.parse(localStorage.getItem("token") || '""') as string;
   //const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
-  const {user:currentUser, token} = useAuth();
+  const {user:currentUser, token, isLoading} = useAuth();
     const [lobby, setLobby]   = useState<Lobby | null>(null);
     const intentionalDisconnect = useRef<boolean>(false);
 
@@ -54,13 +54,14 @@ const LobbyWaitPage: React.FC = () => {
 
 
   // ── Websocket fetch ────────────────────────────────────────────────────────
-  // 1. Zuerst: Ein Effekt, der die Verbindung bei Bedarf wiederherstellt (Refresh-Schutz)
+  // CRITICAL: Wait for AuthContext to load token from localStorage before connecting
 useEffect(() => {
+  if (isLoading) return; // Wait for auth context to finish loading
   if (!webSocket.isConnected && token && currentUser) {
     console.log("WebSocket nicht verbunden - starte Reconnect...");
     webSocket.connect(currentUser.userId.toString(), token);
   }
-}, [webSocket.isConnected, token, currentUser, webSocket]);
+}, [isLoading, webSocket.isConnected, token, currentUser, webSocket]);
   
   useEffect(() => {
     if (!webSocket.isConnected || !lobbyId) return;
