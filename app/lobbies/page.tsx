@@ -69,7 +69,7 @@ const LobbiesPage: React.FC = () => {
         //setLobbies(combindesdLobbies); // Only for testing - replace with response when backend is ready
         setLobbies(response);
         console.log(response); //to be removed
-        console.log("Fetched lobbies:", response.length);
+        console.log("Fetched lobbies:", response.length, response);
         if (response.length === 0) {
           console.log("No lobbies found.");
         }
@@ -206,7 +206,7 @@ return (
                   </span>
                 </div>
                 <div className="lobby-row-meta">
-                  Host: {lobby.admin?.userId || "Unknown"} | Rounds: {lobby.rounds?.length || 0} | Visibility: {lobby.visibility}
+                  Host: {lobby.admin?.userId || "Unknown"} | Rounds: {lobby.maxRounds || 0} | Visibility: {lobby.visibility}
                 </div>
               </div>
             </div>
