@@ -431,7 +431,7 @@ const GamePage: React.FC = () => {
             onTouchEnd={handleMapClickTouch}
             >
             {
-              clickPosition && (<RMarker initialColor={getPlayerColor(userId)} longitude={clickPosition[0]} latitude={clickPosition[1]}/>)
+              clickPosition && (<RMarker initialColor={getPlayerColor(currentUser?.userId.toString() ?? "")} longitude={clickPosition[0]} latitude={clickPosition[1]}/>)
             }
             {/*Markers for origin and destination stations*/}
             {
