@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix(icon): remove favicon.ico so firefox too sees the new icon">
-      <change beforePath="$PROJECT_DIR$/contributions.md" beforeDir="false" afterPath="$PROJECT_DIR$/contributions.md" afterDir="false" />
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix(lobbies): fix rounds info on lobbies page">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_15_04_2026,_13_45_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_15_04_2026__13_45__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026,_08_04_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026,_08_43_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026,_13_06_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026__08_04__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026__08_43__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026__13_06__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/game/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lobbies/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lobbies/newlobby/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/newlobby/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lobbies/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/utils/domain.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/domain.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +37,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Main-Preview" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -31,12 +48,19 @@
     &quot;assignee&quot;: &quot;snowjademusic&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
-    &quot;accountId&quot;: &quot;6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f&quot;
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="main" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:remoweirich/sopra-fs26-group-15-client.git",
+    "accountId": "3bae03c6-3276-43d0-83e5-7ac4490df267"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -53,17 +77,19 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "Main-Preview",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
     "last_opened_file_path": "/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_interpreter_path": "/home/shadi/.config/JetBrains/WebStorm2025.3/node/versions/24.14.1/bin/node",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
+    "settings.editor.selected.configurable": "terminal",
+    "ts.external.directory.path": "/Users/remoweirich/Desktop/UZH/FS2026/SoPra/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -90,13 +116,14 @@
         <item itemvalue="JavaScript Debug.localhost:3000" />
         <item itemvalue="JavaScript Debug.localhost:3000" />
         <item itemvalue="JavaScript Debug.localhost:3000" />
+        <item itemvalue="JavaScript Debug.localhost:3000" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-WS-261.22158.274" />
       </set>
     </attachedChunks>
   </component>
@@ -254,7 +281,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776776854401</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="fix(homepage): Play button sends to lobbies always">
+      <option name="closed" value="true" />
+      <created>1777021063434</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1777021063434</updated>
+    </task>
+    <task id="LOCAL-00017" summary="fix(lobbies): fix rounds info on lobbies page">
+      <option name="closed" value="true" />
+      <created>1777021496940</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1777021496940</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -287,7 +330,9 @@
     <MESSAGE value="fix(icon): have same icon in navbar and in tab head" />
     <MESSAGE value="feat(Game Leaderboard): display per game Leaderboard" />
     <MESSAGE value="fix(icon): remove favicon.ico so firefox too sees the new icon" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(icon): remove favicon.ico so firefox too sees the new icon" />
+    <MESSAGE value="fix(homepage): Play button sends to lobbies always" />
+    <MESSAGE value="fix(lobbies): fix rounds info on lobbies page" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(lobbies): fix rounds info on lobbies page" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

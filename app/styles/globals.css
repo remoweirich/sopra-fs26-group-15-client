@@ -438,7 +438,7 @@ html, body {
 .card--wide {
   width: 100%;
   max-width: 720px;
-  margin: 5 auto;
+  margin: 0 auto;
   padding: var(--sp-lg);
 
 }

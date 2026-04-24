@@ -31,7 +31,7 @@ function LogoMark() {
 export default function Navbar() {
 
   // const [resolvedUser, setResolvedUser] = useState<{ userId: number; username: string } | null>(null);
-  const [notificationCount, setNotificationCount] = useState(3); // Placeholder for notification count, replace with actual logic to fetch count
+  const [notificationCount, setNotificationCount] = useState(0); // Placeholder for notification count, replace with actual logic to fetch count
   // const [showLinks, setShowLinks] = useState(false);
   const{user,logout,isLoading} = useAuth();
 
@@ -146,7 +146,7 @@ const [menuOpen, setMenuOpen] = useState(false);
           <input
             id="lobby-id-search"
             className="navbar-search-input"
-            placeholder="Enter Lobby ID"
+            placeholder="Enter Lobby Code"
             onKeyDown={handleLobbySearch}
           />
         </label>
@@ -221,7 +221,7 @@ const [menuOpen, setMenuOpen] = useState(false);
             <input
               id="mobile-lobby-id-search"
               className="navbar-search-input"
-              placeholder="Enter Lobby ID"
+              placeholder="Enter Lobby Code"
               onKeyDown={handleLobbySearch}
             />
           </label>

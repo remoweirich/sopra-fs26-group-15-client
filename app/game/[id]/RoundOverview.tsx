@@ -69,15 +69,15 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         
     useEffect(() => {
         //sort user results by score descending
-        console.log("unsorted results:", unsortedResults);
+        // console.log("unsorted results:", unsortedResults);
         const sortedResults = [...unsortedResults].sort((a, b) => b.roundPoints - a.totalPoints);
         setSortedRoundResults(sortedResults);
-        console.log("sorted results:", sortedResults);
+        // console.log("sorted results:", sortedResults);
 
         //sort total results by totalscore descending
         const sortedTotalResults = [...unsortedResults].sort((a, b) => b.totalPoints - a.roundPoints);
         setSortedTotalResults(sortedTotalResults);
-        console.log("sorted total results:", sortedTotalResults);
+        // console.log("sorted total results:", sortedTotalResults);
 
     }, [unsortedResults]);
 
@@ -94,7 +94,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                 isReady: true
             }
         });
-        console.log("Sent ready message for user" + userId)
+        // console.log("Sent ready message for user" + userId)
     }
 
     const handleEndGame = async () => {
