@@ -3,6 +3,20 @@
 
 ### Bug Fixes
 
+* attempt to fix hydration race condition in game page ([e1e1e3f](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/e1e1e3faf806bd41ff779e5a0c6937c7d6b3e5bb))
+* **CSS:** changed card margin to 0 auto, from 5 auto ([d696a4e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/d696a4ee0b5fcb9c155120d70b48aafa674960e4))
+* **homepage:** Play button sends to lobbies always ([a43324e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/a43324ebf0643b23ca59413ecc6e711d3d9ddcf2))
+* **lobbies:** fix rounds info on lobbies page ([85aea7b](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/85aea7bed0d87a593554673997da3f765c6dc5ff))
+* **navbar:** visual lobby code in navbar ([850be84](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/850be84d8fe03ab32b5c2b60a1989197d3a22de6))
+* potential fix for hydration race condition in lobbies page ([fcf80ba](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/fcf80baeccb62e8c772d79c5b93b7b52a8ff0298))
+* remove trailing ([03ee7ca](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/03ee7cafe4a0af5a52ee4c55fc19757997aff690))
+* **URL:** missing // ([6bd5589](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/6bd5589c94fadc6dea8fe3a36a9c7b5826fdd70c))
+
+## [1.0.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.0.0...v1.0.1) (2026-04-24)
+
+
+### Bug Fixes
+
 * **URL:** missing // ([6bd5589](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/6bd5589c94fadc6dea8fe3a36a9c7b5826fdd70c))
 
 # 1.0.0 (2026-04-22)
