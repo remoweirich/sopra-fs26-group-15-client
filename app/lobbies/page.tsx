@@ -68,8 +68,8 @@ const LobbiesPage: React.FC = () => {
         // const combindesdLobbies = [...response, lobby1, lobby2];
         //setLobbies(combindesdLobbies); // Only for testing - replace with response when backend is ready
         setLobbies(response);
-        console.log(response); //to be removed
-        console.log("Fetched lobbies:", response.length, response);
+        // console.log(response); //to be removed
+        // console.log("Fetched lobbies:", response.length, response);
         if (response.length === 0) {
           console.log("No lobbies found.");
         }
@@ -107,12 +107,12 @@ const LobbiesPage: React.FC = () => {
   const handleJoinClick = (lobby: Lobby) => {
     const enteredCode = inputCodes[lobby.lobbyId] || lobby.lobbyCode;
     if (token) {
-      handleJoin(lobby.lobbyId, { lobbyCode: enteredCode });
+      handleJoin(lobby.lobbyId, { lobbyCode: enteredCode.toUpperCase() });
     } else {
       setPendingAction({
         type: "join",
         lobbyId: lobby.lobbyId,
-        lobbyCode: enteredCode,
+        lobbyCode: enteredCode.toUpperCase(),
       });
       setIsAuthModalVisible(true);
     }

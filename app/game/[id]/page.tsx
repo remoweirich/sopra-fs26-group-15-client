@@ -57,9 +57,9 @@
 import { use, useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
 import { useWebSocket } from "@/context/WebSocketContext";
+import { useAuth } from "@/context/AuthContext";
 import { Message} from "@/types/message";
 import { Train, Station } from "@/types/train";
 import { Round } from "@/types/round";
@@ -79,8 +79,7 @@ const GamePage: React.FC = () => {
   const router    = useRouter();
   const { id: gameId } = useParams<{ id: string }>();
   const apiService = useApi();
-  const { value: token } = useLocalStorage<string>("token", "");
-  const { value: userId } = useLocalStorage<string>("userId", "");//hardcoded for testing, needs to be set later with login
+  const { user: currentUser, token, isLoading } = useAuth(); // Use AuthContext instead of useLocalStorage
   const { connect, disconnect, subscribe, publish, isConnected } = useWebSocket();
 
 
@@ -155,6 +154,16 @@ const GamePage: React.FC = () => {
     setMounted(true);
   }, []);
 
+  // ── WebSocket connection – wait for auth context to load ─────────────────
+  useEffect(() => {
+    if (isLoading) return; // Wait for auth context to finish loading from localStorage
+    if (!token || !currentUser) return;
+    if (isConnected) return;
+
+    console.log("Game page: WebSocket not connected - initiating connection...");
+    connect(currentUser.userId.toString(), token);
+  }, [isLoading, token, currentUser, isConnected, connect]);
+
     // ── Guess submission ─────────────────────────────────────────────────────
   const handleSubmitGuess = async () => {
     if (!clickPosition) return;
@@ -166,13 +175,13 @@ const GamePage: React.FC = () => {
 
     const payload: GuessMessagePayload = {
       lobbyId: gameId!,
-      userId: userId!, 
-      token: token,
+      userId: currentUser?.userId.toString() || "", 
+      token: token || "",
       Xcoordinate: x, 
       Ycoordinate: y 
   };
 
-    console.log("Guess:", payload);
+    // console.log("Guess:", payload);
   
     if (!isConnected) {
       console.warn("WebSocket not connected yet");
@@ -187,7 +196,7 @@ const GamePage: React.FC = () => {
     setGuessCoords([lat, lon]); // record for later use (e.g. showing pin)
 
     setGuessSubmitted(true);
-    console.log("Guess submitted:", payload);
+    //console.log("Guess submitted:", payload);
   }
 
 
@@ -231,27 +240,29 @@ const GamePage: React.FC = () => {
     if (!isConnected) return;
 
     const subscription = subscribe<GameMessage>(`/topic/game/${gameId}`, (update) => {
-      console.log("Received WS message:", update);
+      //console.log("Received WS message:", update);
       setMessages((prev) => [...prev, update]);
       handleMessage(update);
     });
 
-    // Send initial ready message
+    // Send initial ready message only after successful subscription
     publish(`/app/game/${gameId}/ready`, {
       type: "READY_FOR_NEXT_ROUND",
       payload: {
-        userId: userId,
+        userId: currentUser?.userId.toString(),
         isReady: true
       }
     });
 
-    console.log("Sent initial READY_FOR_NEXT_ROUND message");
+    //console.log("Sent initial READY_FOR_NEXT_ROUND message");
 
     return () => {
-      if (subscription) subscription.unsubscribe();
-      console.log("Unsubscribed from websockets topic")
+      if (subscription) {
+        subscription.unsubscribe();
+        console.log("Unsubscribed from websockets topic")
+      }
     };
-  }, [isConnected, subscribe, publish, gameId, userId]);  
+  }, [isConnected, subscribe, publish, gameId, currentUser]);  
 
   const handleMessage = useCallback((message: GameMessage) => {
     const {
@@ -262,7 +273,7 @@ const GamePage: React.FC = () => {
 
     switch (message.type) {
       case "ROUND_START":
-        console.log("Round started:", message);
+        //console.log("Round started:", message);
         setGuessCoords(null);
         setGuessSubmitted(false);
         setClickPosition(null);
@@ -287,18 +298,18 @@ const GamePage: React.FC = () => {
         break;
 
       case "ROUND_END":
-        console.log("Round end received");
-        console.log("Current version in REF:", { currentClick, alreadySubmitted });
+        // console.log("Round end received");
+        //console.log("Current version in REF:", { currentClick, alreadySubmitted });
 
         if (currentClick && !alreadySubmitted) {
-          console.log("Auto-Submit after ROUND_END");
+          // console.log("Auto-Submit after ROUND_END");
           submitFn();
         }
         setTimerActive(false);
         break;
       
       case "SCORES":
-        console.log("Scores updated:", message);
+        // console.log("Scores updated:", message);
         //convert user guess coordinates
         const userResults = message.payload.userResults.map((result: UserResult) => {
           const [lat, lng] = epsgToLatLng(result.xCoordinate, result.yCoordinate);

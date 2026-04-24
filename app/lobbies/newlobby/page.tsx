@@ -39,7 +39,7 @@ const NewLobbyPage: React.FC = () => {
       visibility: values.visibility,
     };
 
-    console.log(currentUser ? currentUser.userId.toString() : "-1")
+    // console.log(currentUser ? currentUser.userId.toString() : "-1")
 
     // Aufruf mit 3 Argumenten:
     const response = await apiService.post<LobbyAccessDTO>(
