@@ -110,7 +110,7 @@ const GamePage: React.FC = () => {
 
 
   const [messages, setMessages] = useState<Message[]>([]);
-
+  const PLAYER_COLORS = ["#3357FF", "#ffdd00", "#33FF57", "#F333FF", "#FF33A1"];
   const [gameState,         setGameState]         = useState<GameState | null>("ROUND_IN_PROGRESS");
   const [currentTime,         setCurrentTime]         = useState<string>("");
   const [timerActive,        setTimerActive]        = useState<boolean>(true);
@@ -130,6 +130,16 @@ const GamePage: React.FC = () => {
   const [stationPins, setStationPins] = useState<[[number, number], [number,number]] | null>(null); //[lat, long]
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const playerColorMap = useRef<Record<string, string>>({});
+
+  const getPlayerColor = (userId: string) => {
+      if (!playerColorMap.current[userId]) {
+          // Assign a new color from palette based on existing count
+          const colorIndex = Object.keys(playerColorMap.current).length % PLAYER_COLORS.length;
+          playerColorMap.current[userId] = PLAYER_COLORS[colorIndex];
+      }
+      return playerColorMap.current[userId];
+    };
 
   const epochToTime = (epoch: number | null) : string => {
     if (!epoch) {
@@ -410,16 +420,16 @@ const GamePage: React.FC = () => {
             onTouchEnd={handleMapClickTouch}
             >
             {
-              clickPosition && (<RMarker longitude={clickPosition[0]} latitude={clickPosition[1]}/>) 
+              clickPosition && (<RMarker initialColor={getPlayerColor(userId)} longitude={clickPosition[0]} latitude={clickPosition[1]}/>)
             }
             {/*Markers for origin and destination stations*/}
             {
               stationPins?.map((station,idx) => (
-                <RMarker key={`station-${idx}-${station[0]}-${station[1]}`} longitude={station[1]} latitude={station[0]} >
+                <RMarker initialColor={"#E30613"} key={`station-${idx}-${station[0]}-${station[1]}`} longitude={station[1]} latitude={station[0]} >
               <div style={{
               width: '20px',
               height: '20px',
-              backgroundColor: 'green',
+              backgroundColor: '#E30613',
               borderRadius: '50%',
               border: '2px solid white',
               cursor: 'pointer'
@@ -478,8 +488,9 @@ const GamePage: React.FC = () => {
                 results={results?.userResults || []}
                 currentRound={currentRound}
                 maxRounds={maxRounds}
-                publish={publish}/>
-                
+                publish={publish}
+                getPlayerColor={getPlayerColor}/>
+
     }
     else {
       return <LoadingScreen />;

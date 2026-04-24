@@ -48,9 +48,10 @@ interface RoundOverviewProps {
     currentRound: number | null;
     maxRounds: number | null;
     publish: (destination: string, body: Message) => void;
+    getPlayerColor: (userId: string) => string;
     }
 
-const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish }) => {   
+const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish, getPlayerColor }) => {
     
     const router     = useRouter();  
     const { value: userId } = useLocalStorage<string>("userId", "1"); //hardcoded for testing, needs to be set later with login
@@ -117,12 +118,14 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                 {/*Actual Train Position*/}
                 {currentTrain?.currentX && currentTrain?.currentY && (
                     <RMarker
+                    initialColor={"#E30613"}
                     longitude={currentTrain.currentY}
                     latitude={currentTrain.currentX}
                     />)}
                 {/*player guess positions*/}
                 {sortedRoundResults.map((result) => (
                     <RMarker
+                    initialColor={getPlayerColor(result.userId.toString())}
                     key={`guess-${result.userId}-${result.xCoordinate}-${result.yCoordinate}`}
                     longitude={result.yCoordinate}
                     latitude={result.xCoordinate}
@@ -171,7 +174,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
 
         {sortedRoundResults.map((result, index) => (
             result.userId == parseInt(userId) ? (
-                <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you">
+                <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
                 <div className="result-player-avatar">
             {/* TODO: username initial */}
                     </div>
@@ -181,7 +184,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                     </div>
                     <span className="result-player-score">{result.roundPoints}</span>
                 </div>) : (
-                <div key={`round-row-${result.userId}`} className="result-player-row">
+                <div key={`round-row-${result.userId}`} className="result-player-row" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
                     <div className="result-player-avatar">
                         {/* TODO: username initial */}
                     </div>
@@ -201,7 +204,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         {/*map over overallStandings[] */}
 
         {sortedTotalResults.map((result, index) => (
-            <div key={`total-row-${result.userId}`} className="result-standings-row">
+            <div key={`total-row-${result.userId}`} className="result-standings-row" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
           <span className="result-standings-rank">{index+1}.</span>
           <span className="result-standings-name">{result.userId == parseInt(userId) ? ("You"): result.userId}</span>
           <span className="result-standings-score">{result.totalPoints}</span>

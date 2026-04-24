@@ -116,11 +116,12 @@ useEffect(() => {
         userId: currentUser.userId,
         token: token
       }
+
       const messageBody: LobbyMessage = {
         type: "LEAVE_LOBBY",
         payload: payload
       }
-
+      console.log("leave published")
       webSocket.publish(destination, messageBody);
       console.log("message published: ", messageBody);
 
