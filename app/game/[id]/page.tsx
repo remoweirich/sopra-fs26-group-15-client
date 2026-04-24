@@ -57,9 +57,9 @@
 import { use, useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-import useLocalStorage from "@/hooks/useLocalStorage";
 //import { useWebSocket } from "@/hooks/useWebSocket";
 import { useWebSocket } from "@/context/WebSocketContext";
+import { useAuth } from "@/context/AuthContext";
 import { Message} from "@/types/message";
 import { Train, Station } from "@/types/train";
 import { Round } from "@/types/round";
@@ -79,8 +79,7 @@ const GamePage: React.FC = () => {
   const router    = useRouter();
   const { id: gameId } = useParams<{ id: string }>();
   const apiService = useApi();
-  const { value: token } = useLocalStorage<string>("token", "");
-  const { value: userId } = useLocalStorage<string>("userId", "");//hardcoded for testing, needs to be set later with login
+  const { user: currentUser, token, isLoading } = useAuth(); // Use AuthContext instead of useLocalStorage
   const { connect, disconnect, subscribe, publish, isConnected } = useWebSocket();
 
 
@@ -145,6 +144,16 @@ const GamePage: React.FC = () => {
     setMounted(true);
   }, []);
 
+  // ── WebSocket connection – wait for auth context to load ─────────────────
+  useEffect(() => {
+    if (isLoading) return; // Wait for auth context to finish loading from localStorage
+    if (!token || !currentUser) return;
+    if (isConnected) return;
+
+    console.log("Game page: WebSocket not connected - initiating connection...");
+    connect(currentUser.userId.toString(), token);
+  }, [isLoading, token, currentUser, isConnected, connect]);
+
     // ── Guess submission ─────────────────────────────────────────────────────
   const handleSubmitGuess = async () => {
     if (!clickPosition) return;
@@ -156,8 +165,8 @@ const GamePage: React.FC = () => {
 
     const payload: GuessMessagePayload = {
       lobbyId: gameId!,
-      userId: userId!, 
-      token: token,
+      userId: currentUser?.userId.toString() || "", 
+      token: token || "",
       Xcoordinate: x, 
       Ycoordinate: y 
   };
@@ -226,11 +235,11 @@ const GamePage: React.FC = () => {
       handleMessage(update);
     });
 
-    // Send initial ready message
+    // Send initial ready message only after successful subscription
     publish(`/app/game/${gameId}/ready`, {
       type: "READY_FOR_NEXT_ROUND",
       payload: {
-        userId: userId,
+        userId: currentUser?.userId.toString(),
         isReady: true
       }
     });
@@ -238,10 +247,12 @@ const GamePage: React.FC = () => {
     //console.log("Sent initial READY_FOR_NEXT_ROUND message");
 
     return () => {
-      if (subscription) subscription.unsubscribe();
-      console.log("Unsubscribed from websockets topic")
+      if (subscription) {
+        subscription.unsubscribe();
+        console.log("Unsubscribed from websockets topic")
+      }
     };
-  }, [isConnected, subscribe, publish, gameId, userId]);  
+  }, [isConnected, subscribe, publish, gameId, currentUser]);  
 
   const handleMessage = useCallback((message: GameMessage) => {
     const {
