@@ -15,6 +15,7 @@ import { useApi } from "@/hooks/useApi";
 import { RegisterPostDTO, UserAuthDTO, LoginPostDTO } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import { useAuth } from "@/context/AuthContext";
+import { useState} from "react";
 
 
 const Register: React.FC = () => {
@@ -22,6 +23,7 @@ const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm<RegisterPostDTO>();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
   const handleRegistration = async (values: RegisterPostDTO) => {
@@ -40,9 +42,17 @@ const Register: React.FC = () => {
 
       router.push(`/users/${response.userId}`)
 
-    } catch (error) {
+    } catch (error: any) {
+    
+      if (error?.status===400) {
+              setErrorMessage("Registration failed: This username already exists.");
+            console.log("Registration failed:", error);
+            }
+            
+            else {
+              console.log("An unexpected error occurred during Registration.", error);
+            }
 
-      console.error("Registration failed:", error);
     }
   };
 
@@ -59,6 +69,9 @@ const Register: React.FC = () => {
           onFinish={handleRegistration}
           layout="vertical"
         >
+          {errorMessage && (
+      <div className="form-error" style={{ color: 'red', marginBottom: 16 }}>{errorMessage}</div>
+    )}
           <Form.Item
             name="username"
             label="Username"
