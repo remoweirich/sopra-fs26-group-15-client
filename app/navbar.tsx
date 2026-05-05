@@ -1,117 +1,54 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+/**
+ * Navbar — fixed-top SBB-style red bar.
+ *
+ * Three states:
+ *   1) Logged out          → Login + Registrieren CTA
+ *   2) Guest (temporary)   → username + Registrieren CTA + Logout
+ *   3) Registered          → username + Logout
+ *
+ * Guest detection: relies on `user.isGuest === true`. If your AuthContext
+ * uses a different flag (e.g. discriminating via `"email" in user`), update
+ * the `isGuest` line below.
+ */
+
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Badge, Input } from "antd";
-import { ApiService } from "./api/apiService";
-import { MyUserDTO, UserDTO } from "./types/user";
+import { Badge } from "antd";
 import { Bell, LogOut, Search, Menu, X } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
-// ---------------------------------------------------------------------------
-// GuessSBB SVG logo mark (simplified train-pin icon)
-// ---------------------------------------------------------------------------
-function LogoMark() {
+// ── SBB-style cross logo (white) ─────────────────────────────────────
+function SBBCross({ size = 20 }: { size?: number }) {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="8" fill="#E30613" />
-      <path
-        d="M16 4C12.134 4 9 7.134 9 11c0 5.25 7 14 7 14s7-8.75 7-14c0-3.866-3.134-7-7-7z"
-        fill="white"
-      />
-      <circle cx="16" cy="11" r="3" fill="#E30613" />
+    <svg width={size} height={size} viewBox="0 0 22 22" fill="#FFFFFF" aria-hidden="true">
+      <rect x="7" y="0" width="8" height="22" rx="1" />
+      <rect x="0" y="7" width="22" height="8" rx="1" />
     </svg>
   );
 }
 
-// ---------------------------------------------------------------------------
-
-
 export default function Navbar() {
-
-  // const [resolvedUser, setResolvedUser] = useState<{ userId: number; username: string } | null>(null);
-  const [notificationCount, setNotificationCount] = useState(0); // Placeholder for notification count, replace with actual logic to fetch count
-  // const [showLinks, setShowLinks] = useState(false);
-  const{user,logout,isLoading} = useAuth();
+  const [notificationCount] = useState(0); // TODO: wire to real notification source
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [lobbyCode, setLobbyCode] = useState("");
 
   const pathname = usePathname();
   const router = useRouter();
-  // const apiService = new ApiService();
+  const { user, logout, isLoading } = useAuth();
 
+  // Guest detection — adjust this if your AuthContext uses a different flag.
+  const isGuest = (user as { isGuest?: boolean } | null)?.isGuest === true;
 
-//   useEffect(() => {
-//     const token = JSON.parse(localStorage.getItem("token") || '""');
-// const userId = JSON.parse(localStorage.getItem("userId") || "-1");
-    
-
-//     console.log("Navbar - Retrieved token from localStorage:", token);
-//     console.log("Navbar - Retrieved userId from localStorage:", userId);
-
-    
-
-//     if (!token || userId === -1) {
-//       setResolvedUser(null);
-//       setShowLinks(true);
-//       return;
-//     }
-
-//     const fetchAndSetUser = async () => {
-//       try {
-//         const userData = await apiService.get(
-//           `/users/${Number(userId)}`,
-//           {
-//             headers: { token: token },
-//           }) as MyUserDTO | UserDTO;
-//         if ("email" in userData) {
-//           setResolvedUser({ userId: userId, username: userData.username });
-//         } else {
-//           setResolvedUser(null);
-//         }
-//       }
-//       catch (error) {
-//         //console.error("Error fetching user data in Navbar:", error);
-//         setResolvedUser(null);
-//       }
-
-//     };
-
-//     fetchAndSetUser();
-//     setShowLinks(true);
-//   }, []);
-
-
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("userId");
-
-  //   setResolvedUser(null);
-
-  //   router.push("/login");
-  // };
-
-
-  function handleLobbySearch(e: React.KeyboardEvent<HTMLInputElement>) {
-    const value = (e.target as HTMLInputElement).value.trim();
-    if (e.key === "Enter" && value) {
-      router.push(`/lobbies/${value}`);
-    }
-  }
-
-  function linkClass(href: string) {
-    const active = pathname === href || pathname.startsWith(href + "/");
-    return `navbar-link${active ? " active" : ""}`;
-  }
-
-const [menuOpen, setMenuOpen] = useState(false);
-
-  // Close the menu automatically on route change
+  // ── Effects ─────────────────────────────────────────────────────────
+  // Close mobile menu on route change
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Lock body scroll while the mobile menu is open
+  // Lock body scroll while mobile menu is open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = "hidden";
@@ -123,137 +60,204 @@ const [menuOpen, setMenuOpen] = useState(false);
     };
   }, [menuOpen]);
 
-  // Helper: route + close menu (for mobile menu links)
-  const go = (href: string) => {
+  // ── Handlers ────────────────────────────────────────────────────────
+  function handleLobbyJoin() {
+    const code = lobbyCode.trim().toUpperCase();
+    if (!code) return;
+    setLobbyCode("");
+    setMenuOpen(false);
+    router.push(`/lobbies/${code}`);
+  }
+
+  function handleLobbySearchKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") handleLobbyJoin();
+  }
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
+  function go(href: string) {
     setMenuOpen(false);
     router.push(href);
-  };
+  }
 
+  // ── Render ──────────────────────────────────────────────────────────
   return (
     <>
-      <nav className="navbar">
-        {/* ── Brand ──────────────────────────────────────────────────────── */}
-        <Link href="/" className="navbar-brand">
-          <LogoMark />
-          <span className="navbar-brand-text">
-            Gues<span>SBB</span>
-          </span>
-        </Link>
+      <nav className="gs-topbar">
+        <div className="gs-topbar-inner">
 
-        {/* ── Center: Lobby ID search (desktop only) ─────────────────────── */}
-        <label className="navbar-search" htmlFor="lobby-id-search">
-          <Search size={16} className="navbar-search-icon" />
-          <input
-            id="lobby-id-search"
-            className="navbar-search-input"
-            placeholder="Enter Lobby Code"
-            onKeyDown={handleLobbySearch}
-          />
-        </label>
-
-        {/* ── Right: desktop actions ─────────────────────────────────────── */}
-        {!isLoading && (
-          <div className="navbar-actions">
-
-            {user && (
-              <Badge count={notificationCount} size="small" offset={[4, -2]}>
-                <button className="navbar-icon-btn" aria-label="Notifications">
-                  <Bell size={20} />
-                </button>
-              </Badge>
-            )}
-
-            <Link href="/lobbies" className={linkClass("/lobbies")}>
-              Lobbies
+          {/* ── Left: Brand ── */}
+          <div className="gs-topbar-col gs-topbar-col--left">
+            <Link href="/" className="gs-topbar-brand">
+              <SBBCross size={20} />
+              <span className="gs-topbar-brand-text">
+                Gues<span>SBB</span>
+              </span>
             </Link>
-
-            <Link href="/leaderboard" className={linkClass("/leaderboard")}>
-              Leaderboard
-            </Link>
-
-            {user ? (
-              <>
-                <Link
-                  href={`/users/${user.userId}`}
-                  className={linkClass(`/users/${user.userId}`)}
-                >
-                  {user.username}
-                </Link>
-                <button
-                  className="navbar-icon-btn"
-                  onClick={logout}
-                  aria-label="Logout"
-                  title="Abmelden"
-                >
-                  <LogOut size={20} />
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className={linkClass("/login")}>
-                  Login
-                </Link>
-                <Link href="/register" className="navbar-register-pill">
-                  Registration
-                </Link>
-              </>
-            )}
           </div>
-        )}
 
-        {/* ── Burger button (mobile/tablet only) ─────────────────────────── */}
-        <button
-          className="navbar-burger"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          {/* ── Center: Lobby code search ── */}
+          <div className="gs-topbar-col gs-topbar-col--center">
+            <div className="gs-topbar-search">
+              <span className="gs-topbar-search-icon" aria-hidden="true">🔍</span>
+              <input
+                className="gs-topbar-search-input"
+                placeholder="LOBBY-CODE"
+                value={lobbyCode}
+                onChange={e => setLobbyCode(e.target.value.toUpperCase().slice(0, 6))}
+                onKeyDown={handleLobbySearchKey}
+                aria-label="Lobby code"
+              />
+              <button
+                type="button"
+                className="gs-topbar-search-btn"
+                onClick={handleLobbyJoin}
+              >
+                Join
+              </button>
+            </div>
+          </div>
+
+          {/* ── Right: Actions ── */}
+          {!isLoading && (
+            <div className="gs-topbar-col gs-topbar-col--right">
+              <div className="gs-topbar-actions">
+
+                {/* Notifications bell — only for logged-in users */}
+                {user && (
+                  <Badge count={notificationCount} size="small" offset={[4, -2]}>
+                    <button
+                      type="button"
+                      className="gs-topbar-iconbtn"
+                      aria-label="Benachrichtigungen"
+                    >
+                      <Bell size={18} />
+                    </button>
+                  </Badge>
+                )}
+
+                <Link
+                  href="/lobbies"
+                  className={"gs-topbar-link " + (isActive("/lobbies") ? "gs-topbar-link--active" : "")}
+                >
+                  Züge
+                </Link>
+
+                <Link
+                  href="/leaderboard"
+                  className={"gs-topbar-link " + (isActive("/leaderboard") ? "gs-topbar-link--active" : "")}
+                >
+                  Rangliste
+                </Link>
+
+                {user ? (
+                  <>
+                    <Link
+                      href={`/users/${user.userId}`}
+                      className={"gs-topbar-link " + (isActive(`/users/${user.userId}`) ? "gs-topbar-link--active" : "")}
+                      title={user.username}
+                    >
+                      {user.username.length > 12 ? user.username.slice(0, 12) + "…" : user.username}
+                    </Link>
+
+                    {/* Guest sees Registrieren CTA — encourages account upgrade */}
+                    {isGuest && (
+                      <Link href="/register" className="gs-topbar-cta">
+                        Registrieren
+                      </Link>
+                    )}
+
+                    <button
+                      type="button"
+                      className="gs-topbar-iconbtn"
+                      onClick={logout}
+                      aria-label="Logout"
+                      title="Abmelden"
+                    >
+                      <LogOut size={18} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className={"gs-topbar-link " + (isActive("/login") ? "gs-topbar-link--active" : "")}
+                    >
+                      Login
+                    </Link>
+                    <Link href="/register" className="gs-topbar-cta">
+                      Registrieren
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Burger button (visible on mobile) ── */}
+          <button
+            type="button"
+            className="gs-topbar-burger"
+            aria-label={menuOpen ? "Menü schliessen" : "Menü öffnen"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(o => !o)}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </nav>
 
-      {/* ── Full-screen mobile menu overlay ──────────────────────────────── */}
+      {/* ── Mobile menu overlay ─────────────────────────────────────── */}
       {menuOpen && (
-        <div className="mobile-menu">
+        <div className="gs-mobile-menu">
 
-          <label className="mobile-menu-search" htmlFor="mobile-lobby-id-search">
-            <Search size={18} className="navbar-search-icon" />
+          {/* Mobile lobby search */}
+          <div className="gs-mobile-menu-search">
+            <Search size={16} aria-hidden="true" />
             <input
-              id="mobile-lobby-id-search"
-              className="navbar-search-input"
-              placeholder="Enter Lobby Code"
-              onKeyDown={handleLobbySearch}
+              type="text"
+              placeholder="LOBBY-CODE"
+              value={lobbyCode}
+              onChange={e => setLobbyCode(e.target.value.toUpperCase().slice(0, 6))}
+              onKeyDown={handleLobbySearchKey}
+              aria-label="Lobby code"
             />
-          </label>
+            <button type="button" onClick={handleLobbyJoin}>Join</button>
+          </div>
 
-          <button
-            className="mobile-menu-link"
-            onClick={() => go("/lobbies")}
-          >
-            Lobbies
+          <button type="button" className="gs-mobile-menu-link" onClick={() => go("/lobbies")}>
+            🚂 Züge
+          </button>
+          <button type="button" className="gs-mobile-menu-link" onClick={() => go("/leaderboard")}>
+            🏆 Rangliste
           </button>
 
-          <button
-            className="mobile-menu-link"
-            onClick={() => go("/leaderboard")}
-          >
-            Leaderboard
-          </button>
+          <div className="gs-mobile-menu-divider" />
 
           {!isLoading && user && (
             <>
               <button
-                className="mobile-menu-link"
+                type="button"
+                className="gs-mobile-menu-link"
                 onClick={() => go(`/users/${user.userId}`)}
               >
-                {user.username}
+                👤 {user.username}
               </button>
+              {isGuest && (
+                <button
+                  type="button"
+                  className="gs-mobile-menu-link gs-mobile-menu-link--cta"
+                  onClick={() => go("/register")}
+                >
+                  Registrieren
+                </button>
+              )}
               <button
-                className="mobile-menu-link mobile-menu-link--muted"
-                onClick={() => {
-                  setMenuOpen(false);
-                  logout();
-                }}
+                type="button"
+                className="gs-mobile-menu-link gs-mobile-menu-link--muted"
+                onClick={() => { setMenuOpen(false); logout(); }}
               >
                 Logout
               </button>
@@ -263,16 +267,18 @@ const [menuOpen, setMenuOpen] = useState(false);
           {!isLoading && !user && (
             <>
               <button
-                className="mobile-menu-link"
+                type="button"
+                className="gs-mobile-menu-link"
                 onClick={() => go("/login")}
               >
                 Login
               </button>
               <button
-                className="mobile-menu-link mobile-menu-link--primary"
+                type="button"
+                className="gs-mobile-menu-link gs-mobile-menu-link--cta"
                 onClick={() => go("/register")}
               >
-                Registration
+                Registrieren
               </button>
             </>
           )}

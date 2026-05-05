@@ -1,254 +1,417 @@
 "use client";
 
 /**
- * RoundResult  –  shown after each round inside the Game Screen
+ * RoundOverview — shown between rounds (gameState === "BETWEEN_ROUNDS")
  *
- * Design ref: uploaded screenshot (split layout – map left, panel right)
- * ─────────────────────────────────────────────────────────────────────────────
- * This component replaces the full-screen map once the backend sends a
- * ROUND_END WebSocket message. The parent (game/[id]/page.tsx) mounts it
- * instead of the plain map view when gameState.phase === "ROUND_RESULT".
+ * Design: SBB-styled black header with line/route/round, full-bleed map
+ * left, score+ranking sidebar right with sticky next-round footer button.
+ * Stacks on mobile (map top, panels below).
  *
- * Layout:
- *   <div className="game-result-layout">          ← flex row, fills .page-game
- *     <div className="map-container">             ← left: map stays visible
- *     <aside className="result-panel">            ← right: 340px white sidebar
+ * Map markers (MapLibre via maplibre-react-components):
+ *   - Actual train position: green dot + pulsing dashed ring + TATSÄCHLICH label
+ *   - User guess: red SBB teardrop + DU label (anchored at tip)
+ *   - Other players: colored dot + username
+ *   - Dashed red line connecting user guess → actual position
  *
- * Props (all TODO – wire to real data from WS ROUND_END payload):
- *   currentRound, totalRounds   – "ROUND 1 / 5"
- *   trainInfo                   – line, route, time for subtitle
- *   actualPosition              – "Zwischen Baden & Wettingen"
- *   roundResults[]              – per-player distance + score delta
- *   overallStandings[]          – cumulative leaderboard
- *   onNextRound                 – called when host clicks "Next round"
- *   isHost                      – shows/hides the Next round button
+ * Backend logic preserved 1:1:
+ *   - publish(/app/game/{id}/ready, READY_FOR_NEXT_ROUND) on click
+ *   - End-game branch when currentRound === maxRounds → /game/{id}/leaderboard
+ *   - userId from useLocalStorage, gameId from useParams
  */
 
-import { Button } from "antd";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-//import { useWebSocket } from "@/hooks/useWebSocket";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { RMap, RMarker } from "maplibre-react-components";
-//import { Message} from "@types/message";
+import { RMap, RMarker, RSource, RLayer } from "maplibre-react-components";
 import { Train } from "@/types/train";
-import { Round } from "@/types/round";
-import type { MessageType } from "@/types/messageType";
-//import { User } from "@/types/user";
 import { Message } from "@/types/message";
-import {UserResult} from "@/types/user";
+import { UserResult } from "@/types/user";
 
+/* ── Funny German comments per 100-point step ─────────────────────────── */
+const COMMENTS_BY_POINTS: [number, string][] = [
+  [1000, "Volltreffer! Bist du SBB-Mitarbeiter? 🚨"],
+  [900,  "Verdammt präzise. Hast du den Fahrplan auswendig?"],
+  [800,  "Lokführer-verdächtig. Sehr stark."],
+  [700,  "Stark! Du kennst die SBB-Strecken im Schlaf."],
+  [600,  "Anständig! Pendler-Niveau."],
+  [500,  "Solide. Im richtigen Kanton zumindest."],
+  [400,  "Halbwegs orientiert. Halbwegs."],
+  [300,  "Knapp daneben — aber wenigstens in der Schweiz."],
+  [200,  "Naja... zumindest auf dem richtigen Kontinent."],
+  [100,  "Echt? Bayern? Mutig."],
+  [0,    "Das ist der Atlantik. Der Zug fährt in der Schweiz."],
+];
 
+const getComment = (pts: number): string => {
+  for (const [t, msg] of COMMENTS_BY_POINTS) {
+    if (pts >= t) return msg;
+  }
+  return COMMENTS_BY_POINTS[COMMENTS_BY_POINTS.length - 1][1];
+};
+
+const getStamp = (pts: number): { label: string; color: string } => {
+  if (pts >= 800) return { label: "MEISTER",       color: "var(--gs-green)" };
+  if (pts >= 500) return { label: "SOLIDE",        color: "var(--gs-gold)"  };
+  if (pts >= 200) return { label: "VERSUCH",       color: "var(--gs-grey)"  };
+  return            { label: "WO WARST DU?!", color: "var(--gs-red)"   };
+};
 
 interface RoundOverviewProps {
-    train: Train | null;
-    results: UserResult[];
-    currentRound: number | null;
-    maxRounds: number | null;
-    publish: (destination: string, body: Message) => void;
-    getPlayerColor: (userId: string) => string;
-    }
+  train: Train | null;
+  results: UserResult[];
+  currentRound: number | null;
+  maxRounds: number | null;
+  publish: (destination: string, body: Message) => void;
+  getPlayerColor: (userId: string) => string;
+}
 
-const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish, getPlayerColor }) => {
-    
-    const router     = useRouter();  
-    const { value: userId } = useLocalStorage<string>("userId", "1"); //hardcoded for testing, needs to be set later with login
-    const { id: gameId } = useParams();
-    const [unsortedResults, setUnsortedResults] = useState<UserResult[]>(results);
-    const [sortedRoundResults, setSortedRoundResults] = useState<UserResult[]>([]);
-    const [sortedTotalResults, setSortedTotalResults] = useState<UserResult[]>([]);
-    const [currentTrain, setcurrentTrain] = useState<Train | null>(train);
-    //prevent hidration error
-    const [mounted, setMounted] = useState(false);
-    const [readyForNextRound, setReadyForNextRound] = useState(false);
+const RoundOverview: React.FC<RoundOverviewProps> = ({
+  train, results, currentRound, maxRounds, publish, getPlayerColor
+}) => {
+  const router = useRouter();
+  const { value: userId } = useLocalStorage<string>("userId", "1");
+  const { id: gameId } = useParams<{ id: string }>();
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-        
-    useEffect(() => {
-        //sort user results by score descending
-        // console.log("unsorted results:", unsortedResults);
-        const sortedResults = [...unsortedResults].sort((a, b) => b.roundPoints - a.totalPoints);
-        setSortedRoundResults(sortedResults);
-        // console.log("sorted results:", sortedResults);
+  const [mounted, setMounted] = useState(false);
+  const [readyForNextRound, setReadyForNextRound] = useState(false);
+  const [stampVisible, setStampVisible] = useState(false);
 
-        //sort total results by totalscore descending
-        const sortedTotalResults = [...unsortedResults].sort((a, b) => b.totalPoints - a.roundPoints);
-        setSortedTotalResults(sortedTotalResults);
-        // console.log("sorted total results:", sortedTotalResults);
+  useEffect(() => {
+    setMounted(true);
+    const t = setTimeout(() => setStampVisible(true), 250);
+    return () => clearTimeout(t);
+  }, []);
 
-    }, [unsortedResults]);
+  // Sort results — fixed bug (originally cross-compared roundPoints and totalPoints)
+  const sortedRoundResults = useMemo(
+    () => [...results].sort((a, b) => b.roundPoints - a.roundPoints),
+    [results]
+  );
+  const sortedTotalResults = useMemo(
+    () => [...results].sort((a, b) => b.totalPoints - a.totalPoints),
+    [results]
+  );
 
-    const handleReadyForNextRound = async () => {
-        if (readyForNextRound) {
-            return;
-        }
-        setReadyForNextRound(true);
+  // Find current user's result for score panel
+  const userIdNum = parseInt(userId);
+  const myResult = results.find(r => r.userId === userIdNum);
+  const myDistance = myResult?.distance ?? 0;
+  const myRoundPts = myResult?.roundPoints ?? 0;
+  const myTotalPts = myResult?.totalPoints ?? 0;
+  const myCoordX = myResult?.xCoordinate;
+  const myCoordY = myResult?.yCoordinate;
 
-        publish(`/app/game/${gameId}/ready`, {
-            type: "READY_FOR_NEXT_ROUND",
-            payload: {
-                userId: userId,
-                isReady: true
-            }
-        });
-        // console.log("Sent ready message for user" + userId)
-    }
+  const comment = getComment(myRoundPts);
+  const stamp = getStamp(myRoundPts);
 
-    const handleEndGame = async () => {
-      console.log("Ending Game")
-      router.push(`/game/${gameId}/leaderboard`)
-    }
+  const isFinal = currentRound !== null && currentRound === maxRounds;
+  const medals = ["🥇", "🥈", "🥉"];
+
+  const handleReadyForNextRound = () => {
+    if (readyForNextRound) return;
+    setReadyForNextRound(true);
+    publish(`/app/game/${gameId}/ready`, {
+      type: "READY_FOR_NEXT_ROUND",
+      payload: {
+        userId: userId,
+        isReady: true
+      }
+    });
+  };
+
+  const handleEndGame = () => {
+    router.push(`/game/${gameId}/leaderboard`);
+  };
+
+  // ── Dashed line (user guess → actual position) as GeoJSON ──
+  const dashLineGeoJson = useMemo(() => {
+    if (
+      myCoordX === undefined || myCoordY === undefined ||
+      train?.currentX === undefined || train?.currentY === undefined ||
+      train?.currentX === null || train?.currentY === null
+    ) return null;
+    return {
+      type: "Feature" as const,
+      properties: {},
+      geometry: {
+        type: "LineString" as const,
+        coordinates: [
+          [myCoordY, myCoordX],
+          [train.currentY, train.currentX]
+        ]
+      }
+    };
+  }, [myCoordX, myCoordY, train?.currentX, train?.currentY]);
 
   return (
-    <div className="game-result-layout">
-
-      {/* ── Left: map stays mounted so the actual pin is visible ─────────── */}
-      <div className="map-container">
-        {mounted && (
-        <RMap
-            minZoom={6}
-            initialCenter={[currentTrain?.currentY ?? 7.4707, currentTrain?.currentX ?? 46.95]}
-            initialZoom={9}
-            mapStyle="https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json"
-            >
-                {/*Actual Train Position*/}
-                {currentTrain?.currentX && currentTrain?.currentY && (
-                    <RMarker
-                    initialColor={"#E30613"}
-                    longitude={currentTrain.currentY}
-                    latitude={currentTrain.currentX}
-                    />)}
-                {/*player guess positions*/}
-                {sortedRoundResults.map((result) => (
-                    <RMarker
-                    initialColor={getPlayerColor(result.userId.toString())}
-                    key={`guess-${result.userId}-${result.xCoordinate}-${result.yCoordinate}`}
-                    longitude={result.yCoordinate}
-                    latitude={result.xCoordinate}
-                    //color="#3fce63"
-                    />)
-                 )
-
-                }
-            </RMap>)}
-      </div>
-
-      {/* ── Right: result sidebar ─────────────────────────────────────────── */}
-      <aside className="result-panel">
-
-        {/* Header */}
-        <div className="result-panel-header">
-          <p className="result-panel-round-label">
-            {/* TODO: currentRound / totalRounds */}
-            ROUND {currentRound} / {maxRounds}
-          </p>
-          <h2 className="result-panel-title">
-            {/* TODO: target icon */}
-            Result
-          </h2>
-          <p className="result-panel-subtitle">
-            {/* TODO: trainInfo.lineId · trainInfo.fromStation → trainInfo.toStation · trainInfo.currentTime */}
-            {train?.line.name} · {train?.lineOrigin?.stationName} → {train?.lineDestination?.stationName} · {/*add current time */}
-          </p>
-        </div>
-
-        {/* Actual position callout */}
-        <div className="result-actual-position">
-          <div className="result-actual-label">Actual Position</div>
-          <div className="result-actual-value">
-            {/* TODO: actualPosition from ROUND_END payload */}
-            Zwischen {train?.lastLeavingStation.stationName} &amp; {train?.nextPendingStation.stationName}
+    <div className="round-result-page">
+      {/* ── Header ─────────────────────────────────────────────────── */}
+      <header className="round-result-header">
+        <div className="round-result-header-line">{train?.line?.name ?? "—"}</div>
+        <div className="round-result-header-info">
+          <div className="round-result-header-route">
+            {train?.lineOrigin?.stationName ?? "—"}
+            <span className="round-result-header-arrow">→</span>
+            {train?.lineDestination?.stationName ?? "—"}
+          </div>
+          <div className="round-result-header-meta">
+            <span className="round-result-header-meta-label">JETZT</span>
+            <span> · Zwischen {train?.lastLeavingStation?.stationName ?? "—"} &amp; {train?.nextPendingStation?.stationName ?? "—"}</span>
           </div>
         </div>
+        <div className="round-result-header-round">
+          RUNDE
+          <span className="round-result-header-round-num">
+            {currentRound ?? "—"}/{maxRounds ?? "—"}
+          </span>
+        </div>
+      </header>
 
-        {/* This round – per-player scores */}
-        <div className="result-section-label">This Round</div>
-
-        {/* TODO: map over roundResults[] – example rows below */}
-
-        
-
-        {sortedRoundResults.map((result, index) => (
-            result.userId == parseInt(userId) ? (
-                <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
-                <div className="result-player-avatar">
-            {/* TODO: username initial */}
-                    </div>
-                    <div className="result-player-info">
-                        <div className="result-player-name">You</div>
-                        <div className="result-player-distance">{result.distance} km</div>
-                    </div>
-                    <span className="result-player-score">{result.roundPoints}</span>
-                </div>) : (
-                <div key={`round-row-${result.userId}`} className="result-player-row" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
-                    <div className="result-player-avatar">
-                        {/* TODO: username initial */}
-                    </div>
-                    <div className="result-player-info">
-                        <div className="result-player-name">{result.userId /*to do: fetch username*/}</div>
-                        <div className="result-player-distance">{result.distance} km</div>
-                    </div>
-                    <span className="result-player-score">{result.roundPoints}</span>
+      {/* ── Body: map + sidebar ───────────────────────────────────── */}
+      <div className="round-result-body">
+        {/* Map */}
+        <div className="round-result-map">
+          {/* Legend (top-left overlay) */}
+          <div className="round-result-legend">
+            <div className="round-result-legend-item">
+              <span className="round-result-legend-dot round-result-legend-dot--actual" aria-hidden="true" />
+              Tatsächlich
             </div>
-            )))}
-           
-        
+            <div className="round-result-legend-item">
+              <span className="round-result-legend-dot round-result-legend-dot--you" aria-hidden="true" />
+              Du
+            </div>
+            <div className="round-result-legend-item">
+              <span className="round-result-legend-dot round-result-legend-dot--others" aria-hidden="true" />
+              Mitspieler
+            </div>
+          </div>
 
-        {/* Overall standings */}
-        <div className="result-section-label">Overall Standings</div>
+          {mounted && (
+            <RMap
+              minZoom={6}
+              initialCenter={[
+                train?.currentY ?? 7.4707,
+                train?.currentX ?? 46.95
+              ]}
+              initialZoom={9}
+              mapStyle="https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json"
+            >
+              {/* Dashed line: user guess → actual position */}
+              {dashLineGeoJson && (
+                <>
+                  <RSource
+                    id="round-result-dashline-src"
+                    type="geojson"
+                    data={dashLineGeoJson}
+                  />
+                  <RLayer
+                    id="round-result-dashline"
+                    source="round-result-dashline-src"
+                    type="line"
+                    paint={{
+                      "line-color": "#EB0000",
+                      "line-width": 2.5,
+                      "line-dasharray": [3, 2],
+                      "line-opacity": 0.75
+                    }}
+                  />
+                </>
+              )}
 
-        {/*map over overallStandings[] */}
+              {/* Actual position — green pulsing marker */}
+              {train?.currentX != null && train?.currentY != null && (
+                <RMarker
+                  longitude={train.currentY}
+                  latitude={train.currentX}
+                  initialAnchor="center"
+                >
+                  <div className="round-result-actual-marker">
+                    <div className="round-result-actual-ring" />
+                    <div className="round-result-actual-dot" />
+                    <div className="round-result-actual-label">TATSÄCHLICH</div>
+                  </div>
+                </RMarker>
+              )}
 
-        {sortedTotalResults.map((result, index) => (
-            <div key={`total-row-${result.userId}`} className="result-standings-row" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
-          <span className="result-standings-rank">{index+1}.</span>
-          <span className="result-standings-name">{result.userId == parseInt(userId) ? ("You"): result.userId}</span>
-          <span className="result-standings-score">{result.totalPoints}</span>
-        </div>
-        ))}
-
-        
-
-        {/* Footer: next-round button */}
-        <div className="result-panel-footer">
-          {currentRound==maxRounds ? (
-            <Button
-            type="primary"
-            className="btn-full"
-            onClick={handleEndGame}
-          >
-            End Game
-          </Button>
-          ) : (
-            !readyForNextRound ? (
-            <Button
-            type="primary"
-            className="btn-full"
-            onClick={handleReadyForNextRound}
-          >
-            {/* TODO: conditionally render "Waiting for host…" if !isHost */}
-            {/*If we want to render how many players are ready: Add additional websockets logic */}
-            Next round →
-          </Button>) : (
-            <Button
-            type="primary"
-            className="btn-full"
-          >
-            {/* TODO: conditionally render "Waiting for host…" if !isHost */}
-            {/*If we want to render how many players are ready: Add additional websockets logic */}
-            Waiting for other players →
-          </Button>
-          )
+              {/* Player guesses */}
+              {sortedRoundResults.map((result) => {
+                const isMe = result.userId === userIdNum;
+                if (isMe) {
+                  return (
+                    <RMarker
+                      key={`guess-${result.userId}`}
+                      longitude={result.yCoordinate}
+                      latitude={result.xCoordinate}
+                      initialAnchor="bottom"
+                    >
+                      <div className="round-result-you-pin">
+                        <div className="round-result-you-label">DU</div>
+                        <svg width="28" height="38" viewBox="0 0 28 38" aria-hidden="true">
+                          <path
+                            d="M14 1 C 6.5 1, 1 6.5, 1 14 C 1 23.5, 14 37, 14 37 C 14 37, 27 23.5, 27 14 C 27 6.5, 21.5 1, 14 1 Z"
+                            fill="#EB0000"
+                            stroke="white"
+                            strokeWidth="2.5"
+                          />
+                          <circle cx="14" cy="14" r="4.2" fill="white" />
+                        </svg>
+                      </div>
+                    </RMarker>
+                  );
+                }
+                const playerColor = getPlayerColor(result.userId.toString());
+                return (
+                  <RMarker
+                    key={`guess-${result.userId}`}
+                    longitude={result.yCoordinate}
+                    latitude={result.xCoordinate}
+                    initialAnchor="center"
+                  >
+                    <div className="round-result-other-pin">
+                      <div
+                        className="round-result-other-label"
+                        style={{ color: playerColor }}
+                      >
+                        {/* TODO: switch to username once UserResult exposes it */}
+                        {result.userId}
+                      </div>
+                      <div
+                        className="round-result-other-dot"
+                        style={{ background: playerColor }}
+                      />
+                    </div>
+                  </RMarker>
+                );
+              })}
+            </RMap>
           )}
-          
-          
         </div>
 
-      </aside>
+        {/* Sidebar */}
+        <aside className="round-result-sidebar">
+          <div className="round-result-sidebar-scroll">
+            {/* Score panel */}
+            <section className="round-result-score">
+              <div className="round-result-score-row">
+                <div className="round-result-score-cell">
+                  <div className="round-result-score-label">DISTANZ</div>
+                  <div className="round-result-score-value">
+                    {Math.round(myDistance)}
+                    <span className="round-result-score-unit"> km</span>
+                  </div>
+                </div>
+                <div className="round-result-score-cell">
+                  <div className="round-result-score-label">PUNKTE</div>
+                  <div className={
+                    "round-result-score-value " +
+                    (myRoundPts >= 700 ? "round-result-score-value--good"
+                      : myRoundPts >= 300 ? "round-result-score-value--ok"
+                      : "round-result-score-value--bad")
+                  }>
+                    +{myRoundPts}
+                  </div>
+                </div>
+                <div className="round-result-score-cell">
+                  <div className="round-result-score-label">TOTAL</div>
+                  <div className="round-result-score-value">{myTotalPts}</div>
+                </div>
+              </div>
+
+              <div className="round-result-score-comment-row">
+                <div className="round-result-score-comment">„{comment}"</div>
+                {stampVisible && (
+                  <div
+                    className="round-result-score-stamp"
+                    style={{ borderColor: stamp.color, color: stamp.color }}
+                  >
+                    {stamp.label}
+                  </div>
+                )}
+              </div>
+
+              <div className="round-result-score-coords">
+                <span aria-hidden="true">📍</span>
+                {myCoordX !== undefined && myCoordY !== undefined
+                  ? <>{myCoordX.toFixed(2)}°N, {myCoordY.toFixed(2)}°E</>
+                  : "—"}
+                <span className="round-result-score-coords-arrow">→</span>
+                <span className="round-result-score-coords-target">
+                  Zwischen {train?.lastLeavingStation?.stationName ?? "—"} &amp; {train?.nextPendingStation?.stationName ?? "—"}
+                </span>
+              </div>
+            </section>
+
+            {/* Ranking */}
+            <section className="round-result-ranking">
+              <div className="round-result-ranking-header">
+                <span className="round-result-ranking-title">ZWISCHENSTAND</span>
+                <span className="round-result-ranking-sub">
+                  NACH RUNDE {currentRound ?? "—"}
+                </span>
+              </div>
+              {sortedTotalResults.map((result, i) => {
+                const isMe = result.userId === userIdNum;
+                const playerColor = getPlayerColor(result.userId.toString());
+                return (
+                  <div
+                    key={`total-row-${result.userId}`}
+                    className={"round-result-ranking-row " + (isMe ? "round-result-ranking-row--you" : "")}
+                  >
+                    <div className={"round-result-ranking-rank " + (i < 3 ? "round-result-ranking-rank--medal" : "")}>
+                      {i < 3 ? medals[i] : `${i + 1}`}
+                    </div>
+                    <div
+                      className="round-result-ranking-dot"
+                      style={{ background: playerColor }}
+                      aria-hidden="true"
+                    />
+                    <div className="round-result-ranking-name">
+                      {isMe ? "Du" : `${result.userId}`}
+                      {isMe && (
+                        <span className="round-result-ranking-name-tag"> · DU</span>
+                      )}
+                    </div>
+                    <div className="round-result-ranking-score">
+                      {result.totalPoints}
+                    </div>
+                  </div>
+                );
+              })}
+            </section>
+          </div>
+
+          {/* Sticky footer button */}
+          <footer className="round-result-footer">
+            {isFinal ? (
+              <button
+                type="button"
+                onClick={handleEndGame}
+                className="sbb-btn-home sbb-btn-home--primary round-result-btn"
+              >
+                Endabrechnung →
+              </button>
+            ) : !readyForNextRound ? (
+              <button
+                type="button"
+                onClick={handleReadyForNextRound}
+                className="sbb-btn-home sbb-btn-home--primary round-result-btn"
+              >
+                Runde {(currentRound ?? 0) + 1} →
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="sbb-btn-home sbb-btn-home--primary round-result-btn round-result-btn--waiting"
+              >
+                Warte auf andere Spieler…
+              </button>
+            )}
+          </footer>
+        </aside>
+      </div>
     </div>
   );
 };
