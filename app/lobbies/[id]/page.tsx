@@ -10,6 +10,7 @@ import { LobbyMessage } from "@/types/lobbyMessage";
 import { App, Button} from "antd";
 import { useAuth } from "@/context/AuthContext";
 import {UserAuthDTO} from "@/types/user";
+import LobbyLoadingScreen from "./LobbyLoadingScreen";
 
 
 const LobbyWaitPage: React.FC = () => {
@@ -25,6 +26,7 @@ const LobbyWaitPage: React.FC = () => {
   const {user:currentUser, token, isLoading} = useAuth();
     const [lobby, setLobby]   = useState<Lobby | null>(null);
     const intentionalDisconnect = useRef<boolean>(false);
+  const [isLoadingGame, setIsLoadingGame] = useState<boolean>(false);
 
   
   // const [userData, setUserData] = useState< {userId: number; token: string} | null>(null);
@@ -106,6 +108,8 @@ useEffect(() => {
     }
 
     webSocket.publish(destination, messageBody);
+    //show loading screen until trains have loaded
+    setIsLoadingGame(true);
   };
 
   const handleLeave = async () => {
@@ -142,7 +146,7 @@ useEffect(() => {
 
   if (!lobby) return <div className="page-center">Laden...</div>;
   
-
+  if (isLoadingGame) return <LobbyLoadingScreen lobbyId={lobbyId}/>;
   
 
   return (

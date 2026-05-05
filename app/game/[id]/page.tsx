@@ -71,6 +71,7 @@ import { RMap, RMarker } from "maplibre-react-components";
 import { MapLayerMouseEvent, MapLayerTouchEvent } from "maplibre-gl";
 import RoundOverview from "./RoundOverview";
 import LoadingScreen from "./LoadingScreen";
+import SBBClock from "./SBBClock";
 import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
 import {GameMessage, ResultDTO} from "@/types/gameMessage";
 import {UserResult} from "@/types/user";
@@ -391,6 +392,10 @@ const GamePage: React.FC = () => {
         {/* Times */}
         <span className="train-bar-times">
           Dep {departureTime} · Arr {arrivalTime}
+        </span>
+        {/*SBB-Uhr*/}
+        <span style={{marginLeft:"16px"}}>
+          <SBBClock timeStr={currentTime}/>
         </span>
 
         {/* Round indicator + countdown */}
