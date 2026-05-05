@@ -1,3 +1,25 @@
+# [1.1.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.0.0...v1.1.0) (2026-05-05)
+
+
+### Bug Fixes
+
+* attempt to fix hydration race condition in game page ([e1e1e3f](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/e1e1e3faf806bd41ff779e5a0c6937c7d6b3e5bb))
+* **CSS:** changed card margin to 0 auto, from 5 auto ([d696a4e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/d696a4ee0b5fcb9c155120d70b48aafa674960e4))
+* **homepage:** Play button sends to lobbies always ([a43324e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/a43324ebf0643b23ca59413ecc6e711d3d9ddcf2))
+* **lobbies:** fix rounds info on lobbies page ([85aea7b](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/85aea7bed0d87a593554673997da3f765c6dc5ff))
+* **navbar:** visual lobby code in navbar ([850be84](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/850be84d8fe03ab32b5c2b60a1989197d3a22de6))
+* potential fix for hydration race condition in lobbies page ([fcf80ba](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/fcf80baeccb62e8c772d79c5b93b7b52a8ff0298))
+* remove trailing ([03ee7ca](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/03ee7cafe4a0af5a52ee4c55fc19757997aff690))
+* **URL:** missing // ([6bd5589](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/6bd5589c94fadc6dea8fe3a36a9c7b5826fdd70c))
+
+
+### Features
+
+* change semantic release npm version ([b24f9ba](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/b24f9ba681fc960f90643c185679d5c45301d1d6))
+* migrate app with new implementation ([47bc822](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/47bc822c519acb3160388ab2501a4bb06d7fae95))
+* migrate app with new implementation ([ae239fb](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ae239fb0612d3d09d1ca8b38be0490a9f62681c9))
+* migrate app with new implementation npm install ([94cda16](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/94cda16e6159a20e18117089f2846b6d438b55bc))
+
 ## [1.0.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.0.0...v1.0.1) (2026-05-05)
 
 
