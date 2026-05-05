@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.1.0...v1.1.1) (2026-05-05)
+
+
+### Bug Fixes
+
+* change url ([4ff798e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/4ff798ecfdef5c6cdd97f3faf49b304c66827c3f))
+
 # [1.1.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.0.0...v1.1.0) (2026-05-05)
 
 
