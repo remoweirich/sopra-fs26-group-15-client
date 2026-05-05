@@ -4,25 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="prepare">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/postcss.config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.envrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/build.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/dockerize.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/release.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/sonarcloud.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/verceldeployment.yml" beforeDir="false" />
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat: migrate app with new implementation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/deno.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/eslint.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/eslint.config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flake.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/flake.nix" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/install-nix.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,6 +80,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -308,7 +297,23 @@
       <option name="project" value="LOCAL" />
       <updated>1778020288681</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="feat: migrate app with new implementation">
+      <option name="closed" value="true" />
+      <created>1778021403633</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1778021403633</updated>
+    </task>
+    <task id="LOCAL-00020" summary="feat: migrate app with new implementation">
+      <option name="closed" value="true" />
+      <created>1778021465686</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1778021465686</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -344,7 +349,8 @@
     <MESSAGE value="fix(homepage): Play button sends to lobbies always" />
     <MESSAGE value="fix(lobbies): fix rounds info on lobbies page" />
     <MESSAGE value="prepare" />
-    <option name="LAST_COMMIT_MESSAGE" value="prepare" />
+    <MESSAGE value="feat: migrate app with new implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: migrate app with new implementation" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
