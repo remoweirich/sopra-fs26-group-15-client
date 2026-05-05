@@ -1,13 +1,12 @@
 {
-  "name": "sopra-fs26-template-client",
+  "name": "sopra-fs26-template-clien",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "deno lint",
-    "fmt": "deno fmt",
+    "lint": "eslint",
     "release": "semantic-release"
   },
   "dependencies": {
@@ -18,12 +17,12 @@
     "lucide-react": "^1.8.0",
     "maplibre-gl": "^5.22.0",
     "maplibre-react-components": "^0.2.6",
-    "next": "^15.5.7",
+    "next": "16.2.4",
     "node-localstorage": "^3.0.5",
     "process": "^0.11.10",
     "proj4": "^2.20.8",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
@@ -33,13 +32,15 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.2",
     "@semantic-release/release-notes-generator": "^14.0.3",
-    "@types/node": "^22.13.5",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "@types/sockjs-client": "^1.5.4",
-    "eslint": "^9.21.0",
-    "eslint-config-next": "^15.2.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
     "semantic-release": "^24.2.3",
+    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
