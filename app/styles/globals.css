@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
 /*
  * globals.css  –  GuessSBB shared stylesheet
  * ─────────────────────────────────────────────────────────────────────────────
@@ -2582,4 +2584,1721 @@ html, body {
   font-size: 11px;
   color: var(--gray-light);
   font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  globals.css — V2 ADDITIONS BLOCK
+ *  ─────────────────────────────────────────────────────────────────────────
+ *  REPLACE your previous "21. NEW HOMEPAGE" additions block (the one we
+ *  added when porting the home page) with this entire file's contents.
+ *
+ *  KEEP the `@import url('https://fonts.googleapis.com/...');` line at the
+ *  very top of globals.css — it must stay above all other rules.
+ *
+ *  This block now powers three pages:
+ *    - /            (home)
+ *    - /login       (auth, login mode)
+ *    - /register    (auth, register mode)
+ *
+ *  Section map:
+ *    21. Design tokens             (--gs-* CSS custom properties)
+ *    22. Keyframes                 (ticker, slideUp, trainIn)
+ *    23. Universal SBB button      (.sbb-btn-home + variants)
+ *    24. Shared primitives         (.eyebrow, .gs-text-red)
+ *    25. Auth pages                (.auth-*)
+ *    26. Home page                 (.gs-* + .homepage-hero-title)
+ *    27. Reduced motion
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   21. DESIGN TOKENS — new SBB-flavoured palette for redesigned pages.
+       Kept separate from the existing --red / --bg-page tokens so old pages
+       (lobbies, profile, etc.) keep their current look until refactored.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --gs-red:        #EB0000;
+  --gs-red-dark:   #B80000;
+  --gs-black:      #1C1917;
+  --gs-charcoal:   #2C2825;
+  --gs-cream:      #FBF8F2;
+  --gs-parch:      #F0EBE1;
+  --gs-warm:       #E8E2D9;
+  --gs-grey:       #8B8480;
+  --gs-grey-light: #C8C3BC;
+  --gs-font-sans:  'Space Grotesk', sans-serif;
+  --gs-font-mono:  'IBM Plex Mono', monospace;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   22. KEYFRAMES
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes homepage-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes homepage-slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes homepage-trainIn {
+  from { transform: translateX(-300px); opacity: 0; }
+  to   { transform: translateX(0);      opacity: 1; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   23. UNIVERSAL SBB-STYLE PILL BUTTON
+   ───────────────────────────────────────────────────────────────────────────
+   Used as the main CTA across home + auth pages. Two variants:
+     .sbb-btn-home--primary    → red fill, white text
+     .sbb-btn-home--secondary  → parchment fill, grey border, black text
+   The :disabled selector handles the submit-loading state automatically.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sbb-btn-home {
+  font-family: var(--gs-font-sans);
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  position: relative;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease,
+    background 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
+  will-change: transform;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.sbb-btn-home:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(235, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.sbb-btn-home:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  transition: transform 0.06s ease, box-shadow 0.1s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.sbb-btn-home:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.sbb-btn-home--primary {
+  background: var(--gs-red);
+  color: #FFFFFF;
+}
+.sbb-btn-home--primary:hover:not(:disabled) {
+  background: var(--gs-red-dark);
+  color: #FFFFFF;
+}
+
+.sbb-btn-home--secondary {
+  background: var(--gs-parch);
+  color: var(--gs-black);
+  border: 2px solid var(--gs-grey-light);
+}
+.sbb-btn-home--secondary:hover:not(:disabled) {
+  background: var(--gs-warm);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   24. SHARED PRIMITIVES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Mono uppercase eyebrow label, used above titles on home + auth pages. */
+.eyebrow {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.eyebrow--red  { color: var(--gs-red); }
+.eyebrow--grey { color: var(--gs-grey); }
+
+/* Inline color utility (matches new red, distinct from existing --red token). */
+.gs-text-red { color: var(--gs-red); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   25. AUTH PAGES — /login, /register
+   ───────────────────────────────────────────────────────────────────────────
+   Two-column split layout. Mobile/tablet stack vertically, desktop side-by-side.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.auth-shell {
+  min-height: calc(100vh - var(--nav-h));
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .auth-shell { flex-direction: row; }
+}
+
+/* ── Brand panel (red, left on desktop / top on mobile) ─────────────────── */
+.auth-panel--brand {
+  flex: 0 0 auto;
+  background: var(--gs-red);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px;
+  min-height: 260px;
+}
+@media (min-width: 640px) {
+  .auth-panel--brand { padding: 48px 40px; min-height: 320px; }
+}
+@media (min-width: 1024px) {
+  .auth-panel--brand { flex: 1 1 50%; padding: 60px 40px; min-height: auto; }
+}
+
+/* ── Form panel (white, right on desktop / bottom on mobile) ────────────── */
+.auth-panel--form {
+  flex: 1 1 auto;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px 40px;
+  overflow-y: auto;
+}
+@media (min-width: 640px) {
+  .auth-panel--form { padding: 40px; }
+}
+@media (min-width: 1024px) {
+  .auth-panel--form { flex: 1 1 50%; }
+}
+
+/* ── Decorative translucent circles ─────────────────────────────────────── */
+.auth-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.auth-circle--tr {
+  top: -50px; right: -50px;
+  width: 200px; height: 200px;
+  background: rgba(255, 255, 255, 0.08);
+}
+@media (min-width: 640px) {
+  .auth-circle--tr { top: -90px; right: -90px; width: 320px; height: 320px; }
+}
+.auth-circle--bl {
+  bottom: -60px; left: -60px;
+  width: 180px; height: 180px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Brand panel content ────────────────────────────────────────────────── */
+.auth-brand-content {
+  max-width: 420px;
+  text-align: center;
+  position: relative;
+  animation: homepage-slideUp 0.5s ease both;
+}
+
+.auth-cross-box {
+  background: rgba(255, 255, 255, 0.14);
+  width: 58px; height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.auth-cross-box svg { width: 26px; height: 26px; }
+@media (min-width: 640px) {
+  .auth-cross-box { width: 72px; height: 72px; margin-bottom: 22px; }
+  .auth-cross-box svg { width: 34px; height: 34px; }
+}
+
+.auth-headline {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.035em;
+  margin: 0 0 12px;
+  line-height: 1.05;
+  font-size: 26px;
+}
+@media (min-width: 640px)  { .auth-headline { font-size: 32px; } }
+@media (min-width: 1024px) { .auth-headline { font-size: 36px; } }
+
+.auth-description {
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.55;
+  max-width: 360px;
+  margin: 0 auto 22px;
+}
+@media (min-width: 640px) {
+  .auth-description { font-size: 15px; margin-bottom: 32px; }
+}
+
+.auth-stats {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.auth-stat-card {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 10px 18px;
+  min-width: 88px;
+}
+@media (min-width: 640px) {
+  .auth-stat-card { padding: 14px 22px; min-width: 104px; }
+}
+.auth-stat-card-value {
+  font-family: var(--gs-font-mono);
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+  font-size: 18px;
+}
+@media (min-width: 640px) { .auth-stat-card-value { font-size: 22px; } }
+.auth-stat-card-label {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.14em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* ── Form panel content ─────────────────────────────────────────────────── */
+.auth-form {
+  width: 100%;
+  max-width: 420px;
+  animation: homepage-slideUp 0.4s ease 0.1s both;
+}
+
+.auth-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  color: var(--gs-black);
+  letter-spacing: -0.03em;
+  margin: 6px 0;
+  line-height: 1.1;
+  font-size: 26px;
+}
+@media (min-width: 640px) { .auth-title { font-size: 32px; } }
+
+.auth-subtitle {
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
+  color: var(--gs-grey);
+  line-height: 1.5;
+  margin: 0 0 26px;
+}
+
+.auth-field { margin-bottom: 14px; }
+.auth-field-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.auth-field-optional {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  color: var(--gs-grey-light);
+  letter-spacing: 0.08em;
+}
+
+/* Inputs use the same shape as the prototype — sharp corners, mono font.
+   :focus moves the border red, replacing the JS focus/blur handlers. */
+.auth-input,
+.auth-textarea {
+  font-family: var(--gs-font-mono);
+  font-size: 14px;
+  padding: 12px 14px;
+  border: 2px solid var(--gs-warm);
+  background: #FFFFFF;
+  outline: none;
+  width: 100%;
+  color: var(--gs-black);
+  display: block;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  border-radius: 0;  /* override UA defaults */
+}
+.auth-input:focus,
+.auth-textarea:focus {
+  border-color: var(--gs-red);
+}
+.auth-textarea {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.55;
+}
+
+.auth-error {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: var(--gs-red);
+  padding: 8px 12px;
+  background: rgba(235, 0, 0, 0.08);
+  border-left: 3px solid var(--gs-red);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+.auth-submit-wrap { margin-top: 18px; }
+.auth-submit-wrap .sbb-btn-home {
+  width: 100%;
+  padding: 15px 36px;
+  font-size: 15px;
+}
+
+.auth-footer {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: var(--gs-grey);
+  text-align: center;
+  letter-spacing: 0.04em;
+  margin: 18px 0 0;
+}
+.auth-footer-link {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: var(--gs-red);
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.auth-footer-link:hover { text-decoration: underline; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   26. HOME PAGE — /
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.gs-home {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Ticker ─────────────────────────────────────────────────────────────── */
+.gs-ticker {
+  height: 30px;
+  background: var(--gs-black);
+  overflow: hidden;
+  position: relative;
+  border-bottom: 2px solid var(--gs-red);
+  flex-shrink: 0;
+}
+@media (max-width: 639px) { .gs-ticker { height: 36px; } }
+
+.gs-ticker-track {
+  display: inline-flex;
+  animation: homepage-ticker 28s linear infinite;
+  white-space: nowrap;
+  padding-top: 7px;
+}
+@media (max-width: 639px) { .gs-ticker-track { padding-top: 10px; } }
+
+.gs-ticker-text {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: #FFFFFF;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 639px) { .gs-ticker-text { font-size: 11px; } }
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.gs-hero {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 32px;
+}
+@media (max-width: 639px)  { .gs-hero { padding: 32px 20px 28px; } }
+@media (min-width: 1024px) { .gs-hero { flex: 1 1 auto; padding: 24px 32px; } }
+
+.gs-hero-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+}
+
+.gs-hero-badge {
+  display: inline-block;
+  background: var(--gs-red);
+  color: #FFFFFF;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 14px;
+  letter-spacing: 0.2em;
+  margin-bottom: 18px;
+}
+
+.gs-hero-train-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+  animation: homepage-trainIn 0.8s ease both;
+}
+.gs-hero-train-wrap svg {
+  width: 150px;
+  height: auto;
+  display: block;
+}
+@media (max-width: 639px) { .gs-hero-train-wrap svg { width: 120px; } }
+
+/* Big "GuesSBB" title — responsive via clamp() */
+.homepage-hero-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  color: var(--gs-black);
+  letter-spacing: -0.045em;
+  line-height: 0.88;
+  margin: 0 0 16px;
+  animation: homepage-slideUp 0.6s ease 0.1s both;
+  font-size: clamp(48px, 7vw, 84px);
+}
+
+.gs-hero-tagline {
+  font-family: var(--gs-font-sans);
+  font-size: 18px;
+  color: var(--gs-grey);
+  max-width: 440px;
+  margin: 0 auto 8px;
+  line-height: 1.45;
+  font-weight: 500;
+  animation: homepage-slideUp 0.6s ease 0.2s both;
+}
+@media (max-width: 639px) { .gs-hero-tagline { font-size: 16px; } }
+
+.gs-hero-mono {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey-light);
+  margin: 0 0 22px;
+  letter-spacing: 0.06em;
+  animation: homepage-slideUp 0.6s ease 0.3s both;
+  padding: 0 16px;
+}
+/* Show full text by default, swap to short text on small screens.
+   Both variants are rendered in JSX; CSS hides the wrong one. */
+.gs-hero-mono .full  { display: inline; }
+.gs-hero-mono .short { display: none; }
+@media (max-width: 639px) {
+  .gs-hero-mono .full  { display: none; }
+  .gs-hero-mono .short { display: inline; }
+}
+
+.gs-hero-cta-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: homepage-slideUp 0.6s ease 0.35s both;
+  padding: 0 20px;
+}
+.gs-hero-cta-row .sbb-btn-home {
+  font-size: 15px;
+  padding: 15px 36px;
+}
+@media (max-width: 639px) {
+  .gs-hero-cta-row .sbb-btn-home {
+    font-size: 13px;
+    padding: 12px 26px;
+    flex: 1 1 auto;
+  }
+}
+
+/* ── Mountains transition band ──────────────────────────────────────────── */
+.gs-mountains {
+  overflow: hidden;
+  margin-bottom: -2px;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.gs-mountains svg {
+  display: block;
+  width: 100%;
+}
+
+/* ── How-to-play (black section with 3 cards) ──────────────────────────── */
+.gs-howto {
+  background: var(--gs-black);
+  padding: 24px 32px;
+  flex-shrink: 0;
+}
+@media (max-width: 639px) { .gs-howto { padding: 24px 20px; } }
+
+.gs-howto-inner { max-width: 1040px; margin: 0 auto; }
+
+.gs-howto-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+@media (max-width: 639px) { .gs-howto-header { margin-bottom: 14px; } }
+
+.gs-howto-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 24px;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
+  margin: 4px 0 0;
+}
+@media (max-width: 639px) { .gs-howto-title { font-size: 20px; } }
+
+.gs-howto-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 639px) {
+  .gs-howto-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+
+.gs-howto-card {
+  background: var(--gs-charcoal);
+  padding: 16px 18px;
+  border-top: 3px solid var(--gs-red);
+}
+@media (max-width: 639px) { .gs-howto-card { padding: 14px 16px; } }
+
+.gs-howto-num {
+  font-family: var(--gs-font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gs-red);
+  margin-bottom: 4px;
+  line-height: 1;
+}
+.gs-howto-step-title {
+  font-family: var(--gs-font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 3px;
+}
+@media (max-width: 639px) { .gs-howto-step-title { font-size: 14px; } }
+.gs-howto-step-body {
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  color: var(--gs-grey-light);
+  line-height: 1.5;
+}
+
+/* ── Stats strip (red, 4 numerals) ──────────────────────────────────────── */
+.gs-statbar { background: var(--gs-red); flex-shrink: 0; }
+
+.gs-statbar-row {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  padding: 12px 32px;
+}
+@media (max-width: 639px) {
+  .gs-statbar-row { gap: 32px; padding: 12px 20px; }
+}
+
+.gs-stat { text-align: center; }
+.gs-stat-value {
+  font-family: var(--gs-font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.1;
+}
+@media (max-width: 639px) { .gs-stat-value { font-size: 16px; } }
+.gs-stat-label {
+  font-family: var(--gs-font-sans);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.72);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   27. REDUCED MOTION
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .homepage-hero-title,
+  .sbb-btn-home,
+  .auth-brand-content,
+  .auth-form,
+  .gs-hero-train-wrap,
+  .gs-ticker-track,
+  .gs-hero-tagline,
+  .gs-hero-mono,
+  .gs-hero-cta-row {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  globals.css — LOBBIES PAGE ADDITIONS
+ *  ─────────────────────────────────────────────────────────────────────────
+ *  APPEND this entire file at the END of globals.css, right after the
+ *  reduced-motion block (section 27 from the v2 additions).
+ *
+ *  Section map:
+ *    28. Lobbies page          (.lobbies-*)
+ *    29. Auth-gate modal       (.auth-modal-*)
+ *    30. Small button modifier (.sbb-btn-home--small)
+ *    31. Responsive utilities  (.hide-mob, .hide-tab)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   28. LOBBIES PAGE — /lobbies
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lobbies-page {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+}
+
+/* ── Black title header ─────────────────────────────────────────────────── */
+.lobbies-header {
+  background: var(--gs-black);
+}
+.lobbies-header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+@media (max-width: 639px) {
+  .lobbies-header-inner { padding: 16px 20px; }
+}
+.lobbies-header-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 26px;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
+  margin: 4px 0 0;
+}
+@media (max-width: 639px) {
+  .lobbies-header-title { font-size: 22px; }
+}
+
+/* ── Charcoal column-header strip ──────────────────────────────────────── */
+.lobbies-table-head {
+  background: var(--gs-charcoal);
+}
+.lobbies-table-head-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 9px 32px;
+}
+@media (max-width: 639px) {
+  .lobbies-table-head-inner { padding: 9px 20px; }
+}
+.lobbies-col-label {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  color: var(--gs-grey-light);
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+/* ── Grid layout (shared between header and rows) ──────────────────────── */
+.lobbies-grid {
+  display: grid;
+  grid-template-columns: 60px 1fr 140px 70px 80px 130px;
+  gap: 12px;
+  align-items: center;
+}
+@media (max-width: 1023px) {
+  .lobbies-grid {
+    grid-template-columns: 52px 1fr 140px 80px 130px;
+  }
+}
+@media (max-width: 639px) {
+  .lobbies-grid {
+    grid-template-columns: 44px 1fr 100px auto;
+  }
+}
+
+/* ── Lobby rows ─────────────────────────────────────────────────────────── */
+.lobbies-row {
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--gs-warm);
+}
+.lobbies-row--alt    { background: var(--gs-cream); }
+.lobbies-row--ingame { opacity: 0.65; }
+.lobbies-row-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 32px;
+}
+@media (max-width: 639px) {
+  .lobbies-row-inner { padding: 14px 20px; }
+}
+
+/* ── ID badge (red, sharp corners) ─────────────────────────────────────── */
+.lobbies-id {
+  background: var(--gs-red);
+  color: #FFFFFF;
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 5px;
+  text-align: center;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Name + admin info ──────────────────────────────────────────────────── */
+.lobbies-name-cell {
+  min-width: 0;
+}
+.lobbies-name {
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gs-black);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lobbies-by {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey);
+  margin: 2px 0 0;
+}
+
+/* Tiny status dot, shown on mobile next to the name (when status column is hidden) */
+.lobbies-status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lobbies-status-dot--open    { background: #2D6A4F; }
+.lobbies-status-dot--running { background: #C8960C; }
+@media (min-width: 640px) {
+  .lobbies-status-dot { display: none; } /* desktop has the status text column */
+}
+
+/* ── Players count ──────────────────────────────────────────────────────── */
+.lobbies-players {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Rounds ─────────────────────────────────────────────────────────────── */
+.lobbies-rounds {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+}
+
+/* ── Status (text version, hidden on mobile via .hide-mob) ─────────────── */
+.lobbies-status {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.lobbies-status--open    { color: #2D6A4F; }
+.lobbies-status--running { color: #C8960C; }
+
+/* ── Private code input (replaces players cell when lobby is private) ──── */
+.lobbies-code-input {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 10px;
+  border: 2px solid var(--gs-warm);
+  background: #FFFFFF;
+  outline: none;
+  width: 100%;
+  color: var(--gs-black);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.lobbies-code-input:focus {
+  border-color: var(--gs-red);
+}
+.lobbies-code-input::placeholder {
+  color: var(--gs-grey-light);
+  letter-spacing: 0.14em;
+}
+
+/* ── Join button cell ───────────────────────────────────────────────────── */
+.lobbies-join-cell {
+  justify-self: end;
+}
+.lobbies-join-cell .sbb-btn-home {
+  width: 100%;
+}
+
+/* ── Loading / empty state ──────────────────────────────────────────────── */
+.lobbies-state {
+  padding: 60px 20px;
+  text-align: center;
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   29. AUTH-GATE MODAL (re-used by lobbies for "Login or play as guest?")
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-modal {
+  background: #FFFFFF;
+  border-top: 5px solid var(--gs-red);
+  padding: 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 56px rgba(0, 0, 0, 0.28);
+  animation: homepage-slideUp 0.3s ease both;
+}
+@media (max-width: 639px) {
+  .auth-modal { padding: 28px 24px; }
+}
+
+.auth-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.auth-modal-actions .sbb-btn-home {
+  width: 100%;
+  padding: 16px 28px;
+  font-size: 14px;
+}
+
+.auth-modal-guest-btn {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gs-grey);
+  background: transparent;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+.auth-modal-guest-btn:hover {
+  color: var(--gs-black);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   30. SMALL BUTTON MODIFIER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sbb-btn-home--small {
+  font-size: 12px;
+  padding: 8px 18px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   31. RESPONSIVE VISIBILITY UTILITIES
+   ───────────────────────────────────────────────────────────────────────────
+   Used on table columns that should disappear at narrow widths.
+     .hide-tab → hidden on tablet and below (≤ 1023px)
+     .hide-mob → hidden on mobile only       (≤ 639px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1023px) {
+  .hide-tab { display: none !important; }
+}
+@media (max-width: 639px) {
+  .hide-mob { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  globals.css — NEW LOBBY PAGE ADDITIONS
+ *  ─────────────────────────────────────────────────────────────────────────
+ *  APPEND this entire file at the END of globals.css, right after the
+ *  responsive utilities block (section 31 from the lobbies additions).
+ *
+ *  Section map:
+ *    32. New lobby page (.newlobby-*)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   32. NEW LOBBY PAGE — /lobbies/newlobby
+   ───────────────────────────────────────────────────────────────────────────
+   Standalone form rendered as a centered card on a cream page. Visually
+   modeled on the prototype's create-lobby modal: white card, red top border,
+   prototype design tokens.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.newlobby-page {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+}
+@media (min-width: 640px) {
+  .newlobby-page {
+    padding: 60px 32px;
+    align-items: center;
+  }
+}
+
+.newlobby-card {
+  background: #FFFFFF;
+  border-top: 5px solid var(--gs-red);
+  padding: 32px 36px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 8px 56px rgba(0, 0, 0, 0.12);
+  animation: homepage-slideUp 0.3s ease both;
+}
+@media (max-width: 639px) {
+  .newlobby-card { padding: 24px 22px; }
+}
+
+.newlobby-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--gs-black);
+  letter-spacing: -0.025em;
+  margin: 6px 0 4px;
+  line-height: 1.15;
+}
+
+.newlobby-subtitle {
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  color: var(--gs-grey);
+  margin: 0 0 22px;
+}
+
+.newlobby-field {
+  margin-bottom: 18px;
+}
+
+.newlobby-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.newlobby-hint {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey-light);
+  letter-spacing: 0.06em;
+}
+
+.newlobby-input {
+  margin-top: 6px;
+}
+
+/* ── Player count stepper (− value +) ─────────────────────────────────── */
+.newlobby-stepper {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--gs-warm);
+  background: #FFFFFF;
+  height: 46px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.newlobby-stepper-btn {
+  width: 42px;
+  height: 42px;
+  font-family: var(--gs-font-sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gs-black);
+  background: var(--gs-parch);
+  border: none;
+  cursor: pointer;
+  margin: 0 2px;
+  line-height: 1;
+  padding: 0;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+}
+.newlobby-stepper-btn:hover:not(:disabled) {
+  background: var(--gs-warm);
+}
+.newlobby-stepper-btn:disabled {
+  background: transparent;
+  color: var(--gs-grey-light);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.newlobby-stepper-value {
+  flex: 1;
+  text-align: center;
+  font-family: var(--gs-font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gs-black);
+}
+
+/* ── Segmented control (rounds: 1, 3, 5, 10) ──────────────────────────── */
+.newlobby-segmented {
+  display: flex;
+  border: 2px solid var(--gs-warm);
+  margin-top: 6px;
+  height: 42px;
+  border-radius: 999px;
+  overflow: hidden;
+  padding: 3px;
+  gap: 3px;
+}
+.newlobby-seg-btn {
+  flex: 1;
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  background: transparent;
+  color: var(--gs-grey);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+}
+.newlobby-seg-btn:hover:not(.newlobby-seg-btn--active) {
+  background: var(--gs-parch);
+  color: var(--gs-black);
+}
+.newlobby-seg-btn--active {
+  background: var(--gs-red);
+  color: #FFFFFF;
+}
+
+/* ── Visibility radio cards ──────────────────────────────────────────── */
+.newlobby-radio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+.newlobby-radio-card {
+  padding: 12px 14px;
+  border: 2px solid var(--gs-warm);
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  border-radius: 18px;
+  text-align: left;
+  font-family: var(--gs-font-sans);
+}
+.newlobby-radio-card:hover:not(.newlobby-radio-card--active) {
+  border-color: var(--gs-grey-light);
+  transform: translateY(-1px);
+}
+.newlobby-radio-card--active {
+  border-color: var(--gs-red);
+  background: rgba(235, 0, 0, 0.05);
+}
+.newlobby-radio-card-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gs-black);
+  margin-bottom: 2px;
+}
+.newlobby-radio-card-desc {
+  display: block;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey);
+  letter-spacing: 0.04em;
+}
+
+/* ── Action buttons (Erstellen / Abbrechen) ──────────────────────────── */
+.newlobby-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+.newlobby-actions .sbb-btn-home {
+  padding: 14px 24px;
+  font-size: 14px;
+}
+.newlobby-actions .sbb-btn-home--primary {
+  flex: 1;
+}
+
+@media (max-width: 420px) {
+  .newlobby-card {
+    padding: 22px 18px;
+  }
+ 
+  /* Visibility cards: 2 cols → 1 col */
+  .newlobby-radio-grid {
+    grid-template-columns: 1fr;
+  }
+ 
+  /* Action buttons: row → column, both full width */
+  .newlobby-actions {
+    flex-direction: column;
+  }
+  .newlobby-actions .sbb-btn-home {
+    width: 100%;
+  }
+  .newlobby-actions .sbb-btn-home--primary {
+    flex: 0 0 auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ *  globals.css — LOBBY WAITING ROOM ADDITIONS
+ *  ─────────────────────────────────────────────────────────────────────────
+ *  APPEND this entire file at the END of globals.css, right after the
+ *  new lobby additions (section 32).
+ *
+ *  Section map:
+ *    33. Extra design tokens (gold, green)
+ *    34. Eyebrow colour variants (black, gold)
+ *    35. Lobby waiting room (.lobbyroom-*)
+ *    36. Auth-modal gold variant (for smart-start warning)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   33. EXTRA DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --gs-gold:  #C8960C;
+  --gs-green: #2D6A4F;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   34. EYEBROW COLOUR VARIANTS (extends section 24)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.eyebrow--black { color: var(--gs-black); }
+.eyebrow--gold  { color: var(--gs-gold); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   35. LOBBY WAITING ROOM — /lobby/[id]
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lobbyroom-page {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+}
+
+/* ── Black title header ─────────────────────────────────────────────────── */
+.lobbyroom-header {
+  background: var(--gs-black);
+}
+.lobbyroom-header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 22px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+@media (max-width: 639px) {
+  .lobbyroom-header-inner { padding: 16px 20px; }
+}
+
+.lobbyroom-title-block {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lobbyroom-name {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 28px;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
+  margin: 4px 0 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 639px) {
+  .lobbyroom-name { font-size: 22px; }
+}
+
+.lobbyroom-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+@media (max-width: 639px) {
+  .lobbyroom-meta-row { gap: 8px; }
+}
+.lobbyroom-meta-rounds {
+  color: var(--gs-grey-light);
+  text-transform: uppercase;
+}
+.lobbyroom-meta-rounds strong {
+  color: #FFFFFF;
+  font-weight: 700;
+}
+.lobbyroom-meta-sep {
+  color: var(--gs-grey-light);
+  opacity: 0.5;
+}
+.lobbyroom-meta-vis {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.lobbyroom-meta-vis--public  { color: var(--gs-green); }
+.lobbyroom-meta-vis--private { color: var(--gs-gold); }
+.lobbyroom-meta-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.lobbyroom-meta-status--ready { color: var(--gs-green); }
+.lobbyroom-meta-status--wait  { color: var(--gs-gold); }
+.lobbyroom-meta-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.lobbyroom-meta-status--wait .lobbyroom-meta-status-dot {
+  animation: lobbyroom-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes lobbyroom-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+@keyframes lobbyroom-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Red CODE box ───────────────────────────────────────────────────────── */
+.lobbyroom-code-box {
+  background: var(--gs-red);
+  padding: 8px 16px;
+  flex-shrink: 0;
+}
+.lobbyroom-code-label {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.12em;
+  margin-bottom: 1px;
+}
+.lobbyroom-code-value {
+  font-family: var(--gs-font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.1em;
+}
+
+/* ── Content column ─────────────────────────────────────────────────────── */
+.lobbyroom-content {
+  max-width: 620px;
+  margin: 24px auto;
+  padding: 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+@media (max-width: 639px) {
+  .lobbyroom-content { padding: 0 16px; }
+}
+
+/* ── Panels ─────────────────────────────────────────────────────────────── */
+.lobbyroom-panel {
+  background: #FFFFFF;
+}
+.lobbyroom-panel--invite {
+  border-top: 3px solid var(--gs-gold);
+  padding: 18px 22px;
+}
+@media (max-width: 639px) {
+  .lobbyroom-panel--invite { padding: 16px 18px; }
+}
+.lobbyroom-panel--players {
+  border-top: 4px solid var(--gs-red);
+}
+
+/* ── Invite panel ───────────────────────────────────────────────────────── */
+.lobbyroom-invite-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.lobbyroom-copied {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gs-green);
+  letter-spacing: 0.06em;
+  animation: lobbyroom-fadein 0.2s ease both;
+}
+.lobbyroom-invite-pill {
+  display: flex;
+  align-items: stretch;
+  border: 2px solid var(--gs-warm);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lobbyroom-invite-code {
+  flex: 1;
+  padding: 10px 22px;
+  font-family: var(--gs-font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gs-black);
+  letter-spacing: 0.14em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #FFFFFF;
+}
+@media (max-width: 639px) {
+  .lobbyroom-invite-code { font-size: 15px; }
+}
+.lobbyroom-invite-copy-btn {
+  background: var(--gs-red);
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 22px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  margin: -2px;
+  border-radius: 999px;
+  transition: background 0.15s;
+}
+.lobbyroom-invite-copy-btn:hover {
+  background: var(--gs-red-dark);
+}
+
+/* ── Players panel ──────────────────────────────────────────────────────── */
+.lobbyroom-players-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--gs-warm);
+  background: var(--gs-parch);
+}
+.lobbyroom-players-count {
+  font-family: var(--gs-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gs-black);
+}
+.lobbyroom-players-count .num-online { color: var(--gs-green); }
+.lobbyroom-players-count .num-total  { color: var(--gs-grey); }
+.lobbyroom-players-count .max-info   { color: var(--gs-grey-light); margin-left: 4px; }
+
+.lobbyroom-player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--gs-warm);
+  gap: 10px;
+  transition: opacity 0.3s;
+}
+.lobbyroom-player-row:last-child {
+  border-bottom: none;
+}
+.lobbyroom-player-row--disconnected {
+  opacity: 0.6;
+}
+
+.lobbyroom-player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.lobbyroom-player-avatar {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  color: #FFFFFF;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.lobbyroom-player-name-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.lobbyroom-player-name {
+  font-family: var(--gs-font-sans);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--gs-black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lobbyroom-host-badge {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: var(--gs-red);
+  padding: 2px 6px;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+/* ── Connection indicator ──────────────────────────────────────────────── */
+.lobbyroom-conn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.lobbyroom-conn-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lobbyroom-conn-label {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lobbyroom-conn--connected .lobbyroom-conn-label    { color: var(--gs-green); }
+.lobbyroom-conn--connected .lobbyroom-conn-dot {
+  background: var(--gs-green);
+  box-shadow: 0 0 0 2px rgba(45, 106, 79, 0.13);
+}
+.lobbyroom-conn--connecting .lobbyroom-conn-label   { color: var(--gs-gold); }
+.lobbyroom-conn--connecting .lobbyroom-conn-dot {
+  background: var(--gs-gold);
+  animation: lobbyroom-pulse 1.2s ease-in-out infinite;
+}
+.lobbyroom-conn--disconnected .lobbyroom-conn-label { color: var(--gs-red); }
+.lobbyroom-conn--disconnected .lobbyroom-conn-dot   { background: var(--gs-red); }
+
+/* ── Empty slot (dashed) ───────────────────────────────────────────────── */
+.lobbyroom-empty-slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--gs-warm);
+  opacity: 0.5;
+}
+.lobbyroom-empty-slot:last-child {
+  border-bottom: none;
+}
+.lobbyroom-empty-avatar {
+  width: 34px;
+  height: 34px;
+  border: 2px dashed var(--gs-grey-light);
+  flex-shrink: 0;
+}
+.lobbyroom-empty-text {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: var(--gs-grey-light);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Action buttons ─────────────────────────────────────────────────────── */
+.lobbyroom-actions {
+  display: flex;
+  gap: 10px;
+}
+@media (max-width: 639px) {
+  .lobbyroom-actions { flex-direction: column; }
+}
+.lobbyroom-actions .sbb-btn-home {
+  padding: 15px 36px;
+  font-size: 15px;
+}
+.lobbyroom-actions .sbb-btn-home--primary {
+  flex: 1;
+  letter-spacing: 0.06em;
+}
+.lobbyroom-start-meta {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+
+/* ── Non-host banner ───────────────────────────────────────────────────── */
+.lobbyroom-nonhost-banner {
+  text-align: center;
+  padding: 18px;
+  background: #FFFFFF;
+  border: 2px dashed var(--gs-warm);
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+  letter-spacing: 0.06em;
+}
+.lobbyroom-nonhost-banner-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gs-gold);
+  margin-right: 8px;
+  vertical-align: middle;
+  animation: lobbyroom-pulse 1.2s ease-in-out infinite;
+}
+.lobbyroom-nonhost-banner-host {
+  color: var(--gs-black);
+  font-weight: 700;
+}
+.lobbyroom-nonhost-leave-btn {
+  margin-top: 10px;
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gs-red);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+}
+
+/* ── Countdown ──────────────────────────────────────────────────────────── */
+.lobbyroom-countdown {
+  text-align: center;
+  padding: 24px 0;
+}
+.lobbyroom-countdown-number {
+  font-family: var(--gs-font-mono);
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--gs-red);
+  animation: lobbyroom-pulse 0.9s ease infinite;
+  line-height: 1;
+}
+@media (max-width: 639px) {
+  .lobbyroom-countdown-number { font-size: 56px; }
+}
+.lobbyroom-countdown-label {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: var(--gs-grey);
+  letter-spacing: 0.14em;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* ── Loading state ──────────────────────────────────────────────────────── */
+.lobbyroom-loading {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gs-cream);
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   36. AUTH-MODAL GOLD VARIANT (for the smart-start warning)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.auth-modal--gold {
+  border-top-color: var(--gs-gold);
 }

@@ -4,103 +4,50 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
-// import useLocalStorage from "@/hooks/useLocalStorage";
-import { Lobby, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
-import { useWebSocket } from "@/context/WebSocketContext";
-import { Button, Spin, Modal, Tooltip } from "antd";
-// import { UserAuthDTO, RegisterPostDTO } from "@/types/user";
+import { Lobby } from "@/types/lobby";
 import { useLobbyActions } from "@/hooks/useLobbyActions";
-
 
 type PendingAction =
   | { type: "create" }
-  | { type: "join"; lobbyId: number; lobbyCode: string; }
+  | { type: "join"; lobbyId: number; lobbyCode: string }
   | null;
-
 
 const LobbiesPage: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const { handleJoin } = useLobbyActions();
+  const { token } = useAuth();
+
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
-  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const { user: currentUser, token, login } = useAuth();
-
   const [loading, setLoading] = useState(true);
-  const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
-
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [inputCodes, setInputCodes] = useState<{ [key: number]: string }>({});
 
-  // const { set: setLobbyCode } = useLocalStorage<string>("lobbyCode", "");
-
-
   useEffect(() => {
-
     const fetchLobbies = async () => {
-      // const lobby1: Lobby = {
-      //   lobbyId: 1,
-      //   lobbyName: "Lobby 1",
-      //   lobbyCode: "ABC123",
-      //   adminId: 123,
-      //   rounds: 3,
-      //   visibility: "PRIVATE",
-      //   lobbyState: "IN_GAME",
-      //   currentRound: 0,
-      //   scores: [1, 2, 3],
-      //   size: 5
-      // };
-      // const lobby2: Lobby = {
-      //   lobbyId: 2,
-      //   lobbyName: "Lobby 2",
-      //   lobbyCode: "ABC123",
-      //   adminId: 123,
-      //   rounds: 3,
-      //   visibility: "PRIVATE",
-      //   lobbyState: "WAITING",
-      //   currentRound: 0,
-      //   scores: [1, 2, 3],
-      //   size: 5
-      // };
-
       try {
         setLoading(true);
         const response = await apiService.get<Lobby[]>("/lobbies");
-        // const combindesdLobbies = [...response, lobby1, lobby2];
-        //setLobbies(combindesdLobbies); // Only for testing - replace with response when backend is ready
         setLobbies(response);
-        // console.log(response); //to be removed
-        // console.log("Fetched lobbies:", response.length, response);
         if (response.length === 0) {
           console.log("No lobbies found.");
         }
-      }
-      catch (error) {
-
+      } catch (error) {
         console.error("Error fetching lobbies:", error);
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
-
     fetchLobbies();
-
-    // const token = localStorage.getItem("token");
-    // const userId = localStorage.getItem("userId");
-
-    // setHasCredentials(!!token && !!userId);
-
   }, [apiService, token]);
-
 
   const handleCreateNewLobby = () => {
     if (token) {
       router.push("/lobbies/newlobby");
     } else {
-      setPendingAction({
-        type: "create",
-      });
-      setIsAuthModalVisible(true);
+      setPendingAction({ type: "create" });
+      setAuthModalOpen(true);
     }
   };
 
@@ -114,168 +61,224 @@ const LobbiesPage: React.FC = () => {
         lobbyId: lobby.lobbyId,
         lobbyCode: enteredCode.toUpperCase(),
       });
-      setIsAuthModalVisible(true);
+      setAuthModalOpen(true);
     }
   };
 
   const handleContinueAsGuest = async () => {
     if (!pendingAction) return;
     const action = pendingAction;
-
-    setIsAuthModalVisible(false);
+    setAuthModalOpen(false);
     setPendingAction(null);
 
     if (action.type === "create") {
-
       router.push("/lobbies/newlobby");
-
     } else if (action.type === "join") {
       try {
-        await handleJoin(
-          action.lobbyId, { lobbyCode: action.lobbyCode }
-        );
+        await handleJoin(action.lobbyId, { lobbyCode: action.lobbyCode });
       } catch (error) {
         console.error("Guest join failed", error);
-
       }
     }
-  }
+  };
 
-
-
-  // const createGuestCredentials = () => {
-  //   const values: RegisterPostDTO = {
-  //     username: "",
-  //     email: "",
-  //     password: "",
-  //     isGuest: true,
-  //     userBio: ""
-  //   };
-
-  //   return values;
-  // }
-
-
-
-
-  // ── Render ──────────────────────────────────────────────────────────────
-return (
-  <div className="page-root page-content card--wide">
-
-    {/* Header row */}
-    <div className="lobby-page-header">
-      <div>
-        <h1 className="lobby-page-title">
-          <span aria-hidden="true">🎮</span> Lobbies
-        </h1>
-        <p className="lobby-page-subtitle">Join a game or create your own.</p>
-      </div>
-
-      <Button
-        type="primary"
-        className="lobby-new-btn"
-        onClick={handleCreateNewLobby}
-      >
-        + New Lobby
-      </Button>
-    </div>
-
-    {/* Lobby list */}
-    {loading ? (
-      <Spin />
-    ) : lobbies.length === 0 ? (
-      <div className="lobby-list">
-        <p>No lobbies available.</p>
-      </div>
-    ) : (
-      <div className="lobby-list">
-        {lobbies.map((lobby) => (
-          <div
-            key={lobby.lobbyId}
-            className={`lobby-row ${lobby.lobbyState !== "WAITING" ? "lobby-row--ingame" : ""}`}
+  return (
+    <div className="lobbies-page">
+      {/* ── Black title header ─────────────────────────────────────────── */}
+      <div className="lobbies-header">
+        <div className="lobbies-header-inner">
+          <div>
+            <span className="eyebrow eyebrow--red">Abfahrt / Departures</span>
+            <h1 className="lobbies-header-title">Offene Lobbies</h1>
+          </div>
+          <button
+            className="sbb-btn-home sbb-btn-home--primary sbb-btn-home--small"
+            onClick={handleCreateNewLobby}
           >
-            <div className="lobby-row-left">
-              <div className="lobby-row-info">
-                <div className="lobby-row-header">
-                  <span className="lobby-row-visibility" aria-hidden="true">
-                    {lobby.visibility === "PUBLIC" ? "🌍" : "🔒"}
-                  </span>
-                  <span className="lobby-row-name">{lobby.lobbyName}</span>
-                  <span className={`badge ${lobby.lobbyState === "WAITING" ? "badge-open" : "badge-inactive"}`}>
-                    {lobby.lobbyState === "WAITING" ? "Open" : "In Game"}
-                  </span>
-                </div>
-                <div className="lobby-row-meta">
-                  Rounds: {lobby.maxRounds || 0} | Visibility: {lobby.visibility}
+            + Neu
+          </button>
+        </div>
+      </div>
+
+      {/* ── Column header strip ────────────────────────────────────────── */}
+      <div className="lobbies-table-head">
+        <div className="lobbies-table-head-inner">
+          <div className="lobbies-grid">
+            <div className="lobbies-col-label">ID</div>
+            <div className="lobbies-col-label">NAME</div>
+            <div className="lobbies-col-label">SPIELER</div>
+            <div className="lobbies-col-label hide-tab">RUNDEN</div>
+            <div className="lobbies-col-label hide-mob">STATUS</div>
+            <div />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Rows ────────────────────────────────────────────────────────── */}
+      {loading ? (
+        <div className="lobbies-state">Lade Lobbies…</div>
+      ) : lobbies.length === 0 ? (
+        <div className="lobbies-state">Keine Lobbies verfügbar</div>
+      ) : (
+        lobbies.map((lobby, i) => {
+          const isWaiting = lobby.lobbyState === "WAITING";
+          const isPrivate = lobby.visibility === "PRIVATE";
+          const codeInput = inputCodes[lobby.lobbyId] || "";
+          const canJoin =
+            isWaiting && (!isPrivate || codeInput.trim().length > 0);
+
+          return (
+            <div
+              key={lobby.lobbyId}
+              className={
+                "lobbies-row" +
+                (i % 2 === 1 ? " lobbies-row--alt" : "") +
+                (!isWaiting ? " lobbies-row--ingame" : "")
+              }
+            >
+              <div className="lobbies-row-inner">
+                <div className="lobbies-grid">
+                  {/* ID badge — show lobbyCode for public, lock icon for private */}
+                  <div className="lobbies-id">
+                    {isPrivate ? "🔒" : lobby.lobbyCode || lobby.lobbyId}
+                  </div>
+
+                  {/* Name + admin */}
+                  <div className="lobbies-name-cell">
+                    <div className="lobbies-name">
+                      <span
+                        className={
+                          "lobbies-status-dot " +
+                          (isWaiting
+                            ? "lobbies-status-dot--open"
+                            : "lobbies-status-dot--running")
+                        }
+                        aria-hidden="true"
+                      />
+                      {lobby.lobbyName}
+                    </div>
+                    <div className="lobbies-by">
+                      Admin #{lobby.adminId}
+                    </div>
+                  </div>
+
+                  {/* Players count — OR private code input */}
+                  <div>
+                    {isPrivate && isWaiting ? (
+                      <input
+                        className="lobbies-code-input"
+                        placeholder="CODE"
+                        value={codeInput}
+                        onChange={(e) =>
+                          setInputCodes({
+                            ...inputCodes,
+                            [lobby.lobbyId]: e.target.value.toUpperCase(),
+                          })
+                        }
+                        maxLength={8}
+                        autoCapitalize="characters"
+                        autoCorrect="off"
+                        spellCheck={false}
+                      />
+                    ) : (
+                      <div className="lobbies-players">
+                        👥 {lobby.size}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rounds — desktop only */}
+                  <div className="lobbies-rounds hide-tab">
+                    {(lobby.maxRounds ?? 0)}×
+                  </div>
+
+                  {/* Status text — desktop & tablet only */}
+                  <div
+                    className={
+                      "lobbies-status hide-mob " +
+                      (isWaiting
+                        ? "lobbies-status--open"
+                        : "lobbies-status--running")
+                    }
+                  >
+                    {isWaiting ? "OFFEN" : "LÄUFT"}
+                  </div>
+
+                  {/* Join button */}
+                  <div className="lobbies-join-cell">
+                    <button
+                      className={
+                        "sbb-btn-home sbb-btn-home--small " +
+                        (canJoin
+                          ? "sbb-btn-home--primary"
+                          : "sbb-btn-home--secondary")
+                      }
+                      disabled={!canJoin}
+                      onClick={() => handleJoinClick(lobby)}
+                      title={
+                        !isWaiting
+                          ? "Spiel hat bereits begonnen"
+                          : isPrivate && !codeInput.trim()
+                          ? "Code eingeben"
+                          : ""
+                      }
+                    >
+                      {isWaiting ? "Beitreten" : "Läuft"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="lobby-row-right">
-              <div className="private-lobby-code">
-                {lobby.visibility === "PRIVATE" && (
-                  <input
-                    id={`lobby-code-${lobby.lobbyId}`}
-                    className="lobby-code-input"
-                    placeholder="Enter Lobby Code"
-                    value={inputCodes[lobby.lobbyId] || ""} // Wert aus dem State
-                    onChange={(e) => setInputCodes({
-                      ...inputCodes,
-                      [lobby.lobbyId]: e.target.value // Nur den Code für diese ID ändern
-                    })}
-                  />)}
+          );
+        })
+      )}
 
-              </div>
-              <div className="lobby-row-players">
-                👥 {lobby.size} player{lobby.size !== 1 && "s"}
-              </div>
-              <Tooltip title={lobby.lobbyState !== "WAITING" ? "Game already started" : ""}>
-                <Button
-                  type="primary"
-                  className="lobby-row-join-btn"
-                  onClick={() => handleJoinClick(lobby)}
-                  disabled={lobby.lobbyState !== "WAITING" || (lobby.visibility === "PRIVATE" && !inputCodes[lobby.lobbyId])}
-                >
-                  Join
-                </Button>
-              </Tooltip>
+      {/* ── Auth-gate modal ─────────────────────────────────────────────── */}
+      {authModalOpen && (
+        <div
+          className="auth-modal-backdrop"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setAuthModalOpen(false);
+          }}
+        >
+          <div className="auth-modal">
+            <span className="eyebrow eyebrow--red">Vor dem Start</span>
+            <h2 className="auth-title">Wie willst du spielen?</h2>
+            <p className="auth-subtitle">
+              Logg dich ein für Statistiken &amp; Rangliste — oder spring direkt
+              als Gast rein. Als Gast werden deine Ergebnisse nicht gespeichert.
+            </p>
+            <div className="auth-modal-actions">
+              <button
+                className="sbb-btn-home sbb-btn-home--primary"
+                onClick={() => {
+                  setAuthModalOpen(false);
+                  router.push("/login");
+                }}
+              >
+                Einloggen
+              </button>
+              <button
+                className="sbb-btn-home sbb-btn-home--secondary"
+                onClick={() => {
+                  setAuthModalOpen(false);
+                  router.push("/register");
+                }}
+              >
+                Konto erstellen
+              </button>
+              <button
+                className="auth-modal-guest-btn"
+                onClick={handleContinueAsGuest}
+              >
+                Als Gast weiterspielen
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-    )}
-    <Modal
-      title="Continue as Guest?"
-      open={isAuthModalVisible}
-      onCancel={() => setIsAuthModalVisible(false)}
-      footer={[
-        // Guest Button (left-aligned or secondary style)
-        <Button key="guest" onClick={handleContinueAsGuest}>
-          Continue as Guest
-        </Button>,
-
-        // Register Button
-        <Button key="register"
-          type="primary"
-          onClick={() => router.push("/register")}>
-          Register
-        </Button>,
-
-        // Login Button (Primary action)
-        <Button
-          key="login"
-          type="primary"
-          onClick={() => router.push("/login")}
-        >
-          Login
-        </Button>,
-      ]}
-    >
-      <p>
-        You can log in or register to save your data. Feel free to continue as a guest,
-        but you won&apos;t get your glorious stats saved!
-      </p>
-    </Modal>
-  </div>
-)};
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default LobbiesPage;

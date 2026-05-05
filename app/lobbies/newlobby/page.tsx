@@ -1,159 +1,198 @@
 "use client";
 
-
-// import { useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-// import useLocalStorage from "@/hooks/useLocalStorage";
-import { Button, Form, Input, Radio, InputNumber, App } from "antd";
 import { CreateLobbyPostDTO, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { useLobbyActions } from "@/hooks/useLobbyActions";
 import { useAuth } from "@/context/AuthContext";
 
+const ROUND_OPTIONS = [1, 3, 5, 10] as const;
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 12;
+
 const NewLobbyPage: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
-  const [form] = Form.useForm<CreateLobbyPostDTO>();
   const { handleJoin } = useLobbyActions();
-  const {message: antdMessage} = App.useApp();
+  const { user: currentUser, token, login } = useAuth();
 
-  const {user:currentUser, token, login} = useAuth();
+  const [lobbyName, setLobbyName] = useState("");
+  const [size, setSize] = useState(6);
+  const [maxRounds, setMaxRounds] = useState<number>(5);
+  const [visibility, setVisibility] = useState<"PUBLIC" | "PRIVATE">("PUBLIC");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lobbyName.trim()) {
+      setError("Bitte gib einen Lobby-Namen ein.");
+      return;
+    }
+    setError("");
+    setSubmitting(true);
+    try {
+      const payload: CreateLobbyPostDTO = {
+        lobbyName: lobbyName.trim(),
+        size: Number(size),
+        maxRounds: Number(maxRounds),
+        visibility,
+      };
+      const response = await apiService.post<LobbyAccessDTO>(
+        "/lobbies",
+        payload,
+        {
+          headers: {
+            token: token ? token : "",
+            userId: currentUser ? currentUser.userId.toString() : "-1",
+          },
+        }
+      );
 
+      await login(response.token, response.userId);
 
-  // ── Submit ──────────────────────────────────────────────────────────────
-  const handleCreate = async (values: CreateLobbyPostDTO) => {
-  
-    // const rawToken = localStorage.getItem("token");
-    // const token = rawToken ? JSON.parse(rawToken) : "";
-
-    // const rawUserId = localStorage.getItem("userId");
-    // const userId = rawUserId ? JSON.parse(rawUserId) : -1;
-
-    const payload = {
-      lobbyName: values.lobbyName,
-      size: Number(values.size),
-      maxRounds: Number(values.maxRounds),
-      // WICHTIG: Boolean zu Enum-String konvertieren
-      visibility: values.visibility,
-    };
-
-    // console.log(currentUser ? currentUser.userId.toString() : "-1")
-
-    // Aufruf mit 3 Argumenten:
-    const response = await apiService.post<LobbyAccessDTO>(
-      "/lobbies",              // 1. Endpoint
-      payload,      // 2. Data (Body) - schicke direkt das DTO
-      {                        // 3. Options (Headers)
-        headers: {
-          token: token ? token : "",
-          userId: currentUser ? currentUser.userId.toString() : "-1",
-        },
-      }
-    );
-
-    // localStorage.setItem("token", JSON.stringify(response.token));
-    // localStorage.setItem("userId", JSON.stringify(response.userId));
-    await login(response.token, response.userId);
-
-    const lobbyCodeDTO: LobbyCodeDTO = {
-      lobbyCode: response.lobbyCode
-    };
-
-    handleJoin(response.lobbyId, lobbyCodeDTO, {userId: response.userId, token: response.token});
-
+      const lobbyCodeDTO: LobbyCodeDTO = { lobbyCode: response.lobbyCode };
+      handleJoin(response.lobbyId, lobbyCodeDTO, {
+        userId: response.userId,
+        token: response.token,
+      });
+    } catch (err) {
+      console.error("Lobby creation failed:", err);
+      setError("Lobby konnte nicht erstellt werden. Bitte versuch es erneut.");
+      setSubmitting(false);
+    }
   };
 
   return (
-  <div className="page-center page-content">
-    <div className="card card--form card--lobby-form">
+    <div className="newlobby-page">
+      <form className="newlobby-card" onSubmit={handleCreate} noValidate>
+        <span className="eyebrow eyebrow--red">Neue Lobby</span>
+        <h2 className="newlobby-title">Set up your game</h2>
+        <p className="newlobby-subtitle">Konfiguriere deine Runde.</p>
 
-      {/* Card header */}
-      <h2 className="form-title">
-        <span aria-hidden="true">🎯</span> New Lobby
-      </h2>
-      <p className="form-subtitle">Set up your game.</p>
-
-      <Form
-        form={form}
-        name="lobby-creation"
-        size="large"
-        variant="outlined"
-        layout="vertical"
-        onFinish={handleCreate}
-      >
-        <Form.Item
-          name="lobbyName"
-          label="Lobby Name"
-          rules={[{ required: true, message: "Please enter a lobby name!" }]}
-        >
-          <Input placeholder="e.g. Pendler-Challenge" />
-        </Form.Item>
-
-        <Form.Item
-          name="size"
-          label="Amount of Players"
-          rules={[{ required: true, message: "Please enter the amount of players!" }]}
-        >
-          <InputNumber
-            placeholder="e.g. 5"
-            min={2}
-            max={20}
-            className="lobby-form-number"
+        {/* Lobby name */}
+        <div className="newlobby-field">
+          <span className="eyebrow eyebrow--grey">Lobby-Name</span>
+          <input
+            className="auth-input newlobby-input"
+            value={lobbyName}
+            onChange={(e) => setLobbyName(e.target.value.slice(0, 28))}
+            placeholder="Züri-Express"
+            maxLength={28}
+            autoCapitalize="off"
+            spellCheck={false}
           />
-        </Form.Item>
+        </div>
 
-        <Form.Item
-          name="maxRounds"
-          label="Rounds"
-          rules={[{ required: true, message: "Please select amount of rounds to be played!" }]}
-        >
-          <Radio.Group className="lobby-form-tiles lobby-form-tiles--rounds">
-            {[1, 3, 5, 10].map((r) => (
-              <Radio
-                key={r}
-                value={r}
-                className="lobby-form-tile lobby-form-tile--round"
+        {/* Player count stepper */}
+        <div className="newlobby-field">
+          <div className="newlobby-field-header">
+            <span className="eyebrow eyebrow--grey">Spieleranzahl</span>
+            <span className="newlobby-hint">{MIN_PLAYERS}–{MAX_PLAYERS}</span>
+          </div>
+          <div className="newlobby-stepper">
+            <button
+              type="button"
+              className="newlobby-stepper-btn"
+              onClick={() => setSize((s) => Math.max(MIN_PLAYERS, s - 1))}
+              disabled={size <= MIN_PLAYERS}
+              aria-label="Weniger Spieler"
+            >
+              −
+            </button>
+            <div className="newlobby-stepper-value">{size}</div>
+            <button
+              type="button"
+              className="newlobby-stepper-btn"
+              onClick={() => setSize((s) => Math.min(MAX_PLAYERS, s + 1))}
+              disabled={size >= MAX_PLAYERS}
+              aria-label="Mehr Spieler"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        {/* Rounds segmented */}
+        <div className="newlobby-field">
+          <span className="eyebrow eyebrow--grey">Runden</span>
+          <div className="newlobby-segmented" role="radiogroup" aria-label="Runden">
+            {ROUND_OPTIONS.map((n) => (
+              <button
+                key={n}
+                type="button"
+                role="radio"
+                aria-checked={maxRounds === n}
+                className={
+                  "newlobby-seg-btn" +
+                  (maxRounds === n ? " newlobby-seg-btn--active" : "")
+                }
+                onClick={() => setMaxRounds(n)}
               >
-                {r}
-              </Radio>
+                {n}
+              </button>
             ))}
-          </Radio.Group>
-        </Form.Item>
+          </div>
+        </div>
 
-        <Form.Item
-          name="visibility"
-          label="Lobby Visibility"
-          rules={[{ required: true, message: "Please select a visibility option!" }]}
-        >
-          <Radio.Group className="lobby-form-tiles lobby-form-tiles--vis">
-            <Radio value="PUBLIC" className="lobby-form-tile lobby-form-tile--vis">
-              <span className="lobby-form-tile-emoji" aria-hidden="true">🌍</span>
-              <span className="lobby-form-tile-label">Public</span>
-              <span className="lobby-form-tile-desc">Anyone can join</span>
-            </Radio>
-            <Radio value="PRIVATE" className="lobby-form-tile lobby-form-tile--vis">
-              <span className="lobby-form-tile-emoji" aria-hidden="true">🔒</span>
-              <span className="lobby-form-tile-label">Private</span>
-              <span className="lobby-form-tile-desc">Invite only</span>
-            </Radio>
-          </Radio.Group>
-        </Form.Item>
+        {/* Visibility */}
+        <div className="newlobby-field">
+          <span className="eyebrow eyebrow--grey">Sichtbarkeit</span>
+          <div className="newlobby-radio-grid" role="radiogroup" aria-label="Sichtbarkeit">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={visibility === "PUBLIC"}
+              className={
+                "newlobby-radio-card" +
+                (visibility === "PUBLIC" ? " newlobby-radio-card--active" : "")
+              }
+              onClick={() => setVisibility("PUBLIC")}
+            >
+              <span className="newlobby-radio-card-title">Öffentlich</span>
+              <span className="newlobby-radio-card-desc">
+                Jeder kann beitreten
+              </span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={visibility === "PRIVATE"}
+              className={
+                "newlobby-radio-card" +
+                (visibility === "PRIVATE" ? " newlobby-radio-card--active" : "")
+              }
+              onClick={() => setVisibility("PRIVATE")}
+            >
+              <span className="newlobby-radio-card-title">Privat</span>
+              <span className="newlobby-radio-card-desc">Nur per Code</span>
+            </button>
+          </div>
+        </div>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="form-submit-btn btn-full"
+        {error && <div className="auth-error">{error}</div>}
+
+        <div className="newlobby-actions">
+          <button
+            type="submit"
+            className="sbb-btn-home sbb-btn-home--primary"
+            disabled={submitting}
           >
-            Create Lobby
-          </Button>
-        </Form.Item>
-
-      </Form>
+            {submitting ? "Erstellen…" : "Lobby erstellen"}
+          </button>
+          <button
+            type="button"
+            className="sbb-btn-home sbb-btn-home--secondary"
+            onClick={() => router.push("/lobbies")}
+            disabled={submitting}
+          >
+            Abbrechen
+          </button>
+        </div>
+      </form>
     </div>
-  </div>
-)};
+  );
+};
 
 export default NewLobbyPage;
