@@ -105,7 +105,8 @@ _Continue with the same table format as above._
 ---
 
 ## Contributions Week 5 - [Begin Date] to [End Date]
-
+| **@dorianrother**    | 4.5    |   https://github.com/remoweirich/sopra-fs26-group-15-client/commit/9f7a77f3952b0a8fd7810d20e1875b91bc5893f3  | added error message for wrong login credentials, registration name conflicts, wrong lobby code and lobby join conflicts                                                                                                                | ensures failure transparency to user                              |
+| **@dorianrother**    | 5.5    |  https://github.com/remoweirich/sopra-fs26-group-15-client/commit/2be7ede5970fa52774e4b8c2b8c9347c0fb37f56  | created a react component for the iconic SBB clock, created and implemented a loadingscreen between the lobby and game page when starting the game | Makes waiting times more transparent to the user; the clock is a preparation for the redesign of the frontend
 _Continue with the same table format as above._
 
 ---
