@@ -69,8 +69,8 @@ const LobbiesPage: React.FC = () => {
         // const combindesdLobbies = [...response, lobby1, lobby2];
         //setLobbies(combindesdLobbies); // Only for testing - replace with response when backend is ready
         setLobbies(response);
-        // console.log(response); //to be removed
-        // console.log("Fetched lobbies:", response.length, response);
+        console.log(response); //to be removed
+        console.log("Fetched lobbies:", response.length);
         if (response.length === 0) {
           console.log("No lobbies found.");
         }
@@ -91,7 +91,7 @@ const LobbiesPage: React.FC = () => {
 
     // setHasCredentials(!!token && !!userId);
 
-  }, [apiService, token]);
+  }, [apiService]);
 
 
   const handleCreateNewLobby = () => {
@@ -127,7 +127,7 @@ const LobbiesPage: React.FC = () => {
       setPendingAction({
         type: "join",
         lobbyId: lobby.lobbyId,
-        lobbyCode: enteredCode.toUpperCase(),
+        lobbyCode: enteredCode,
       });
       setIsAuthModalVisible(true);
     }
@@ -164,19 +164,6 @@ const LobbiesPage: React.FC = () => {
     }
   }
 
-
-
-  // const createGuestCredentials = () => {
-  //   const values: RegisterPostDTO = {
-  //     username: "",
-  //     email: "",
-  //     password: "",
-  //     isGuest: true,
-  //     userBio: ""
-  //   };
-
-  //   return values;
-  // }
 
 
 
@@ -252,7 +239,7 @@ return (
 
               </div>
               <div className="lobby-row-players">
-                👥 {lobby.size} player{lobby.size !== 1 && "s"}
+                👥 {lobby.currentPlayers} player{lobby.maxPlayers !== 1 && "s"}
               </div>
               <Tooltip title={lobby.lobbyState !== "WAITING" ? "Game already started" : ""}>
                 <Button

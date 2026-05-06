@@ -33,13 +33,12 @@ const NewLobbyPage: React.FC = () => {
 
     const payload = {
       lobbyName: values.lobbyName,
-      size: Number(values.size),
+      maxPlayers: Number(values.maxPlayers),  // war size
       maxRounds: Number(values.maxRounds),
-      // WICHTIG: Boolean zu Enum-String konvertieren
       visibility: values.visibility,
     };
 
-    // console.log(currentUser ? currentUser.userId.toString() : "-1")
+    console.log(currentUser ? currentUser.userId.toString() : "-1")
 
     // Aufruf mit 3 Argumenten:
     const response = await apiService.post<LobbyAccessDTO>(
@@ -92,7 +91,7 @@ const NewLobbyPage: React.FC = () => {
         </Form.Item>
 
         <Form.Item
-          name="size"
+          name="maxPlayers"
           label="Amount of Players"
           rules={[{ required: true, message: "Please enter the amount of players!" }]}
         >

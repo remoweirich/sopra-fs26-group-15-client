@@ -84,7 +84,7 @@ const Register: React.FC = () => {
             label="Email"
             rules={[
               { required: true, message: "Please enter your email!" },
-              { type: "email", message: "Please enter a valid email!" },
+              //{ type: "email", message: "Please enter a valid email!" },
             ]}
           >
             <Input placeholder="your@email.com" />
@@ -94,7 +94,7 @@ const Register: React.FC = () => {
             label="Password"
             rules={[
               { required: true, message: "Please enter a password!" },
-              { min: 6, message: "Min. 6 characters" },
+              //{ min: 6, message: "Min. 6 characters" },
             ]}
           >
             <Input.Password placeholder="Min. 6 characters" />

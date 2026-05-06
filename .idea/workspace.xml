@@ -4,22 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix(lobbies): fix rounds info on lobbies page">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_15_04_2026,_13_45_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_15_04_2026__13_45__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026,_08_04_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026,_08_43_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026,_13_06_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026__08_04__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026__08_43__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_15_04_2026__13_06__Changes_.xml" beforeDir="false" />
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: change url">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/game/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lobbies/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lobbies/newlobby/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/newlobby/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lobbies/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/utils/domain.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/utils/domain.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/contributions.md" beforeDir="false" afterPath="$PROJECT_DIR$/contributions.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,11 +15,19 @@
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
+      <entry key="_/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-client" value="3DL12y7xArBtb9j58G022c91y4J" />
       <entry key="_/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client" value="3BRDRiUIGYQN9IU52iwU206PbJs" />
     </persistenceIdMap>
   </component>
   <component name="CopilotUserSelectedChatMode">
     <option name="chatModeId" value="Ask" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="GitHub Workflow" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -48,17 +43,10 @@
     &quot;assignee&quot;: &quot;snowjademusic&quot;
   }
 }</component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="main" />
-      </list>
-    </option>
-  </component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "git@github.com:remoweirich/sopra-fs26-group-15-client.git",
-    "accountId": "3bae03c6-3276-43d0-83e5-7ac4490df267"
+    "accountId": "b7bb69f4-867a-425b-873b-42f0cdfe52de"
   }
 }]]></component>
   <component name="ProjectColorInfo">{
@@ -77,22 +65,29 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "Main-Preview",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
-    "last_opened_file_path": "/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-client",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "/home/shadi/.config/JetBrains/WebStorm2025.3/node/versions/24.14.1/bin/node",
+    "nodejs_interpreter_path": "node",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "terminal",
-    "ts.external.directory.path": "/Users/remoweirich/Desktop/UZH/FS2026/SoPra/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-client/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -160,6 +155,7 @@
       <workItem from="1776680191021" duration="10536000" />
       <workItem from="1776702584032" duration="3717000" />
       <workItem from="1776775376427" duration="3659000" />
+      <workItem from="1778046333371" duration="603000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -297,7 +293,55 @@
       <option name="project" value="LOCAL" />
       <updated>1777021496940</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="prepare">
+      <option name="closed" value="true" />
+      <created>1778020288681</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1778020288681</updated>
+    </task>
+    <task id="LOCAL-00019" summary="feat: migrate app with new implementation">
+      <option name="closed" value="true" />
+      <created>1778021403633</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1778021403633</updated>
+    </task>
+    <task id="LOCAL-00020" summary="feat: migrate app with new implementation">
+      <option name="closed" value="true" />
+      <created>1778021465686</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1778021465686</updated>
+    </task>
+    <task id="LOCAL-00021" summary="feat: migrate app with new implementation npm install">
+      <option name="closed" value="true" />
+      <created>1778021718348</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1778021718348</updated>
+    </task>
+    <task id="LOCAL-00022" summary="feat: change semantic release npm version">
+      <option name="closed" value="true" />
+      <created>1778021860483</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1778021860483</updated>
+    </task>
+    <task id="LOCAL-00023" summary="fix: change url">
+      <option name="closed" value="true" />
+      <created>1778023574358</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1778023574358</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -332,7 +376,12 @@
     <MESSAGE value="fix(icon): remove favicon.ico so firefox too sees the new icon" />
     <MESSAGE value="fix(homepage): Play button sends to lobbies always" />
     <MESSAGE value="fix(lobbies): fix rounds info on lobbies page" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(lobbies): fix rounds info on lobbies page" />
+    <MESSAGE value="prepare" />
+    <MESSAGE value="feat: migrate app with new implementation" />
+    <MESSAGE value="feat: migrate app with new implementation npm install" />
+    <MESSAGE value="feat: change semantic release npm version" />
+    <MESSAGE value="fix: change url" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: change url" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
