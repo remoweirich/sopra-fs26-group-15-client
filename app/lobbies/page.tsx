@@ -30,6 +30,7 @@ const LobbiesPage: React.FC = () => {
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
 
   const [inputCodes, setInputCodes] = useState<{ [key: number]: string }>({});
+  const [joinError, setJoinError] = useState<string>("");
 
   // const { set: setLobbyCode } = useLocalStorage<string>("lobbyCode", "");
 
@@ -104,10 +105,24 @@ const LobbiesPage: React.FC = () => {
     }
   };
 
-  const handleJoinClick = (lobby: Lobby) => {
+  const handleJoinClick = async (lobby: Lobby) => {
+    setJoinError("");
     const enteredCode = inputCodes[lobby.lobbyId] || lobby.lobbyCode;
     if (token) {
-      handleJoin(lobby.lobbyId, { lobbyCode: enteredCode });
+      try {
+        await handleJoin(lobby.lobbyId, { lobbyCode: enteredCode.toUpperCase() });
+      } catch (error: any) {
+        if (error?.status === 409) {
+          setJoinError("Lobby already full");
+        } else if (error?.status === 404) {
+          setJoinError("Lobby not found");
+        } else if (error?.status === 403) {
+          setJoinError("Incorrect lobby code");
+        }
+        else {
+          setJoinError("Failed to join lobby. Please try again.");
+        }
+      }
     } else {
       setPendingAction({
         type: "join",
@@ -126,17 +141,25 @@ const LobbiesPage: React.FC = () => {
     setPendingAction(null);
 
     if (action.type === "create") {
-
       router.push("/lobbies/newlobby");
-
     } else if (action.type === "join") {
+      setJoinError("");
       try {
         await handleJoin(
           action.lobbyId, { lobbyCode: action.lobbyCode }
         );
-      } catch (error) {
-        console.error("Guest join failed", error);
-
+      } catch (error: any) {
+        if (error?.status === 409) {
+          setJoinError("Lobby already full");
+        } else if (error?.status === 404) {
+          setJoinError("Lobby not found");
+        } 
+        else if (error?.status === 403) {
+          setJoinError("Incorrect lobby code");
+        }
+        else {
+          setJoinError("Failed to join lobby. Please try again.");
+        }
       }
     }
   }
@@ -168,6 +191,9 @@ return (
     </div>
 
     {/* Lobby list */}
+    {joinError && (
+      <div className="join-error" style={{ color: 'red', marginBottom: 16 }}>{joinError}</div>
+    )}
     {loading ? (
       <Spin />
     ) : lobbies.length === 0 ? (

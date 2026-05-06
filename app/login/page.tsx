@@ -15,16 +15,22 @@ import { useApi } from "@/hooks/useApi";
 import { Button, Form, Input } from "antd";
 import { UserAuthDTO, LoginPostDTO } from "@/types/user";
 import { useAuth } from "@/context/AuthContext";
+import { useState} from "react";
 
 
 const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // const {set: setToken,  } = useLocalStorage<string>("token", "");
   // const {set: setUserId} = useLocalStorage<number>("userId", -1);
   const {login} = useAuth(); 
+
+  type Error = {
+    status: number;
+  }
 
   const handleLogin = async (values: LoginPostDTO) => {
       try {
@@ -38,10 +44,22 @@ const Login: React.FC = () => {
         await login(response.token, response.userId);
         router.push(`/users/${response.userId}`)
   
-      } catch (error) {
-  
-        console.error("Registration failed:", error);
-      }
+      } catch (error: any) {
+
+            if (error?.status===404) {
+              setErrorMessage("Login failed: User not found.");
+            console.error("Registration failed:", error);
+            }
+            else if (error?.status===401){
+            setErrorMessage("Login failed: Wrong username or password.");
+            console.error("Registration failed:", error);
+          }
+            else {
+              console.log("An unexpected error occurred during Login.", error);
+            }
+          }
+          
+      
     };
 
 return (
@@ -49,6 +67,7 @@ return (
       <div className="card card--form">
         <h2 className="form-title">Welcome back!</h2>
         <p className="form-subtitle">Sign in to keep playing.</p>
+        {errorMessage && <div className="form-error">{errorMessage}</div>}
         <Form
           form={form}
           name="login"
