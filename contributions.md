@@ -103,14 +103,13 @@ _Continue with the same table format as above._
 | **@ClaudeStark**   | 21.04    | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/95a7c796ac2d0de7a27659a26bfc0ec7aeb325fc     | Refactoring the whloe user management in Front end by merging many file structures into one AuthContext to have a consistent logged-in or logged-out state for the whole App occur. | Relevant to toggle navbar and get synchronous state over all differen pages concerning user information actions.                                                                                                    |
 | **@ClaudeStark**   | 21.04    | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/a97e4e779e03da443d80000d7211c4f21a54aa74     | Implementing a consistent connection and subscribe logic for entering a lobby. If the users comes via the create lobby or directly joins, both paths should behave the same and end in being subscribed to this specific lobby | Relevant for enabeling other teammates to simulate the ingame logic by rushing through the lobby with a working subscription.                                                                                                    |
 ---
-
 ## Contributions Week 5 - [Begin Date] to [End Date]
-| **@dorianrother**    | 4.5    |   https://github.com/remoweirich/sopra-fs26-group-15-client/commit/9f7a77f3952b0a8fd7810d20e1875b91bc5893f3  | added error message for wrong login credentials, registration name conflicts, wrong lobby code and lobby join conflicts                                                                                                                | ensures failure transparency to user                              |
-| **@dorianrother**    | 5.5    |  https://github.com/remoweirich/sopra-fs26-group-15-client/commit/2be7ede5970fa52774e4b8c2b8c9347c0fb37f56  | created a react component for the iconic SBB clock, created and implemented a loadingscreen between the lobby and game page when starting the game | Makes waiting times more transparent to the user; the clock is a preparation for the redesign of the frontend
-_Continue with the same table format as above._
 
----
-
+| **@dorianrother** | 4.5  | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/9f7a77f3952b0a8fd7810d20e1875b91bc5893f3 | added error message for wrong login credentials, registration name conflicts, wrong lobby code and lobby join conflicts | ensures failure transparency to user |
+|---|------|---|---|---|
+| **@dorianrother** | 5.5  | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/2be7ede5970fa52774e4b8c2b8c9347c0fb37f56 | created a react component for the iconic SBB clock, created and implemented a loadingscreen between the lobby and game page when starting the game | Makes waiting times more transparent to the user; the clock is a preparation for the redesign of the frontend |
+| **@ClaudeStark** | 5.5. | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/1b03ca223d65fa0b51ef233b4021e4a0233aea63 |  Collaborated with @remoweirich to design the database structure and implemented the backend architecture on the new Hetzner server, including multiple new entities and a migration from volatile in-memory state to persistent database queries. | Establishes a reliable, persistent data layer that replaces ephemeral state, enabling scalable and consistent game data management. |
+| **@ClaudeStark** | 3.5. | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/4ff798ecfdef5c6cdd97f3faf49b304c66827c3f | Set up a dedicated WebSocket message broker on a separate server to centralize and manage all WebSocket communication. | Decouples message routing from the application server, improving scalability and reliability of real-time communication across the game. |
 ## Contributions Week 6 - [Begin Date] to [End Date]
 
 _Continue with the same table format as above._
