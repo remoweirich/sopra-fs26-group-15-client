@@ -39,6 +39,9 @@ import type { MessageType } from "@/types/messageType";
 //import { User } from "@/types/user";
 import { Message } from "@/types/message";
 import {UserResult} from "@/types/user";
+import { useAuth } from "@/context/AuthContext";
+import { MyUserDTO, UserDTO } from "@/types/user";
+
 
 
 
@@ -52,6 +55,9 @@ interface RoundOverviewProps {
 
 const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish }) => {   
     
+    const { user: currentUser, token, login, isLoading } = useAuth();
+    const apiService = useApi();
+  
     const router     = useRouter();  
     const { value: userId } = useLocalStorage<string>("userId", "1"); //hardcoded for testing, needs to be set later with login
     const { id: gameId } = useParams();
@@ -62,6 +68,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
     //prevent hidration error
     const [mounted, setMounted] = useState(false);
     const [readyForNextRound, setReadyForNextRound] = useState(false);
+    const [usernamesMap, setUsernamesMap] = useState<{ [userId: number]: string }>({});
 
     useEffect(() => {
         setMounted(true);
@@ -78,6 +85,27 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         const sortedTotalResults = [...unsortedResults].sort((a, b) => b.totalPoints - a.roundPoints);
         setSortedTotalResults(sortedTotalResults);
         // console.log("sorted total results:", sortedTotalResults);
+        
+        const fetchUsernames = async () => {
+          if (!token) {return}
+          for (const result of sortedResults) {
+            try {
+              const data = await apiService.get<MyUserDTO | UserDTO>(
+                `/users/${result.userId}`,
+                {
+                  headers: { token: token },
+                }
+              );
+
+              setUsernamesMap((prevMap) => ({ ...prevMap, [result.userId]: data.username }));
+            } catch (error) {
+              console.log("Failed to fetch username for userId " + result.userId, error);
+            }
+          }
+        };
+        fetchUsernames();
+        //create a map of userId to username
+
 
     }, [unsortedResults]);
 
@@ -186,7 +214,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                         {/* TODO: username initial */}
                     </div>
                     <div className="result-player-info">
-                        <div className="result-player-name">{result.userId /*to do: fetch username*/}</div>
+                        <div className="result-player-name">{usernamesMap[result.userId]/*to do: fetch username*/}</div>
                         <div className="result-player-distance">{result.distance} km</div>
                     </div>
                     <span className="result-player-score">{result.roundPoints}</span>
@@ -203,7 +231,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         {sortedTotalResults.map((result, index) => (
             <div key={`total-row-${result.userId}`} className="result-standings-row">
           <span className="result-standings-rank">{index+1}.</span>
-          <span className="result-standings-name">{result.userId == parseInt(userId) ? ("You"): result.userId}</span>
+          <span className="result-standings-name">{result.userId == parseInt(userId) ? ("You"): usernamesMap[result.userId]}</span>
           <span className="result-standings-score">{result.totalPoints}</span>
         </div>
         ))}
