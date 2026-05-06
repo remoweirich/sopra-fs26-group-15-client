@@ -11,7 +11,6 @@ import { RMap, RMarker } from "maplibre-react-components";
 import { MapLayerMouseEvent, MapLayerTouchEvent } from "maplibre-gl";
 import RoundOverview from "./RoundOverview";
 import LoadingScreen from "./LoadingScreen";
-import SBBClock from "./SBBClock";
 import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
 import { GameMessage } from "@/types/gameMessage";
 import { UserResult } from "@/types/user";
@@ -166,66 +165,6 @@ const GamePage: React.FC = () => {
             console.log("Received WS message:", update);
             handleMessage(update);
         });
-  }, [guessCoords, guessSubmitted, handleSubmitGuess, gameId, router]);
-
-
- 
-  
-  // ── Map click handler (passed from RMap component) ─────────────────────
-  const handleMapClick = (e: MapLayerMouseEvent) => {
-    setClickPosition(e.lngLat.toArray());
-
-    
-  };
-  const handleMapClickTouch = (e: MapLayerTouchEvent) => {
-    setClickPosition(e.lngLat.toArray());
-    
-  };
-
-  // ── Render ───────────────────────────────────────────────────────────────
-  const train = currentTrain;
-  
-  if (gameState === "ROUND_IN_PROGRESS") {
-    return (
-  
-  // in-round Map view with train info bar, question, and map interaction
-
-    <>
-      {/* ── Compact game navbar ─────────────────────────────────────────── */}
-      <nav className="navbar navbar--game">
-        {/* TODO: logo mark (white variant) */}
-        <span style={{ marginLeft: "auto" }}>
-          <Button
-            className="btn-ghost-muted"
-            onClick={() => router.push("/lobbies")}
-          >
-            Exit Game
-          </Button>
-        </span>
-      </nav>
-
-      {/* ── Red train-info bar ──────────────────────────────────────────── */}
-      <div className="train-bar">
-        {/* Line badge e.g. "S12" */}
-        <span className="train-bar-line-badge">
-          {train?.line.name ?? "—"}
-        </span>
-
-        {/* Route */}
-        <span className="train-bar-route">
-          From {train?.lineOrigin.stationName}
-          <span className="train-bar-route-arrow"> → </span>
-          To {train?.lineDestination.stationName}
-        </span>
-
-        {/* Times */}
-        <span className="train-bar-times">
-          Dep {departureTime} · Arr {arrivalTime}
-        </span>
-        {/*SBB-Uhr*/}
-        <span style={{marginLeft:"16px"}}>
-          <SBBClock timeStr={currentTime}/>
-        </span>
 
         if (!readySent.current) {
             publish(`/app/game/${gameId}/ready`, {});

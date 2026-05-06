@@ -1,10 +1,38 @@
 "use client";
 
+/**
+ * RoundResult  –  shown after each round inside the Game Screen
+ *
+ * Design ref: uploaded screenshot (split layout – map left, panel right)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * This component replaces the full-screen map once the backend sends a
+ * ROUND_END WebSocket message. The parent (game/[id]/page.tsx) mounts it
+ * instead of the plain map view when gameState.phase === "ROUND_RESULT".
+ *
+ * Layout:
+ *   <div className="game-result-layout">          ← flex row, fills .page-game
+ *     <div className="map-container">             ← left: map stays visible
+ *     <aside className="result-panel">            ← right: 340px white sidebar
+ *
+ * Props (all TODO – wire to real data from WS ROUND_END payload):
+ *   currentRound, totalRounds   – "ROUND 1 / 5"
+ *   trainInfo                   – line, route, time for subtitle
+ *   actualPosition              – "Zwischen Baden & Wettingen"
+ *   roundResults[]              – per-player distance + score delta
+ *   overallStandings[]          – cumulative leaderboard
+ *   onNextRound                 – called when host clicks "Next round"
+ *   isHost                      – shows/hides the Next round button
+ */
+
 import { Button } from "antd";
-import { useEffect, useState , useMemo} from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useApi } from "@/hooks/useApi";
+import useLocalStorage from "@/hooks/useLocalStorage";
+//import { useWebSocket } from "@/hooks/useWebSocket";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { RMap, RMarker } from "maplibre-react-components";
+//import { Message} from "@types/message";
 import { Train } from "@/types/train";
 import { Round } from "@/types/round";
 import type { MessageType } from "@/types/messageType";
@@ -87,57 +115,88 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         }
         setReadyForNextRound(true);
 
-    const router = useRouter();
-    const { user } = useAuth();
-    const { id: gameId } = useParams<{ id: string }>();
+        publish(`/app/game/${gameId}/ready`, {
+            type: "READY_FOR_NEXT_ROUND",
+            payload: {
+                userId: userId,
+                isReady: true
+            }
+        });
+        // console.log("Sent ready message for user" + userId)
+    }
 
-    const [readyForNextRound, setReadyForNextRound] = useState(false);
+    const handleEndGame = async () => {
+      console.log("Ending Game")
+      router.push(`/game/${gameId}/leaderboard`)
+    }
 
-    const sortedRoundResults = useMemo(
-        () => [...results].sort((a, b) => b.roundPoints - a.roundPoints),
-        [results]
-    );
+  return (
+    <div className="game-result-layout">
 
-    const sortedTotalResults = useMemo(
-        () => [...results].sort((a, b) => b.totalPoints - a.totalPoints),
-        [results]
-    );
+      {/* ── Left: map stays mounted so the actual pin is visible ─────────── */}
+      <div className="map-container">
+        {mounted && (
+        <RMap
+            minZoom={6}
+            initialCenter={[currentTrain?.currentY ?? 7.4707, currentTrain?.currentX ?? 46.95]}
+            initialZoom={9}
+            mapStyle="https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json"
+            >
+                {/*Actual Train Position*/}
+                {currentTrain?.currentX && currentTrain?.currentY && (
+                    <RMarker
+                    longitude={currentTrain.currentY}
+                    latitude={currentTrain.currentX}
+                    />)}
+                {/*player guess positions*/}
+                {sortedRoundResults.map((result) => (
+                    <RMarker
+                    key={`guess-${result.userId}-${result.xCoordinate}-${result.yCoordinate}`}
+                    longitude={result.yCoordinate}
+                    latitude={result.xCoordinate}
+                    //color="#3fce63"
+                    />)
+                 )
 
-    const handleReadyForNextRound = () => {
-        if (readyForNextRound) return;
-        setReadyForNextRound(true);
-        publish(`/app/game/${gameId}/ready`, {});
-        console.log("Sent ready message for user " + user?.userId);
-    };
+                }
+            </RMap>)}
+      </div>
 
-    const handleEndGame = () => {
-        router.push(`/game/${gameId}/leaderboard`);
-    };
+      {/* ── Right: result sidebar ─────────────────────────────────────────── */}
+      <aside className="result-panel">
 
-    return (
-        <div className="game-result-layout">
+        {/* Header */}
+        <div className="result-panel-header">
+          <p className="result-panel-round-label">
+            {/* TODO: currentRound / totalRounds */}
+            ROUND {currentRound} / {maxRounds}
+          </p>
+          <h2 className="result-panel-title">
+            {/* TODO: target icon */}
+            Result
+          </h2>
+          <p className="result-panel-subtitle">
+            {/* TODO: trainInfo.lineId · trainInfo.fromStation → trainInfo.toStation · trainInfo.currentTime */}
+            {train?.line.name} · {train?.lineOrigin?.stationName} → {train?.lineDestination?.stationName} · {/*add current time */}
+          </p>
+        </div>
 
-            <div className="map-container">
-                <RMap
-                    minZoom={6}
-                    initialCenter={[train?.currentY ?? 7.4707, train?.currentX ?? 46.95]}
-                    initialZoom={9}
-                    mapStyle="https://openmaptiles.geo.data.gouv.fr/styles/osm-bright/style.json"
-                >
-                    {train?.currentX && train?.currentY && (
-                        <RMarker
-                            longitude={train.currentY}
-                            latitude={train.currentX}
-                        />
-                    )}
-                    {sortedRoundResults.map((result) => (
-                        <RMarker
-                            key={`guess-${result.userId}-${result.xCoordinate}-${result.yCoordinate}`}
-                            longitude={result.yCoordinate}
-                            latitude={result.xCoordinate}
-                        />
-                    ))}
-                </RMap>
+        {/* Actual position callout */}
+        <div className="result-actual-position">
+          <div className="result-actual-label">Actual Position</div>
+          <div className="result-actual-value">
+            {/* TODO: actualPosition from ROUND_END payload */}
+            Zwischen {train?.lastLeavingStation.stationName} &amp; {train?.nextPendingStation.stationName}
+          </div>
+        </div>
+
+        {/* This round – per-player scores */}
+        <div className="result-section-label">This Round</div>
+
+        {/* TODO: map over roundResults[] – example rows below */}
+
+        
+
         {sortedRoundResults.map((result, index) => (
             result.userId == parseInt(userId) ? (
                 <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you">
@@ -160,25 +219,15 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                     </div>
                     <span className="result-player-score">{result.roundPoints}</span>
             </div>
+            )))}
+           
+        
 
-            <aside className="result-panel">
+        {/* Overall standings */}
+        <div className="result-section-label">Overall Standings</div>
 
-                <div className="result-panel-header">
-                    <p className="result-panel-round-label">ROUND {currentRound} / {maxRounds}</p>
-                    <h2 className="result-panel-title">Result</h2>
-                    <p className="result-panel-subtitle">
-                        {train?.line.name} · {train?.lineOrigin?.stationName} → {train?.lineDestination?.stationName}
-                    </p>
-                </div>
+        {/*map over overallStandings[] */}
 
-                <div className="result-actual-position">
-                    <div className="result-actual-label">Actual Position</div>
-                    <div className="result-actual-value">
-                        Zwischen {train?.lastLeavingStation?.stationName ?? "?"} &amp; {train?.nextPendingStation?.stationName ?? "?"}
-                    </div>
-                </div>
-
-                <div className="result-section-label">This Round</div>
         {sortedTotalResults.map((result, index) => (
             <div key={`total-row-${result.userId}`} className="result-standings-row">
           <span className="result-standings-rank">{index+1}.</span>
@@ -224,59 +273,9 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           
         </div>
 
-                {sortedRoundResults.map((result) => (
-                    result.userId === user?.userId ? (
-                        <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you">
-                            <div className="result-player-avatar" />
-                            <div className="result-player-info">
-                                <div className="result-player-name">You</div>
-                                <div className="result-player-distance">{result.distance} km</div>
-                            </div>
-                            <span className="result-player-score">{result.roundPoints}</span>
-                        </div>
-                    ) : (
-                        <div key={`round-row-${result.userId}`} className="result-player-row">
-                            <div className="result-player-avatar" />
-                            <div className="result-player-info">
-                                <div className="result-player-name">{result.userId}</div>
-                                <div className="result-player-distance">{result.distance} km</div>
-                            </div>
-                            <span className="result-player-score">{result.roundPoints}</span>
-                        </div>
-                    )
-                ))}
-
-                <div className="result-section-label">Overall Standings</div>
-
-                {sortedTotalResults.map((result, index) => (
-                    <div key={`total-row-${result.userId}`} className="result-standings-row">
-                        <span className="result-standings-rank">{index + 1}.</span>
-                        <span className="result-standings-name">
-                            {result.userId === user?.userId ? "You" : result.userId}
-                        </span>
-                        <span className="result-standings-score">{result.totalPoints}</span>
-                    </div>
-                ))}
-
-                <div className="result-panel-footer">
-                    {currentRound === maxRounds ? (
-                        <Button type="primary" className="btn-full" onClick={handleEndGame}>
-                            End Game
-                        </Button>
-                    ) : !readyForNextRound ? (
-                        <Button type="primary" className="btn-full" onClick={handleReadyForNextRound}>
-                            Next round →
-                        </Button>
-                    ) : (
-                        <Button type="primary" className="btn-full" disabled>
-                            Waiting for other players →
-                        </Button>
-                    )}
-                </div>
-
-            </aside>
-        </div>
-    );
+      </aside>
+    </div>
+  );
 };
 
 export default RoundOverview;

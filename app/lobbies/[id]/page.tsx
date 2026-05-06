@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { useWebSocket } from "@/context/WebSocketContext";
@@ -10,7 +10,6 @@ import { App, Button } from "antd";
 import { useAuth } from "@/context/AuthContext";
 import {UserAuthDTO} from "@/types/user";
 import LobbyLoadingScreen from "./LobbyLoadingScreen";
-
 
 const LobbyWaitPage: React.FC = () => {
   const router = useRouter();
@@ -23,9 +22,10 @@ const LobbyWaitPage: React.FC = () => {
   //const token = JSON.parse(localStorage.getItem("token") || '""') as string;
   //const userId = JSON.parse(localStorage.getItem("userId") || '""') as number;
   const {user:currentUser, token, isLoading} = useAuth();
-    const [lobby, setLobby]   = useState<Lobby | null>(null);
+    const [lobby, setLobby]   = useState<MyLobbyDTO | null>(null);
     const intentionalDisconnect = useRef<boolean>(false);
   const [isLoadingGame, setIsLoadingGame] = useState<boolean>(false);
+  const webSocket = useWebSocket();
 
   
   // const [userData, setUserData] = useState< {userId: number; token: string} | null>(null);
@@ -89,19 +89,31 @@ const LobbyWaitPage: React.FC = () => {
   }, [isConnected, lobbyId, router, subscribe]);
 
   // ── Actions ──────────────────────────────────────────────────────────────
-  const handleStartGame = () => {
-    if (!isConnected) {
+ const handleStartGame = async () => {
+    if (!webSocket.isConnected){
       message.warning("Verbindung wird noch aufgebaut...");
-      return;
-    }
+    return;}
+    console.log("Starting game");
+
+    const destination = `/app/lobby/${lobbyId}/start`;
+
     if (!currentUser || !token) return;
-    console.log(`[LobbyWait] Publishing start game for lobby ${lobbyId}`);
-    publish(`/app/lobby/${lobbyId}/start`, {});
+
+    const payload: UserAuthDTO = {
+      userId: currentUser.userId,
+      token: token
+    }
+
+    const messageBody: LobbyMessage = {
+      type: "START_GAME",
+      payload: payload
+    }
 
     webSocket.publish(destination, messageBody);
     //show loading screen until trains have loaded
     setIsLoadingGame(true);
   };
+
 
   const handleLeave = () => {
     if (!currentUser || !token) return;
