@@ -14,6 +14,7 @@ import LoadingScreen from "./LoadingScreen";
 import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
 import { GameMessage } from "@/types/gameMessage";
 import { UserResult } from "@/types/user";
+import SBBClock from "./SBBClock";
 
 const GamePage: React.FC = () => {
     const router = useRouter();
@@ -205,6 +206,10 @@ const GamePage: React.FC = () => {
                     </span>
                     <span className="train-bar-times">
                         Dep {departureTime} · Arr {arrivalTime}
+                    </span>
+                    {/*SBB-Uhr*/}
+                    <span style={{marginLeft:"16px"}}>
+                      <SBBClock timeStr={currentTime}/>
                     </span>
                     <div className="train-bar-round">
                         <span>Round {currentRound}/{maxRounds}</span>
