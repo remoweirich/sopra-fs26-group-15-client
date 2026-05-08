@@ -8,7 +8,7 @@ interface ClockProps {
 }
 
 /* SBB-Uhr — Hour & minute show train scenario time; second hand sweeps for life */
-const SBBClock: React.FC<ClockProps>=({timeStr, size=86})=>{
+const SBBClock: React.FC<ClockProps>=({timeStr, size=40})=>{
   const [h,m]=(timeStr||"10:00").split(":").map(Number);
   const [sec,setSec]=useState(()=>new Date().getSeconds());
   useEffect(()=>{const t=setInterval(()=>setSec(s=>(s+1)%60),1000);return()=>clearInterval(t);},[]);
