@@ -41,6 +41,7 @@ import { Message } from "@/types/message";
 import {UserResult} from "@/types/user";
 import { useAuth } from "@/context/AuthContext";
 import { MyUserDTO, UserDTO } from "@/types/user";
+import { COMMENTS } from "@/utils/comments";
 
 
 
@@ -130,6 +131,13 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
       router.push(`/game/${gameId}/leaderboard`)
     }
 
+    const loadComment = () => {
+        const result = sortedRoundResults.find(result => result.userId==parseInt(userId))
+        if (!result) {return ""}
+        const comment = COMMENTS.find(comment => comment[0]<=result?.distance && result?.distance<=comment[1])
+        return (comment?comment[2] : "")
+    }
+
   return (
     <div className="game-result-layout">
 
@@ -189,6 +197,13 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           <div className="result-actual-value">
             {/* TODO: actualPosition from ROUND_END payload */}
             Zwischen {train?.lastLeavingStation.stationName} &amp; {train?.nextPendingStation.stationName}
+          </div>
+        </div>
+
+        {/*Snarky comments based on distance*/}
+        <div className="result-comment">
+          <div className="result-value">
+            {loadComment()}
           </div>
         </div>
 
