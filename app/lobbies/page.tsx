@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 // import useLocalStorage from "@/hooks/useLocalStorage";
 import { Lobby, LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { useWebSocket } from "@/context/WebSocketContext";
-import { Button, Spin, Modal, Tooltip } from "antd";
+import { Spin } from "antd";
 // import { UserAuthDTO, RegisterPostDTO } from "@/types/user";
 import { useLobbyActions } from "@/hooks/useLobbyActions";
 
@@ -93,6 +93,22 @@ const LobbiesPage: React.FC = () => {
 
   }, [apiService]);
 
+  useEffect(() => {
+    if (!isAuthModalVisible) return;
+    
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsAuthModalVisible(false);
+    };
+
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [isAuthModalVisible]);
+
 
   const handleCreateNewLobby = () => {
     if (token) {
@@ -113,14 +129,14 @@ const LobbiesPage: React.FC = () => {
         await handleJoin(lobby.lobbyId, { lobbyCode: enteredCode.toUpperCase() });
       } catch (error: any) {
         if (error?.status === 409) {
-          setJoinError("Lobby already full");
+          setJoinError("Lobby ist voll");
         } else if (error?.status === 404) {
-          setJoinError("Lobby not found");
+          setJoinError("Lobby nicht gefunden");
         } else if (error?.status === 403) {
-          setJoinError("Incorrect lobby code");
+          setJoinError("Falscher Lobby-Code");
         }
         else {
-          setJoinError("Failed to join lobby. Please try again.");
+          setJoinError("Beitreten fehlgeschlagen. Bitte erneut versuchen.");
         }
       }
     } else {
@@ -150,145 +166,234 @@ const LobbiesPage: React.FC = () => {
         );
       } catch (error: any) {
         if (error?.status === 409) {
-          setJoinError("Lobby already full");
+          setJoinError("Lobby ist voll");
         } else if (error?.status === 404) {
-          setJoinError("Lobby not found");
-        } 
+          setJoinError("Lobby nicht gefunden");
+        }
         else if (error?.status === 403) {
-          setJoinError("Incorrect lobby code");
+          setJoinError("Falscher Lobby-Code");
         }
         else {
-          setJoinError("Failed to join lobby. Please try again.");
+          setJoinError("Beitreten fehlgeschlagen. Bitte erneut versuchen.");
         }
       }
     }
   }
 
 
-
-
-
   // ── Render ──────────────────────────────────────────────────────────────
-return (
-  <div className="page-root page-content card--wide">
+  return (
+    <div className="gs-lobbies-root">
 
-    {/* Header row */}
-    <div className="lobby-page-header">
-      <div>
-        <h1 className="lobby-page-title">
-          <span aria-hidden="true">🎮</span> Lobbies
-        </h1>
-        <p className="lobby-page-subtitle">Join a game or create your own.</p>
-      </div>
-
-      <Button
-        type="primary"
-        className="lobby-new-btn"
-        onClick={handleCreateNewLobby}
-      >
-        + New Lobby
-      </Button>
-    </div>
-
-    {/* Lobby list */}
-    {joinError && (
-      <div className="join-error" style={{ color: 'red', marginBottom: 16 }}>{joinError}</div>
-    )}
-    {loading ? (
-      <Spin />
-    ) : lobbies.length === 0 ? (
-      <div className="lobby-list">
-        <p>No lobbies available.</p>
-      </div>
-    ) : (
-      <div className="lobby-list">
-        {lobbies.map((lobby) => (
-          <div
-            key={lobby.lobbyId}
-            className={`lobby-row ${lobby.lobbyState !== "WAITING" ? "lobby-row--ingame" : ""}`}
+      {/* Black header */}
+      <header className="gs-lobbies-header">
+        <div className="gs-lobbies-header-inner">
+          <div className="gs-lobbies-header-text">
+            <span className="gs-lobbies-eyebrow">ABFAHRT / DEPARTURES</span>
+            <h1 className="gs-lobbies-title">Offene Lobbies</h1>
+          </div>
+          <button
+            type="button"
+            className="gs-btn gs-btn--primary gs-btn--sm"
+            onClick={handleCreateNewLobby}
           >
-            <div className="lobby-row-left">
-              <div className="lobby-row-info">
-                <div className="lobby-row-header">
-                  <span className="lobby-row-visibility" aria-hidden="true">
-                    {lobby.visibility === "PUBLIC" ? "🌍" : "🔒"}
-                  </span>
-                  <span className="lobby-row-name">{lobby.lobbyName}</span>
-                  <span className={`badge ${lobby.lobbyState === "WAITING" ? "badge-open" : "badge-inactive"}`}>
-                    {lobby.lobbyState === "WAITING" ? "Open" : "In Game"}
-                  </span>
-                </div>
-                <div className="lobby-row-meta">
-                  Rounds: {lobby.maxRounds || 0} | Visibility: {lobby.visibility}
-                </div>
-              </div>
-            </div>
-            <div className="lobby-row-right">
-              <div className="private-lobby-code">
-                {lobby.visibility === "PRIVATE" && (
-                  <input
-                    id={`lobby-code-${lobby.lobbyId}`}
-                    className="lobby-code-input"
-                    placeholder="Enter Lobby Code"
-                    value={inputCodes[lobby.lobbyId] || ""} // Wert aus dem State
-                    onChange={(e) => setInputCodes({
-                      ...inputCodes,
-                      [lobby.lobbyId]: e.target.value // Nur den Code für diese ID ändern
-                    })}
-                  />)}
+            + Neu
+          </button>
+        </div>
+      </header>
 
+      {/* Charcoal column-headers row */}
+      <div className="gs-lobbies-thead" role="row">
+        <div className="gs-lobbies-thead-inner gs-lobbies-grid">
+          <div className="gs-lobbies-th">ID</div>
+          <div className="gs-lobbies-th">Name</div>
+          <div className="gs-lobbies-th gs-lobbies-hide-sm">Spieler</div>
+          <div className="gs-lobbies-th gs-lobbies-hide-md">Runden</div>
+          <div className="gs-lobbies-th">Status</div>
+          <div aria-hidden="true" />
+        </div>
+      </div>
+
+      {/* Error banner */}
+      {joinError && (
+        <div className="gs-lobbies-error" role="alert">
+          {joinError}
+        </div>
+      )}
+
+      {/* Body */}
+      {loading ? (
+        <div className="gs-lobbies-state">
+          <Spin />
+        </div>
+      ) : lobbies.length === 0 ? (
+        <div className="gs-lobbies-state gs-lobbies-empty">
+          Keine offenen Lobbies.
+        </div>
+      ) : (
+        <div className="gs-lobbies-body">
+          {lobbies.map((lobby, i) => {
+            const isFull = lobby.currentPlayers >= lobby.maxPlayers;
+            const isLive = lobby.lobbyState !== "WAITING";
+            const isPrivate = lobby.visibility === "PRIVATE";
+            const enteredCode = inputCodes[lobby.lobbyId] || "";
+            const buttonDisabled =
+              isFull || isLive || (isPrivate && !enteredCode);
+            const buttonLabel = isFull ? "Voll" : isLive ? "Läuft" : "Beitreten";
+            const buttonVariant = isFull || isLive ? "secondary" : "primary";
+
+            return (
+              <div
+                key={lobby.lobbyId}
+                className={
+                  "gs-lobby-row" +
+                  (i % 2 === 1 ? " gs-lobby-row--alt" : "") +
+                  (isLive ? " gs-lobby-row--dim" : "")
+                }
+                role="row"
+              >
+                <div className="gs-lobbies-grid">
+                  {/* ID badge */}
+                  <div className="gs-lobby-id" aria-label="Lobby code">
+                    {lobby.lobbyCode}
+                  </div>
+
+                  {/* Name + meta + (private code input) */}
+                  <div className="gs-lobby-info">
+                    <div className="gs-lobby-name">
+                      <span className="gs-lobby-vis-icon" aria-hidden="true">
+                        {isPrivate ? "🔒" : "🌍"}
+                      </span>
+                      <span className="gs-lobby-name-text">{lobby.lobbyName}</span>
+                    </div>
+                    <div className="gs-lobby-meta">
+                      {isPrivate ? "Privat" : "Öffentlich"}
+                    </div>
+                    {isPrivate && !isLive && !isFull && (
+                      <input
+                        id={`lobby-code-${lobby.lobbyId}`}
+                        className="gs-lobby-code-input"
+                        placeholder="Code"
+                        maxLength={6}
+                        value={enteredCode}
+                        onChange={(e) =>
+                          setInputCodes({
+                            ...inputCodes,
+                            [lobby.lobbyId]: e.target.value
+                              .toUpperCase()
+                              .slice(0, 6),
+                          })
+                        }
+                        aria-label={`Code für Lobby ${lobby.lobbyName}`}
+                      />
+                    )}
+                  </div>
+
+                  {/* Player squares */}
+                  <div className="gs-lobby-players gs-lobbies-hide-sm">
+                    <div className="gs-lobby-pips" aria-hidden="true">
+                      {Array.from({ length: lobby.maxPlayers }).map((_, j) => (
+                        <span
+                          key={j}
+                          className={
+                            "gs-lobby-pip" +
+                            (j < lobby.currentPlayers
+                              ? " gs-lobby-pip--filled"
+                              : "")
+                          }
+                        />
+                      ))}
+                    </div>
+                    <span className="gs-lobby-players-count">
+                      {lobby.currentPlayers}/{lobby.maxPlayers}
+                    </span>
+                  </div>
+
+                  {/* Rounds */}
+                  <div className="gs-lobby-rounds gs-lobbies-hide-md">
+                    {lobby.maxRounds || 0}×
+                  </div>
+
+                  {/* Status */}
+                  <div
+                    className={
+                      "gs-lobby-status " +
+                      (isLive ? "gs-lobby-status--live" : "gs-lobby-status--open")
+                    }
+                  >
+                    {isLive ? "Läuft" : "Offen"}
+                  </div>
+
+                  {/* Join button */}
+                  <button
+                    type="button"
+                    className={`gs-btn gs-btn--${buttonVariant} gs-btn--sm gs-lobby-join`}
+                    onClick={() => handleJoinClick(lobby)}
+                    disabled={buttonDisabled}
+                  >
+                    {buttonLabel}
+                  </button>
+                </div>
               </div>
-              <div className="lobby-row-players">
-                👥 {lobby.currentPlayers} player{lobby.maxPlayers !== 1 && "s"}
-              </div>
-              <Tooltip title={lobby.lobbyState !== "WAITING" ? "Game already started" : ""}>
-                <Button
-                  type="primary"
-                  className="lobby-row-join-btn"
-                  onClick={() => handleJoinClick(lobby)}
-                  disabled={lobby.lobbyState !== "WAITING" || (lobby.visibility === "PRIVATE" && !inputCodes[lobby.lobbyId])}
-                >
-                  Join
-                </Button>
-              </Tooltip>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Auth gate modal — custom, matches prototype design */}
+      {isAuthModalVisible && (
+        <div
+          className="gs-modal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsAuthModalVisible(false);
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-modal-title"
+        >
+          <div className="gs-modal-card">
+            <span className="gs-modal-eyebrow">Vor dem Start</span>
+            <h2 id="auth-modal-title" className="gs-modal-title">
+              Wie willst du spielen?
+            </h2>
+            <p className="gs-modal-body">
+              Logg dich ein für Statistiken &amp; Rangliste — oder spring direkt
+              als Gast rein.
+            </p>
+            <div className="gs-modal-actions">
+              <button
+                type="button"
+                className="gs-btn gs-btn--primary gs-modal-btn"
+                onClick={() => {
+                  setIsAuthModalVisible(false);
+                  router.push("/login");
+                }}
+              >
+                Einloggen
+              </button>
+              <button
+                type="button"
+                className="gs-btn gs-btn--secondary gs-modal-btn"
+                onClick={() => {
+                  setIsAuthModalVisible(false);
+                  router.push("/register");
+                }}
+              >
+                Konto erstellen
+              </button>
+              <button
+                type="button"
+                className="gs-modal-ghost"
+                onClick={handleContinueAsGuest}
+              >
+                Als Gast weiterspielen
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-    )}
-    <Modal
-      title="Continue as Guest?"
-      open={isAuthModalVisible}
-      onCancel={() => setIsAuthModalVisible(false)}
-      footer={[
-        // Guest Button (left-aligned or secondary style)
-        <Button key="guest" onClick={handleContinueAsGuest}>
-          Continue as Guest
-        </Button>,
-
-        // Register Button
-        <Button key="register"
-          type="primary"
-          onClick={() => router.push("/register")}>
-          Register
-        </Button>,
-
-        // Login Button (Primary action)
-        <Button
-          key="login"
-          type="primary"
-          onClick={() => router.push("/login")}
-        >
-          Login
-        </Button>,
-      ]}
-    >
-      <p>
-        You can log in or register to save your data. Feel free to continue as a guest,
-        but you won&apos;t get your glorious stats saved!
-      </p>
-    </Modal>
-  </div>
-)};
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default LobbiesPage;

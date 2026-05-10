@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GuessSBB",
+  title: "GuesSBB",
   description: "Guess where the Swiss train is right now.",
 };
 

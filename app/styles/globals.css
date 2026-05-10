@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
 /*
  * globals.css  –  GuessSBB shared stylesheet
  * ─────────────────────────────────────────────────────────────────────────────
@@ -73,6 +75,23 @@
   --nav-h:       56px;   /* standard navbar height */
   --nav-game-h:  48px;   /* compact in-game navbar height */
   --train-bar-h: 40px;   /* red train-info strip in game */
+
+    /* ── GuesSBB v2 design tokens (HomePage redesign — used by .home-* in §14) */
+  --gs-red:        #EB0000;
+  --gs-red-dark:   #B80000;
+  --gs-black:      #1C1917;
+  --gs-charcoal:   #2C2825;
+  --gs-cream:      #FBF8F2;
+  --gs-parch:      #F0EBE1;
+  --gs-warm:       #E8E2D9;
+  --gs-grey:       #8B8480;
+  --gs-grey-l:     #C8C3BC;
+  --gs-grey-xl:    #EBE7E0;
+  --gs-gold:       #C8960C;
+  --gs-green:      #2D6A4F;
+  --gs-white:      #FFFFFF;
+  --gs-font-sans:  'Space Grotesk', sans-serif;
+  --gs-font-mono:  'IBM Plex Mono', monospace;
 }
 
 
@@ -1681,359 +1700,424 @@ html, body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   14. HOME PAGE  (app/page.tsx)
+   14. HOME PAGE  (app/page.tsx) — v2 redesign
    ═══════════════════════════════════════════════════════════════════════════
 
-   .home-hero                – full hero section with mountains backdrop
-   .home-hero-mountains      – decorative SVG positioned behind hero content
-   .home-hero-content        – relative wrapper sitting above the mountains
-   .home-hero-illustration   – pin icon + train SVG row at top of hero
-   .home-hero-train          – small train SVG positioned next to the pin
-   .home-hero-title          – giant "GuessSBB" h1 (72px desktop)
-   .home-hero-tagline        – mono uppercase subtitle "Wo ist der Zug…"
-   .home-hero-description    – body paragraph under the tagline
+   Complete visual rebuild of the landing page using the GuesSBB v2 design
+   language: Space Grotesk + IBM Plex Mono fonts, cream parchment background,
+   pill buttons with red accent, animated ticker bar, mountain silhouette
+   transition into a black "Spielanleitung" section, and a red stats footer.
 
-   .home-step-card           – one of the 3 how-it-works cards
-   .home-step-emoji-bg       – huge watermark emoji in card corner
-   .home-step-emoji          – visible emoji above the step number
-   .home-step-number         – "01" / "02" / "03" mono label
-   .home-step-number--red/gold/green – accent colour per step
-   .home-step-title          – card heading
-   .home-step-desc           – muted card body text
+   All tokens prefixed --gs-* (defined in :root above).
 
-   .home-stats-bar           – horizontal stats strip below the cards
-   .home-stat                – individual stat cell
-   .home-stat-emoji          – emoji above the value
-   .home-stat-value          – mono numeric value
-   .home-stat-value--small   – smaller variant (for text values like usernames)
-   .home-stat-label          – muted label below the value
+   Structure:
+     A. Root container (flex column)
+     B. Ticker
+     C. Hero (eyebrow, train SVG, title, tagline, subtitle, buttons)
+     D. Mountain transition
+     E. How-to-play (3-step grid on black)
+     F. Stats bar (red footer)
+     G. Animations & reduced motion
+     H. Responsive — Mobile S → Ultrawide
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Hero section ──────────────────────────────────────────────────────── */
-.home-hero {
-  position: relative;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: var(--sp-2xl) var(--sp-lg) var(--sp-xl);
-  text-align: center;
-  overflow: hidden;
-}
-
-/* Mountains: dekorativer Hintergrund unten */
-.home-hero-mountains {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 180px;              /* feste Höhe statt aspect-ratio-Verzerrung */
-  opacity: 0.85;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.home-hero-content {
-  position: relative;
-  z-index: 1;
-}
-
-/* Illustration: Pin + Train nebeneinander, zentriert */
-.home-hero-illustration {
+/* ── A. Root ─────────────────────────────────────────────────────────────── */
+.home-root {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+  color: var(--gs-black);
+  font-family: var(--gs-font-sans);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-md);
-  margin: 0 auto var(--sp-lg);
+  flex-direction: column;
+}
+
+/* ── B. Ticker ───────────────────────────────────────────────────────────── */
+.home-ticker {
+  flex-shrink: 0;
+  height: 32px;
+  background: var(--gs-black);
+  border-bottom: 2px solid var(--gs-red);
+  overflow: hidden;
   position: relative;
 }
 
-/* Pin-Wrapper: hübsche Bounce-Animation */
-.home-hero-pin {
-  animation:
-    home-pin-drop   0.6s ease-out 1.7s both,
-    home-pin-bounce 2.4s ease-in-out 2.3s infinite;
-  filter: drop-shadow(0 6px 8px rgba(227, 6, 19, 0.25));
-  flex-shrink: 0;
+.home-ticker-track {
+  display: inline-flex;
+  white-space: nowrap;
+  padding-top: 9px;
+  animation: home-ticker-scroll 28s linear infinite;
 }
 
-@keyframes home-pin-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-10px); }
+.home-ticker-track > span {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: var(--gs-white);
+  letter-spacing: 0.04em;
 }
 
-/* Sonne: fadet von unten nach oben ein */
-.home-hero-sun {
-  animation: home-sun-rise 0.8s ease-out 0s both;
-  transform-box: fill-box;
-  transform-origin: center;
+@keyframes home-ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
-@keyframes home-sun-rise {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ── C. Hero ─────────────────────────────────────────────────────────────── */
+.home-hero {
+  padding: 32px 20px 28px;
 }
 
-/* Zug: fährt von links herein */
-@keyframes home-train-drive {
-  from { opacity: 0; transform: translateX(-180px) rotate(-4deg); }
-  to   { opacity: 1; transform: translateX(0)      rotate(-4deg); }
+.home-hero-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
 }
 
-/* Pin: fällt von oben herunter, mit kleinem Overshoot */
-@keyframes home-pin-drop {
-  0%   { opacity: 0; transform: translateY(-60px); }
-  70%  { opacity: 1; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
+.home-hero-eyebrow {
+  display: inline-block;
+  background: var(--gs-red);
+  color: var(--gs-white);
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 14px;
+  letter-spacing: 0.2em;
+  margin-bottom: 18px;
 }
 
-
-/* Train: jetzt inline-item, kein absolute mehr */
 .home-hero-train {
-  width: 160px;
-  height: auto;
-  flex-shrink: 0;
-  transform: rotate(-4deg);
-  animation: home-train-drive 0.9s ease-out 0.8s both;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+  animation: home-train-in 0.8s ease both;
 }
 
-/* Respect Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  .home-hero-pin,
-  .home-hero-train,
-  .home-hero-sun {
-    animation: none;
-  }
+.home-train-svg {
+  display: block;
+  width: 120px;
+  height: auto;
 }
 
 .home-hero-title {
-  font-size: 72px;
-  font-weight: 900;
-  color: var(--black);
-  margin: 0 0 var(--sp-sm);
-  letter-spacing: -0.05em;
-  line-height: 0.95;
+  font-family: var(--gs-font-sans);
+  font-size: clamp(44px, 14vw, 72px);
+  font-weight: 800;
+  color: var(--gs-black);
+  letter-spacing: -0.045em;
+  line-height: 0.88;
+  margin: 0 0 16px;
+  animation: home-slide-up 0.6s ease 0.1s both;
+}
+
+.home-hero-title-accent {
+  color: var(--gs-red);
 }
 
 .home-hero-tagline {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 14px;
-  color: var(--gray-light);
-  letter-spacing: 0.1em;
+  font-family: var(--gs-font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gs-grey);
+  max-width: 440px;
+  margin: 0 auto 8px;
+  line-height: 1.45;
+  animation: home-slide-up 0.6s ease 0.2s both;
+}
+
+.home-hero-subtitle {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey-l);
+  letter-spacing: 0.06em;
+  margin: 0 0 22px;
+  padding: 0 16px;
+  animation: home-slide-up 0.6s ease 0.3s both;
+}
+
+.home-hero-subtitle-full  { display: none; }
+.home-hero-subtitle-short { display: inline; }
+
+.home-hero-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0 20px;
+  animation: home-slide-up 0.6s ease 0.35s both;
+}
+
+.home-btn {
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin: 0 0 var(--sp-md);
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 150px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow 0.2s ease,
+    background 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
 }
 
-.home-hero-description {
-  font-size: 19px;
-  color: var(--gray-mid);
-  max-width: 520px;
-  margin: 0 auto var(--sp-lg);
-  line-height: 1.7;
+.home-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 22px rgba(235, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* ── How-it-works step cards ───────────────────────────────────────────── */
-.home-step-card {
-  padding: var(--sp-lg);
-  text-align: left;
-  position: relative;
+.home-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.06s ease, box-shadow 0.1s ease;
+}
+
+.home-btn--primary {
+  background: var(--gs-red);
+  color: var(--gs-white);
+  border-color: var(--gs-red);
+}
+
+.home-btn--primary:hover:not(:disabled) {
+  background: var(--gs-red-dark);
+  border-color: var(--gs-red-dark);
+}
+
+.home-btn--secondary {
+  background: var(--gs-parch);
+  color: var(--gs-black);
+  border-color: var(--gs-grey-l);
+}
+
+.home-btn--secondary:hover:not(:disabled) {
+  background: var(--gs-warm);
+}
+
+/* ── D. Mountain transition ─────────────────────────────────────────────── */
+.home-mountains {
+  flex-shrink: 0;
   overflow: hidden;
-  transition: transform 0.25s, box-shadow 0.25s;
-  cursor: default;
-  border: 1px solid var(--gray-border);
-}
-
-.home-step-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-elevated);
-}
-
-.home-step-emoji-bg {
-  position: absolute;
-  top: -20px;
-  right: -10px;
-  font-size: 80px;
-  opacity: 0.08;
-  line-height: 1;
+  margin-bottom: -2px;
   pointer-events: none;
 }
 
-.home-step-emoji {
-  font-size: 36px;
-  margin-bottom: var(--sp-sm);
-  line-height: 1;
+.home-mtn-svg {
+  display: block;
+  width: 100%;
+  height: 110px;
 }
 
-.home-step-number {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: var(--sp-sm);
-  letter-spacing: 0.05em;
+/* ── E. How-to-play ─────────────────────────────────────────────────────── */
+.home-howto {
+  flex-shrink: 0;
+  background: var(--gs-black);
+  padding: 24px 20px;
 }
 
-.home-step-number--red   { color: var(--red); }
-.home-step-number--gold  { color: #E8B927; }
-.home-step-number--green { color: var(--green); }
+.home-howto-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+}
 
-.home-step-title {
+.home-howto-header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.home-howto-label {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gs-red);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.home-howto-title {
+  font-family: var(--gs-font-sans);
   font-size: 20px;
   font-weight: 800;
-  color: var(--black);
-  margin-bottom: var(--sp-sm);
+  color: var(--gs-white);
+  letter-spacing: -0.03em;
+  margin: 4px 0 0;
 }
 
-.home-step-desc {
-  font-size: 14px;
-  color: var(--gray-mid);
-  line-height: 1.7;
+.home-howto-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
-/* ── Stats bar ─────────────────────────────────────────────────────────── */
-.home-stats-bar {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  gap: var(--sp-md);
-  padding: var(--sp-lg) var(--sp-xl);
-  margin-top: var(--sp-lg);
+.home-howto-card {
+  background: var(--gs-charcoal);
+  padding: 14px 16px;
+  border-top: 3px solid var(--gs-red);
 }
 
-.home-stat {
-  text-align: center;
-  flex: 1;
-  min-width: 0;
-}
-
-.home-stat-emoji {
-  font-size: 20px;
+.home-howto-card-num {
+  font-family: var(--gs-font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gs-red);
   margin-bottom: 4px;
   line-height: 1;
 }
 
-.home-stat-value {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 20px;
+.home-howto-card-title {
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
   font-weight: 700;
-  color: var(--black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--gs-white);
+  margin-bottom: 3px;
 }
 
-.home-stat-value--small {
-  font-size: 14px;
+.home-howto-card-body {
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  color: var(--gs-grey-l);
+  line-height: 1.5;
+}
+
+/* ── F. Stats bar ───────────────────────────────────────────────────────── */
+.home-stats {
+  flex-shrink: 0;
+  background: var(--gs-red);
+}
+
+.home-stats-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.home-stat {
+  text-align: center;
+  min-width: 70px;
+}
+
+.home-stat-value {
+  font-family: var(--gs-font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gs-white);
+  line-height: 1.1;
 }
 
 .home-stat-label {
-  font-size: 12px;
-  color: var(--gray-mid);
-  margin-top: 4px;
+  font-family: var(--gs-font-sans);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.72);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
+/* ── G. Animations ──────────────────────────────────────────────────────── */
+@keyframes home-slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   15. RESPONSIVE  –  Tablet & Mobile
-   ═══════════════════════════════════════════════════════════════════════════
+@keyframes home-train-in {
+  from { transform: translateX(-300px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
 
-   Breakpoints:
-     ≤ 1024px  tablet
-     ≤ 640px   mobile
-     ≤ 380px   very small phones
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Tablet (≤ 1024px) */
-@media (max-width: 1024px) {
-  .home-hero {
-    padding: var(--sp-xl) var(--sp-lg);
-  }
-
-  .home-hero-title {
-    font-size: 56px;
-  }
-
-    .home-hero-train {
-    width: 130px;
+@media (prefers-reduced-motion: reduce) {
+  .home-ticker-track,
+  .home-hero-train,
+  .home-hero-title,
+  .home-hero-tagline,
+  .home-hero-subtitle,
+  .home-hero-actions {
+    animation: none !important;
   }
 }
 
-/* Mobile (≤ 640px) */
-@media (max-width: 640px) {
+/* ── H. Responsive ──────────────────────────────────────────────────────── */
+/*  Breakpoints targeted explicitly:
+      320  Mobile S    (base)
+      375  Mobile M    (no overrides – base works)
+      425  Mobile L    (buttons stop forcing full width)
+      640  Tablet      (grid 1→2, full subtitle, larger spacing)
+      1024 Laptop      (grid 2→3, hero fills viewport)
+      1440 Laptop L    (extra hero padding)
+      2560 4K          (cap content widths)
+      3440 Ultrawide   (same cap reaffirmed)
+*/
+
+@media (min-width: 425px) {
+  .home-btn { flex: 0 1 auto; }
+}
+
+@media (min-width: 640px) {
+  .home-ticker          { height: 30px; }
+  .home-ticker-track    { padding-top: 7px; }
+  .home-ticker-track > span { font-size: 12px; }
+
+  .home-hero            { padding: 48px 32px; }
+  .home-train-svg       { width: 150px; }
+  .home-hero-title      { font-size: clamp(48px, 7vw, 84px); }
+  .home-hero-tagline    { font-size: 18px; }
+
+  .home-hero-subtitle-full  { display: inline; }
+  .home-hero-subtitle-short { display: none; }
+
+  .home-howto           { padding: 24px 32px; }
+  .home-howto-header    { margin-bottom: 16px; }
+  .home-howto-title     { font-size: 24px; }
+  .home-howto-grid      { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .home-howto-card      { padding: 16px 18px; }
+  .home-howto-card-title{ font-size: 15px; }
+
+  .home-stats-inner     { gap: 32px; padding: 12px 32px; }
+  .home-stat-value      { font-size: 18px; }
+
+  .home-btn             { padding: 15px 36px; font-size: 15px; }
+}
+
+@media (min-width: 1024px) {
   .home-hero {
-    padding: var(--sp-lg) var(--sp-md) var(--sp-xl);
-  }
-
-  .home-hero-title {
-    font-size: 44px;
-  }
-
-  .home-hero-tagline {
-    font-size: 12px;
-  }
-
-  .home-hero-description {
-    font-size: 16px;
-    margin-bottom: var(--sp-md);
-  }
-
- /* Train wird kleiner, aber bleibt sichtbar */
-  .home-hero-train {
-    width: 100px;
-  }
-
-  .home-hero-illustration {
-    gap: var(--sp-sm);
-  }
-
-  .home-hero-mountains {
-    height: 120px;
-  }
-
-  /* Stats bar: stack vertically */
-  .home-stats-bar {
-    flex-direction: column;
-    align-items: stretch;
-    padding: var(--sp-md);
-    gap: var(--sp-md);
-  }
-
-  .home-stat {
+    flex: 1 1 auto;
     display: flex;
-    align-items: center;
-    gap: var(--sp-sm);
-    text-align: left;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px 32px;
   }
-
-  .home-stat-emoji {
-    margin-bottom: 0;
-    font-size: 22px;
-  }
-
-  .home-stat-value {
-    flex: 1;
-    text-align: left;
-  }
-
-  .home-stat-label {
-    margin-top: 0;
-    font-size: 11px;
-    color: var(--gray-light);
-  }
+  .home-howto-grid  { grid-template-columns: repeat(3, 1fr); }
+  .home-stats-inner { gap: 60px; }
 }
 
-/* Very small phones (≤ 380px) */
-@media (max-width: 380px) {
-  .home-hero-title {
-    font-size: 36px;
-  }
+@media (min-width: 1440px) {
+  .home-hero { padding: 48px 32px; }
+}
 
-  .page-hero-actions {
-    flex-direction: column;
-    width: 100%;
-  }
+@media (min-width: 2560px) {
+  .home-hero-inner,
+  .home-howto-inner,
+  .home-stats-inner { max-width: 1280px; }
+  .home-hero-title  { font-size: 84px; }
+}
 
-  .page-hero-actions .ant-btn {
-    width: 100%;
-  }
+@media (min-width: 3440px) {
+  .home-hero-inner,
+  .home-howto-inner,
+  .home-stats-inner { max-width: 1280px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2583,3 +2667,1442 @@ html, body {
   color: var(--gray-light);
   font-weight: 500;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   21. NAVBAR v2  (app/navbar.tsx) — GuesSBB redesign
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Replaces the previous .navbar / .mobile-menu (sections 3, 16, 17) which
+   are now orphaned and will be deleted in a final cleanup pass once every
+   page has migrated to the gs-* classes.
+
+   Structure:
+     A. Top bar — sticky, full-width red strip
+        Brand (left)  ·  Lobby code pill (center, lg only)  ·  Actions (right)
+     B. Burger button — visible below 1024px
+     C. Drawer + backdrop — right-side, dark, contains everything from "Actions"
+     D. Responsive — Mobile S → Ultrawide
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── A. Top bar root ────────────────────────────────────────────────────── */
+.gs-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: var(--nav-h);
+  background: var(--gs-red);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  font-family: var(--gs-font-sans);
+}
+
+/* Brand: SBB cross + wordmark */
+.gs-nav-brand {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.gs-nav-brand-text {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--gs-white);
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.gs-nav-brand-text > span {
+  opacity: 0.72;
+}
+
+/* Center column wrapper — empty by default, visible only at lg */
+.gs-nav-search-wrap {
+  flex: 0 0 auto;
+  display: none;
+  justify-content: center;
+}
+
+.gs-nav-search {
+  display: flex;
+  align-items: center;
+  background: var(--gs-white);
+  border: 2px solid var(--gs-white);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.gs-nav-search:focus-within {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.gs-nav-search-icon {
+  color: var(--gs-grey);
+  margin: 0 4px 0 14px;
+  flex-shrink: 0;
+}
+
+.gs-nav-search-input {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gs-black);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 108px;
+  padding: 0 8px 0 4px;
+  letter-spacing: 0.12em;
+  height: 34px;
+}
+
+.gs-nav-search-input::placeholder {
+  color: var(--gs-grey);
+}
+
+.gs-nav-search-join {
+  background: var(--gs-red);
+  border: none;
+  color: var(--gs-white);
+  font-family: var(--gs-font-sans);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 0 18px;
+  height: 34px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-radius: 999px;
+  margin: -2px -2px -2px 0;
+  transition: background 0.14s ease;
+  flex-shrink: 0;
+}
+
+.gs-nav-search-join:hover {
+  background: var(--gs-red-dark);
+}
+
+/* Right column wrapper */
+.gs-nav-actions {
+  flex: 1 1 0;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Bell icon button (logged-in users only) */
+.gs-nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--gs-white);
+  cursor: pointer;
+  border-radius: 999px;
+  transition: background 0.14s ease;
+  margin-right: 4px;
+}
+
+.gs-nav-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Generic nav link (Züge, Rangliste, username) */
+.gs-nav-link {
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gs-white);
+  background: transparent;
+  border: none;
+  padding: 7px 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s ease;
+}
+
+.gs-nav-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--gs-white);
+}
+
+.gs-nav-link--active {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Logout button (logged-in users only) */
+.gs-nav-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.78);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 5px 14px;
+  cursor: pointer;
+  margin-left: 4px;
+  border-radius: 999px;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.gs-nav-logout:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--gs-white);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Login button (guest) — ghost style */
+.gs-nav-login {
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gs-white);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 6px 18px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  text-decoration: none;
+  margin-left: 8px;
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.gs-nav-login:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--gs-white);
+  color: var(--gs-white);
+}
+
+/* Registration button (guest) — solid white pill, primary CTA */
+.gs-nav-register {
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--gs-red);
+  background: var(--gs-white);
+  border: 1px solid var(--gs-white);
+  padding: 6px 18px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  text-decoration: none;
+  margin-left: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition:
+    background 0.14s ease,
+    transform 0.18s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow 0.18s ease;
+}
+
+.gs-nav-register:hover {
+  transform: translateY(-1px);
+  background: var(--gs-cream);
+  color: var(--gs-red);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* ── B. Burger button ───────────────────────────────────────────────────── */
+.gs-nav-burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--gs-white);
+  cursor: pointer;
+  border-radius: 999px;
+  margin-left: auto;
+  transition: background 0.14s ease;
+}
+
+.gs-nav-burger:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── C. Drawer + backdrop ───────────────────────────────────────────────── */
+.gs-drawer-backdrop {
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  animation: gs-drawer-fade 0.2s ease both;
+}
+
+@keyframes gs-drawer-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.gs-drawer {
+  position: fixed;
+  top: var(--nav-h);
+  right: 0;
+  bottom: 0;
+  width: 72%;
+  max-width: 320px;
+  background: var(--gs-black);
+  z-index: 999;
+  padding: 8px 0;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+}
+
+.gs-drawer--open {
+  transform: translateX(0);
+}
+
+/* Drawer lobby search */
+.gs-drawer-search-wrap {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gs-charcoal);
+}
+
+.gs-drawer-search-label {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  color: var(--gs-grey-l);
+  letter-spacing: 0.18em;
+  margin-bottom: 8px;
+}
+
+.gs-drawer-search {
+  display: flex;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+
+.gs-drawer-search-input {
+  font-family: var(--gs-font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gs-white);
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 10px 18px;
+  letter-spacing: 0.14em;
+  min-width: 0;
+}
+
+.gs-drawer-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.gs-drawer-search-join {
+  background: var(--gs-red);
+  border: none;
+  color: var(--gs-white);
+  font-family: var(--gs-font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 22px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  margin: -1px;
+  transition: background 0.14s ease;
+}
+
+.gs-drawer-search-join:hover {
+  background: var(--gs-red-dark);
+}
+
+/* Drawer link rows */
+.gs-drawer-link {
+  display: block;
+  width: 100%;
+  font-family: var(--gs-font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gs-white);
+  background: transparent;
+  border: none;
+  padding: 14px 20px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  transition: background 0.14s ease;
+}
+
+.gs-drawer-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.gs-drawer-link--muted {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.gs-drawer-link--login {
+  color: var(--gs-white);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  margin: 8px 16px 4px;
+  width: calc(100% - 32px);
+  padding: 12px 24px;
+  text-align: center;
+}
+
+.gs-drawer-link--login:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--gs-white);
+}
+
+.gs-drawer-link--register {
+  background: var(--gs-white);
+  color: var(--gs-red);
+  border-radius: 999px;
+  margin: 4px 16px 12px;
+  width: calc(100% - 32px);
+  padding: 12px 24px;
+  text-align: center;
+  font-weight: 800;
+}
+
+.gs-drawer-link--register:hover {
+  background: var(--gs-cream);
+  color: var(--gs-red);
+}
+
+.gs-drawer-divider {
+  height: 1px;
+  background: var(--gs-charcoal);
+  margin: 8px 0;
+}
+
+/* ── D. Responsive ──────────────────────────────────────────────────────── */
+/*  Breakpoints targeted explicitly:
+      320  Mobile S    (compact brand, burger right)
+      375  Mobile M    (no overrides)
+      425  Mobile L    (no overrides)
+      640  Tablet sm   (slightly bigger brand text)
+      768  Tablet      (still burger — 4 nav items + search don't fit)
+      1024 Laptop      (search appears, actions appear, burger hidden)
+      1440 Laptop L    (more horizontal padding)
+      2560 4K          (cap navbar inner width)
+      3440 Ultrawide   (same cap)
+*/
+
+/* Below 1024 — burger only, hide search + actions */
+@media (max-width: 1023px) {
+  .gs-nav-search-wrap { display: none !important; }
+  .gs-nav-actions     { display: none !important; }
+  .gs-nav-burger      { display: inline-flex; }
+}
+
+/* From 1024 — full desktop layout */
+@media (min-width: 1024px) {
+  .gs-navbar {
+    padding: 0 24px;
+  }
+
+  .gs-nav-search-wrap { display: flex; }
+  .gs-nav-actions     { display: flex; }
+  .gs-nav-burger      { display: none; }
+
+  /* Drawer should never appear at this breakpoint, but be safe */
+  .gs-drawer,
+  .gs-drawer-backdrop { display: none; }
+}
+
+/* From 1440 — slightly more breathing room */
+@media (min-width: 1440px) {
+  .gs-navbar { padding: 0 32px; }
+}
+
+/* From 2560 (4K) — cap navbar content width via flex justification.
+   Use a max-width on each column? Cleaner: cap the brand + actions widths.
+   Nothing to do — flex:1 1 0 already balances. */
+
+/* Very narrow phones: trim brand text size */
+@media (max-width: 374px) {
+  .gs-navbar         { padding: 0 12px; gap: 8px; }
+  .gs-nav-brand-text { font-size: 16px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   22. BUTTONS v2  (.gs-btn) — generic reusable pill buttons
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Use across all v2 pages. Variants:
+     .gs-btn--primary    red filled, white text         (main CTA)
+     .gs-btn--secondary  parchment filled, dark text    (secondary CTA)
+     .gs-btn--ghost      transparent, white border      (overlay use)
+
+   Sizes:
+     .gs-btn--sm   compact (table rows, headers)
+     (default)     md      standard hero/form size
+     .gs-btn--lg   prominent (primary CTAs in heroes)
+
+   The HomePage still uses .home-btn (page-scoped) — to be migrated later
+   in a single cleanup pass once all pages are on .gs-btn.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.gs-btn {
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s cubic-bezier(.34, 1.56, .64, 1),
+    box-shadow 0.2s ease,
+    background 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease,
+    opacity 0.14s ease;
+}
+
+.gs-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 22px rgba(235, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.gs-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.06s ease, box-shadow 0.1s ease;
+}
+
+.gs-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.gs-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Variants */
+.gs-btn--primary {
+  background: var(--gs-red);
+  color: var(--gs-white);
+  border-color: var(--gs-red);
+}
+
+.gs-btn--primary:hover:not(:disabled) {
+  background: var(--gs-red-dark);
+  border-color: var(--gs-red-dark);
+}
+
+.gs-btn--secondary {
+  background: var(--gs-parch);
+  color: var(--gs-black);
+  border-color: var(--gs-grey-l);
+}
+
+.gs-btn--secondary:hover:not(:disabled) {
+  background: var(--gs-warm);
+}
+
+.gs-btn--ghost {
+  background: transparent;
+  color: var(--gs-white);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.gs-btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--gs-white);
+}
+
+/* Sizes */
+.gs-btn--sm {
+  font-size: 11px;
+  padding: 8px 16px;
+  letter-spacing: 0.06em;
+}
+
+.gs-btn--lg {
+  font-size: 15px;
+  padding: 15px 36px;
+}
+
+@media (min-width: 640px) {
+  .gs-btn { font-size: 15px; padding: 15px 36px; }
+  .gs-btn--sm { font-size: 11px; padding: 8px 18px; }
+  .gs-btn--lg { font-size: 16px; padding: 17px 42px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   23. LOBBIES PAGE v2  (app/lobbies/page.tsx)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Full-bleed black header + charcoal column-headers + alternating cream/white
+   row body. Departure-board aesthetic (mono labels, red ID badges).
+
+   Structure:
+     A. Root + page background
+     B. Black header bar  (eyebrow, title, "+ Neu" button)
+     C. Column headers   (charcoal strip)
+     D. Body row layout  (CSS grid, responsive column drops)
+     E. Row content      (ID badge, info, player pips, rounds, status, btn)
+     F. Empty / loading / error states
+     G. Responsive
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── A. Root ─────────────────────────────────────────────────────────────── */
+.gs-lobbies-root {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+  font-family: var(--gs-font-sans);
+  color: var(--gs-black);
+}
+
+/* Shared inner-wrapper width */
+.gs-lobbies-header-inner,
+.gs-lobbies-thead-inner,
+.gs-lobbies-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── B. Black header ─────────────────────────────────────────────────────── */
+.gs-lobbies-header {
+  background: var(--gs-black);
+  width: 100%;
+}
+
+.gs-lobbies-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.gs-lobbies-header-text {
+  min-width: 0;
+}
+
+.gs-lobbies-eyebrow {
+  display: inline-block;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gs-red);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.gs-lobbies-title {
+  font-family: var(--gs-font-sans);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gs-white);
+  letter-spacing: -0.03em;
+  margin: 4px 0 0;
+}
+
+/* ── C. Column headers (charcoal) ────────────────────────────────────────── */
+.gs-lobbies-thead {
+  background: var(--gs-charcoal);
+  width: 100%;
+}
+
+.gs-lobbies-thead-inner {
+  padding: 9px 20px;
+}
+
+.gs-lobbies-th {
+  font-family: var(--gs-font-mono);
+  font-size: 9px;
+  color: var(--gs-grey-l);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ── D. Grid layout (rows + thead share template) ───────────────────────── */
+/* Mobile base: 4 columns. SPIELER + RUNDEN cells hidden via gs-lobbies-hide-* */
+.gs-lobbies-grid {
+  display: grid;
+  grid-template-columns: 50px 1fr 70px auto;
+  gap: 12px;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.gs-lobbies-thead-inner.gs-lobbies-grid {
+  padding: 9px 20px;
+}
+
+.gs-lobbies-hide-sm,
+.gs-lobbies-hide-md {
+  display: none;
+}
+
+/* ── E. Body row + cell content ─────────────────────────────────────────── */
+.gs-lobbies-body {
+  width: 100%;
+}
+
+.gs-lobby-row {
+  background: var(--gs-white);
+  border-bottom: 1px solid var(--gs-warm);
+  width: 100%;
+}
+
+.gs-lobby-row--alt {
+  background: var(--gs-cream);
+}
+
+.gs-lobby-row--dim {
+  opacity: 0.65;
+}
+
+.gs-lobby-row .gs-lobbies-grid {
+  padding: 14px 20px;
+}
+
+/* ID badge */
+.gs-lobby-id {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gs-white);
+  background: var(--gs-red);
+  padding: 4px 5px;
+  text-align: center;
+  letter-spacing: 0.04em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Info column */
+.gs-lobby-info {
+  min-width: 0;
+}
+
+.gs-lobby-name {
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gs-black);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.gs-lobby-vis-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.gs-lobby-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gs-lobby-meta {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.gs-lobby-code-input {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--gs-black);
+  background: var(--gs-white);
+  border: 1.5px solid var(--gs-warm);
+  padding: 5px 10px;
+  width: 100px;
+  margin-top: 6px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.gs-lobby-code-input:focus {
+  border-color: var(--gs-red);
+}
+
+.gs-lobby-code-input::placeholder {
+  color: var(--gs-grey-l);
+  letter-spacing: 0.04em;
+}
+
+/* Player pips */
+.gs-lobby-players {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.gs-lobby-pips {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.gs-lobby-pip {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--gs-grey-xl);
+  flex-shrink: 0;
+}
+
+.gs-lobby-pip--filled {
+  background: var(--gs-red);
+}
+
+.gs-lobby-players-count {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey);
+}
+
+/* Rounds */
+.gs-lobby-rounds {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+  text-align: left;
+}
+
+/* Status */
+.gs-lobby-status {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.gs-lobby-status--open {
+  color: var(--gs-green);
+}
+
+.gs-lobby-status--live {
+  color: var(--gs-gold);
+}
+
+/* Join button cell — push to right edge of its grid cell */
+.gs-lobby-join {
+  justify-self: end;
+}
+
+/* ── F. Loading / empty / error ─────────────────────────────────────────── */
+.gs-lobbies-state {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 20px;
+  text-align: center;
+  font-family: var(--gs-font-sans);
+}
+
+.gs-lobbies-empty {
+  font-family: var(--gs-font-mono);
+  font-size: 12px;
+  color: var(--gs-grey);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gs-lobbies-error {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  background: rgba(235, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(235, 0, 0, 0.2);
+  color: var(--gs-red);
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── G. Responsive ──────────────────────────────────────────────────────── */
+/*  Breakpoint logic:
+      ≤640   Mobile   4 cols visible   ID | Name | Status | Btn
+      641-1023 Tablet 5 cols visible   ID | Name | Spieler | Status | Btn
+      ≥1024  Desktop  6 cols visible   ID | Name | Spieler | Runden | Status | Btn
+
+      ≥1440  Laptop L  larger title, more padding
+      ≥2560  4K        max-width caps (already in shared wrappers)
+      ≥3440  Ultrawide same caps reaffirmed
+*/
+
+/* Tablet (≥641) — show Spieler column */
+@media (min-width: 641px) {
+  .gs-lobbies-grid {
+    grid-template-columns: 56px 1fr 160px 80px auto;
+    gap: 16px;
+    padding: 0 24px;
+  }
+
+  .gs-lobbies-thead-inner.gs-lobbies-grid {
+    padding: 9px 24px;
+  }
+
+  .gs-lobby-row .gs-lobbies-grid {
+    padding: 14px 24px;
+  }
+
+  .gs-lobbies-hide-sm { display: revert; }
+
+  .gs-lobbies-header-inner {
+    padding: 18px 24px;
+  }
+
+  .gs-lobbies-title { font-size: 24px; }
+
+  .gs-lobby-name { font-size: 15px; }
+}
+
+/* Desktop (≥1024) — show Runden column too */
+@media (min-width: 1024px) {
+  .gs-lobbies-grid {
+    grid-template-columns: 60px 1fr 170px 60px 80px auto;
+    gap: 18px;
+    padding: 0 32px;
+  }
+
+  .gs-lobbies-thead-inner.gs-lobbies-grid {
+    padding: 9px 32px;
+  }
+
+  .gs-lobby-row .gs-lobbies-grid {
+    padding: 16px 32px;
+  }
+
+  .gs-lobbies-hide-md { display: revert; }
+
+  .gs-lobbies-header-inner {
+    padding: 22px 32px;
+  }
+
+  .gs-lobbies-title { font-size: 26px; }
+}
+
+/* Laptop L (≥1440) — slightly larger header */
+@media (min-width: 1440px) {
+  .gs-lobbies-header-inner {
+    padding: 24px 32px;
+  }
+
+  .gs-lobbies-title { font-size: 30px; }
+}
+
+/* 4K + Ultrawide — content max-width 1280 already enforced via shared wrappers.
+   Body rows extend full-bleed (background) but content stays centered. */
+
+   /* ═══════════════════════════════════════════════════════════════════════════
+   24. MODALS v2  (.gs-modal-*) — generic dialog/auth gate
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Custom modal replacing Antd Modal on pages migrated to v2 design.
+   Used by:
+     - LobbiesPage auth gate ("Wie willst du spielen?")
+   May be reused for: NewLobby form modal, Lobby-Room confirmations.
+
+   Structure:
+     .gs-modal-overlay   – fixed full-viewport black backdrop, centers card
+     .gs-modal-card      – white box with red top-border accent
+     .gs-modal-eyebrow   – red mono "VOR DEM START" label
+     .gs-modal-title     – h2 large dark title
+     .gs-modal-body      – muted description paragraph
+     .gs-modal-actions   – vertical button stack
+     .gs-modal-btn       – modifier on .gs-btn for full-width inside modal
+     .gs-modal-ghost     – text-link footer button ("Als Gast weiterspielen")
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.gs-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: gs-modal-fade 0.2s ease both;
+}
+
+.gs-modal-card {
+  background: var(--gs-white);
+  border-top: 5px solid var(--gs-red);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 56px rgba(0, 0, 0, 0.28);
+  animation: gs-modal-slide-up 0.3s ease both;
+}
+
+.gs-modal-eyebrow {
+  display: inline-block;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gs-red);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.gs-modal-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--gs-black);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 6px 0;
+}
+
+.gs-modal-body {
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  color: var(--gs-grey);
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+
+.gs-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Modifier: full-width button inside the modal action stack */
+.gs-modal-btn {
+  width: 100%;
+}
+
+/* Tertiary text-link button ("Als Gast weiterspielen") */
+.gs-modal-ghost {
+  font-family: var(--gs-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gs-grey);
+  background: transparent;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+  transition: color 0.14s ease;
+}
+
+.gs-modal-ghost:hover {
+  color: var(--gs-black);
+}
+
+.gs-modal-ghost:focus-visible {
+  outline: 2px solid var(--gs-red);
+  outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes gs-modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes gs-modal-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gs-modal-overlay,
+  .gs-modal-card {
+    animation: none;
+  }
+}
+
+/* Responsive — slightly more breathing room on tablet+ */
+@media (min-width: 640px) {
+  .gs-modal-card {
+    padding: 36px;
+  }
+
+  .gs-modal-title {
+    font-size: 24px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   25. NEW LOBBY PAGE v2  (app/lobbies/newlobby/page.tsx)
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Standalone form page — same visual treatment as the auth modal (white card
+   with red top accent), but rendered on a full-page cream background instead
+   of inside an overlay.
+
+   Reusable form primitives defined here (used only by this page for now,
+   but candidates for migration to a shared form section later):
+     .gs-stepper        – horizontal numeric stepper (− / value / +)
+     .gs-segmented      – pill segmented control for choosing one of N values
+     .gs-radio-cards    – 2-column grid of selectable cards
+
+   Structure:
+     A. Page wrapper (centered, cream bg)
+     B. Card container (white, red top border)
+     C. Card header (eyebrow, title, subtitle)
+     D. Form field shells (label + input)
+     E. Stepper component
+     F. Segmented control
+     G. Radio cards
+     H. Actions row
+     I. Responsive
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── A. Page wrapper ────────────────────────────────────────────────────── */
+.gs-newlobby-root {
+  min-height: calc(100vh - var(--nav-h));
+  background: var(--gs-cream);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px;
+  font-family: var(--gs-font-sans);
+}
+
+/* ── B. Card ────────────────────────────────────────────────────────────── */
+.gs-newlobby-card {
+  background: var(--gs-white);
+  border-top: 5px solid var(--gs-red);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 56px rgba(0, 0, 0, 0.10);
+}
+
+/* ── C. Card header ─────────────────────────────────────────────────────── */
+.gs-newlobby-eyebrow {
+  display: inline-block;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gs-red);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.gs-newlobby-title {
+  font-family: var(--gs-font-sans);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--gs-black);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 6px 0 4px;
+}
+
+.gs-newlobby-subtitle {
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  color: var(--gs-grey);
+  margin: 0 0 22px;
+}
+
+/* ── D. Form fields ─────────────────────────────────────────────────────── */
+.gs-newlobby-field {
+  margin-bottom: 18px;
+}
+
+.gs-newlobby-field:last-of-type {
+  margin-bottom: 0;
+}
+
+.gs-newlobby-label {
+  display: inline-block;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gs-grey);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.gs-newlobby-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.gs-newlobby-label-row .gs-newlobby-label {
+  margin-bottom: 0;
+}
+
+.gs-newlobby-hint {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey-l);
+  letter-spacing: 0.06em;
+}
+
+/* Text input */
+.gs-newlobby-input {
+  font-family: var(--gs-font-mono);
+  font-size: 14px;
+  color: var(--gs-black);
+  background: var(--gs-white);
+  border: 2px solid var(--gs-warm);
+  padding: 12px 14px;
+  width: 100%;
+  outline: none;
+  display: block;
+  transition: border-color 0.15s ease;
+}
+
+.gs-newlobby-input::placeholder {
+  color: var(--gs-grey-l);
+}
+
+.gs-newlobby-input:focus {
+  border-color: var(--gs-red);
+}
+
+.gs-newlobby-input--error {
+  border-color: var(--gs-red);
+}
+
+.gs-newlobby-error {
+  display: block;
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-red);
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ── E. Stepper ─────────────────────────────────────────────────────────── */
+.gs-stepper {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--gs-warm);
+  background: var(--gs-white);
+  height: 46px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.gs-stepper-btn {
+  width: 42px;
+  height: 42px;
+  font-family: var(--gs-font-sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gs-black);
+  background: var(--gs-parch);
+  border: none;
+  cursor: pointer;
+  margin: 0 2px;
+  line-height: 1;
+  padding: 0;
+  border-radius: 999px;
+  transition: background 0.14s ease, opacity 0.14s ease, color 0.14s ease;
+}
+
+.gs-stepper-btn:hover:not(:disabled) {
+  background: var(--gs-warm);
+}
+
+.gs-stepper-btn:disabled {
+  background: transparent;
+  color: var(--gs-grey-l);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.gs-stepper-value {
+  flex: 1;
+  text-align: center;
+  font-family: var(--gs-font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gs-black);
+}
+
+/* ── F. Segmented control ───────────────────────────────────────────────── */
+.gs-segmented {
+  display: flex;
+  border: 2px solid var(--gs-warm);
+  height: 42px;
+  border-radius: 999px;
+  overflow: hidden;
+  padding: 3px;
+  gap: 3px;
+}
+
+.gs-segmented-btn {
+  flex: 1;
+  font-family: var(--gs-font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gs-grey);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  border-radius: 999px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.gs-segmented-btn:hover:not(.gs-segmented-btn--active) {
+  background: var(--gs-parch);
+}
+
+.gs-segmented-btn--active {
+  background: var(--gs-red);
+  color: var(--gs-white);
+}
+
+/* ── G. Radio cards ─────────────────────────────────────────────────────── */
+.gs-radio-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.gs-radio-card {
+  padding: 12px 14px;
+  border: 2px solid var(--gs-warm);
+  background: var(--gs-white);
+  cursor: pointer;
+  border-radius: 18px;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.gs-radio-card:hover:not(.gs-radio-card--active) {
+  border-color: var(--gs-grey-l);
+  transform: translateY(-1px);
+}
+
+.gs-radio-card--active {
+  border-color: var(--gs-red);
+  background: rgba(235, 0, 0, 0.05);
+}
+
+.gs-radio-card-label {
+  font-family: var(--gs-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gs-black);
+  margin-bottom: 2px;
+}
+
+.gs-radio-card-desc {
+  font-family: var(--gs-font-mono);
+  font-size: 10px;
+  color: var(--gs-grey);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ── H. Actions row ─────────────────────────────────────────────────────── */
+.gs-newlobby-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.gs-newlobby-submit {
+  flex: 1;
+}
+
+/* ── I. Responsive ──────────────────────────────────────────────────────── */
+/*  Card width is bounded (max 460–480px) so the form doesn't stretch on
+    wide monitors. All breakpoint changes are about padding around it. */
+
+/* Very narrow phones (Mobile S 320, Mobile M 375) — tighter padding,
+   stack radio cards vertically so labels don't truncate */
+@media (max-width: 374px) {
+  .gs-newlobby-root  { padding: 16px 12px; }
+  .gs-newlobby-card  { padding: 22px 18px; }
+  .gs-radio-cards    { grid-template-columns: 1fr; }
+  .gs-newlobby-actions { flex-direction: column; }
+}
+
+/* Tablet (640+) — slightly more breathing room inside card */
+@media (min-width: 640px) {
+  .gs-newlobby-root  { padding: 48px 20px; }
+  .gs-newlobby-card  { padding: 32px 36px; max-width: 480px; }
+  .gs-newlobby-title { font-size: 24px; }
+}
+
+/* Laptop (1024+) — more vertical space above/below card */
+@media (min-width: 1024px) {
+  .gs-newlobby-root { padding: 64px 32px; }
+}
+
+/* Laptop L (1440+) — same card, just more breathing room top */
+@media (min-width: 1440px) {
+  .gs-newlobby-root { padding: 80px 32px; }
+}
+
+/* 4K + Ultrawide — card stays max 480px, page bg fills viewport */

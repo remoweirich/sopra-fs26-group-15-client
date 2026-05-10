@@ -10,17 +10,19 @@ import { Bell, LogOut, Search, Menu, X } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
 // ---------------------------------------------------------------------------
-// GuessSBB SVG logo mark (simplified train-pin icon)
+// Swiss cross logo mark — white version on red navbar background
 // ---------------------------------------------------------------------------
-function LogoMark() {
+function SBBCross({ size = 20 }: { size?: number }) {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="8" fill="#E30613" />
-      <path
-        d="M16 4C12.134 4 9 7.134 9 11c0 5.25 7 14 7 14s7-8.75 7-14c0-3.866-3.134-7-7-7z"
-        fill="white"
-      />
-      <circle cx="16" cy="11" r="3" fill="#E30613" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 22 22"
+      fill="#FFFFFF"
+      aria-hidden="true"
+    >
+      <rect x="7" y="0" width="8" height="22" rx="1" />
+      <rect x="0" y="7" width="22" height="8" rx="1" />
     </svg>
   );
 }
@@ -92,16 +94,24 @@ export default function Navbar() {
   // };
 
 
-  function handleLobbySearch(e: React.KeyboardEvent<HTMLInputElement>) {
-    const value = (e.target as HTMLInputElement).value.trim();
-    if (e.key === "Enter" && value) {
-      router.push(`/lobbies/${value}`);
-    }
+  // ── Lobby code search (controlled input + Join button) ────────────────────
+  const [lobbyCode, setLobbyCode] = useState("");
+
+  function handleLobbyJoin() {
+    const value = lobbyCode.trim();
+    if (!value) return;
+    router.push(`/lobbies/${value.toUpperCase()}`);
+    setLobbyCode("");
+    setMenuOpen(false);
+  }
+
+  function handleLobbyKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") handleLobbyJoin();
   }
 
   function linkClass(href: string) {
     const active = pathname === href || pathname.startsWith(href + "/");
-    return `navbar-link${active ? " active" : ""}`;
+    return `gs-nav-link${active ? " gs-nav-link--active" : ""}`;
   }
 
 const [menuOpen, setMenuOpen] = useState(false);
@@ -131,44 +141,61 @@ const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
-      <nav className="navbar">
-        {/* ── Brand ──────────────────────────────────────────────────────── */}
-        <Link href="/" className="navbar-brand">
-          <LogoMark />
-          <span className="navbar-brand-text">
+      <nav className="gs-navbar">
+        {/* ── Left column: brand ─────────────────────────────────────────── */}
+        <Link href="/" className="gs-nav-brand">
+          <SBBCross size={20} />
+          <span className="gs-nav-brand-text">
             Gues<span>SBB</span>
           </span>
         </Link>
 
-        {/* ── Center: Lobby ID search (desktop only) ─────────────────────── */}
-        <label className="navbar-search" htmlFor="lobby-id-search">
-          <Search size={16} className="navbar-search-icon" />
-          <input
-            id="lobby-id-search"
-            className="navbar-search-input"
-            placeholder="Enter Lobby ID"
-            onKeyDown={handleLobbySearch}
-          />
-        </label>
+        {/* ── Center column: lobby code pill (desktop only) ──────────────── */}
+        <div className="gs-nav-search-wrap">
+          <div className="gs-nav-search">
+            <Search size={14} className="gs-nav-search-icon" aria-hidden="true" />
+            <input
+              id="lobby-id-search"
+              className="gs-nav-search-input"
+              placeholder="LOBBY-CODE"
+              value={lobbyCode}
+              onChange={(e) =>
+                setLobbyCode(e.target.value.toUpperCase().slice(0, 6))
+              }
+              onKeyDown={handleLobbyKeyDown}
+              maxLength={6}
+              aria-label="Lobby code"
+            />
+            <button
+              type="button"
+              className="gs-nav-search-join"
+              onClick={handleLobbyJoin}
+            >
+              Join
+            </button>
+          </div>
+        </div>
 
-        {/* ── Right: desktop actions ─────────────────────────────────────── */}
+        {/* ── Right column: actions ──────────────────────────────────────── */}
         {!isLoading && (
-          <div className="navbar-actions">
-
+          <div className="gs-nav-actions">
             {user && (
               <Badge count={notificationCount} size="small" offset={[4, -2]}>
-                <button className="navbar-icon-btn" aria-label="Notifications">
-                  <Bell size={20} />
+                <button
+                  className="gs-nav-icon-btn"
+                  aria-label="Notifications"
+                >
+                  <Bell size={18} />
                 </button>
               </Badge>
             )}
 
             <Link href="/lobbies" className={linkClass("/lobbies")}>
-              Lobbies
+              Züge
             </Link>
 
             <Link href="/leaderboard" className={linkClass("/leaderboard")}>
-              Leaderboard
+              Rangliste
             </Link>
 
             {user ? (
@@ -180,20 +207,21 @@ const [menuOpen, setMenuOpen] = useState(false);
                   {user.username}
                 </Link>
                 <button
-                  className="navbar-icon-btn"
+                  className="gs-nav-logout"
                   onClick={logout}
                   aria-label="Logout"
                   title="Abmelden"
                 >
-                  <LogOut size={20} />
+                  <LogOut size={14} />
+                  Logout
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className={linkClass("/login")}>
+                <Link href="/login" className="gs-nav-login">
                   Login
                 </Link>
-                <Link href="/register" className="navbar-register-pill">
+                <Link href="/register" className="gs-nav-register">
                   Registration
                 </Link>
               </>
@@ -203,7 +231,7 @@ const [menuOpen, setMenuOpen] = useState(false);
 
         {/* ── Burger button (mobile/tablet only) ─────────────────────────── */}
         <button
-          className="navbar-burger"
+          className="gs-nav-burger"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen(!menuOpen)}
@@ -212,72 +240,99 @@ const [menuOpen, setMenuOpen] = useState(false);
         </button>
       </nav>
 
-      {/* ── Full-screen mobile menu overlay ──────────────────────────────── */}
+      {/* ── Backdrop behind drawer ─────────────────────────────────────── */}
       {menuOpen && (
-        <div className="mobile-menu">
+        <div
+          className="gs-drawer-backdrop"
+          onClick={() => setMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
-          <label className="mobile-menu-search" htmlFor="mobile-lobby-id-search">
-            <Search size={18} className="navbar-search-icon" />
+      {/* ── Right-side drawer (mobile/tablet) ──────────────────────────── */}
+      <aside
+        className={`gs-drawer${menuOpen ? " gs-drawer--open" : ""}`}
+        aria-hidden={!menuOpen}
+      >
+        {/* Lobby code search inside drawer */}
+        <div className="gs-drawer-search-wrap">
+          <div className="gs-drawer-search-label">LOBBY-CODE EINGEBEN</div>
+          <div className="gs-drawer-search">
             <input
               id="mobile-lobby-id-search"
-              className="navbar-search-input"
-              placeholder="Enter Lobby ID"
-              onKeyDown={handleLobbySearch}
+              className="gs-drawer-search-input"
+              placeholder="A1B2"
+              value={lobbyCode}
+              onChange={(e) =>
+                setLobbyCode(e.target.value.toUpperCase().slice(0, 6))
+              }
+              onKeyDown={handleLobbyKeyDown}
+              maxLength={6}
+              aria-label="Lobby code"
             />
-          </label>
-
-          <button
-            className="mobile-menu-link"
-            onClick={() => go("/lobbies")}
-          >
-            Lobbies
-          </button>
-
-          <button
-            className="mobile-menu-link"
-            onClick={() => go("/leaderboard")}
-          >
-            Leaderboard
-          </button>
-
-          {!isLoading && user && (
-            <>
-              <button
-                className="mobile-menu-link"
-                onClick={() => go(`/users/${user.userId}`)}
-              >
-                {user.username}
-              </button>
-              <button
-                className="mobile-menu-link mobile-menu-link--muted"
-                onClick={() => {
-                  setMenuOpen(false);
-                  logout();
-                }}
-              >
-                Logout
-              </button>
-            </>
-          )}
-
-          {!isLoading && !user && (
-            <>
-              <button
-                className="mobile-menu-link"
-                onClick={() => go("/login")}
-              >
-                Login
-              </button>
-              <button
-                className="mobile-menu-link mobile-menu-link--primary"
-                onClick={() => go("/register")}
-              >
-                Registration
-              </button>
-            </>
-          )}
+            <button
+              type="button"
+              className="gs-drawer-search-join"
+              onClick={handleLobbyJoin}
+            >
+              Join
+            </button>
+          </div>
         </div>
-      )}
+
+        <button
+          className="gs-drawer-link"
+          onClick={() => go("/lobbies")}
+        >
+          🚂 Züge
+        </button>
+
+        <button
+          className="gs-drawer-link"
+          onClick={() => go("/leaderboard")}
+        >
+          🏆 Rangliste
+        </button>
+
+        <div className="gs-drawer-divider" />
+
+        {!isLoading && user && (
+          <>
+            <button
+              className="gs-drawer-link"
+              onClick={() => go(`/users/${user.userId}`)}
+            >
+              👤 {user.username}
+            </button>
+            <button
+              className="gs-drawer-link gs-drawer-link--muted"
+              onClick={() => {
+                setMenuOpen(false);
+                logout();
+              }}
+            >
+              Logout
+            </button>
+          </>
+        )}
+
+        {!isLoading && !user && (
+          <>
+            <button
+              className="gs-drawer-link gs-drawer-link--login"
+              onClick={() => go("/login")}
+            >
+              Login
+            </button>
+            <button
+              className="gs-drawer-link gs-drawer-link--register"
+              onClick={() => go("/register")}
+            >
+              Registration
+            </button>
+          </>
+        )}
+      </aside>
     </>
   );
 }
