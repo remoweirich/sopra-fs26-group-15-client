@@ -15,6 +15,7 @@ import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
 import { GameMessage } from "@/types/gameMessage";
 import { UserResult } from "@/types/user";
 import SBBClock from "./SBBClock";
+import { playerColors } from "@/utils/colors";
 
 const GamePage: React.FC = () => {
     const router = useRouter();
@@ -53,6 +54,39 @@ const GamePage: React.FC = () => {
             minute: "2-digit",
         });
     };
+
+    const playerColorMap = useRef<Record<string, string>>({});
+
+    
+    
+    const getPlayerColor = (userId: string) => {
+      if (!results)  {
+        return playerColors[0];
+      }
+      if (!playerColorMap.current[userId]) {
+          //build up colorMap for all users
+          const userIdHashMap: (number | null)[] = Array(playerColors.length).fill(null);
+          
+          //sort userResults by Id first
+          const sortedUserResults = [...results.userResults].sort((a, b) => (a.userId-b.userId))
+          
+          for (const user of sortedUserResults) {
+            
+            let searchKey = user.userId % playerColors.length;
+
+            while (userIdHashMap[searchKey] && sortedUserResults.length<=userIdHashMap.length) {
+              //slot alr occopied
+              searchKey+=1
+            }
+            userIdHashMap[searchKey]=user.userId
+            playerColorMap.current[user.userId] = playerColors[searchKey];
+
+          }
+          
+        
+          }
+        return playerColorMap.current[userId];
+      };
 
     // ── Guess submission ─────────────────────────────────────────────────────
     const handleSubmitGuess = async () => {
@@ -278,6 +312,7 @@ const GamePage: React.FC = () => {
                 currentRound={currentRound}
                 maxRounds={maxRounds}
                 publish={publish}
+                getPlayerColor={getPlayerColor}
             />
         );
     } else {

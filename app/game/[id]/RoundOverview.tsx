@@ -41,6 +41,7 @@ import { Message } from "@/types/message";
 import {UserResult} from "@/types/user";
 import { useAuth } from "@/context/AuthContext";
 import { MyUserDTO, UserDTO } from "@/types/user";
+import { COMMENTS } from "@/utils/comments";
 
 
 
@@ -51,9 +52,10 @@ interface RoundOverviewProps {
     currentRound: number | null;
     maxRounds: number | null;
     publish: (destination: string, body: Message) => void;
+    getPlayerColor: (userId: string) => string;
     }
 
-const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish }) => {   
+const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRound, maxRounds, publish, getPlayerColor }) => {   
     
     const { user: currentUser, token, login, isLoading } = useAuth();
     const apiService = useApi();
@@ -77,12 +79,12 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
     useEffect(() => {
         //sort user results by score descending
         // console.log("unsorted results:", unsortedResults);
-        const sortedResults = [...unsortedResults].sort((a, b) => b.roundPoints - a.totalPoints);
+        const sortedResults = [...unsortedResults].sort((a, b) => b.roundPoints - a.roundPoints);
         setSortedRoundResults(sortedResults);
         // console.log("sorted results:", sortedResults);
 
         //sort total results by totalscore descending
-        const sortedTotalResults = [...unsortedResults].sort((a, b) => b.totalPoints - a.roundPoints);
+        const sortedTotalResults = [...unsortedResults].sort((a, b) => b.totalPoints - a.totalPoints);
         setSortedTotalResults(sortedTotalResults);
         // console.log("sorted total results:", sortedTotalResults);
         
@@ -104,7 +106,6 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           }
         };
         fetchUsernames();
-        //create a map of userId to username
 
 
     }, [unsortedResults]);
@@ -130,6 +131,13 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
       router.push(`/game/${gameId}/leaderboard`)
     }
 
+    const loadComment = () => {
+        const result = sortedRoundResults.find(result => result.userId==parseInt(userId))
+        if (!result) {return ""}
+        const comment = COMMENTS.find(comment => comment[0]<=result?.distance && result?.distance<=comment[1])
+        return (comment?comment[2] : "")
+    }
+
   return (
     <div className="game-result-layout">
 
@@ -147,6 +155,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                     <RMarker
                     longitude={currentTrain.currentY}
                     latitude={currentTrain.currentX}
+                    initialColor="red"
                     />)}
                 {/*player guess positions*/}
                 {sortedRoundResults.map((result) => (
@@ -154,6 +163,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                     key={`guess-${result.userId}-${result.xCoordinate}-${result.yCoordinate}`}
                     longitude={result.yCoordinate}
                     latitude={result.xCoordinate}
+                    initialColor={getPlayerColor(result.userId.toString())}
                     //color="#3fce63"
                     />)
                  )
@@ -190,6 +200,13 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
           </div>
         </div>
 
+        {/*Snarky comments based on distance*/}
+        <div className="result-comment">
+          <div className="result-value">
+            {loadComment()}
+          </div>
+        </div>
+
         {/* This round – per-player scores */}
         <div className="result-section-label">This Round</div>
 
@@ -199,7 +216,8 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
 
         {sortedRoundResults.map((result, index) => (
             result.userId == parseInt(userId) ? (
-                <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you">
+                <div key={`round-row-${result.userId}`} className="result-player-row result-player-row--you"
+                style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
                 <div className="result-player-avatar">
             {/* TODO: username initial */}
                     </div>
@@ -209,7 +227,8 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
                     </div>
                     <span className="result-player-score">{result.roundPoints}</span>
                 </div>) : (
-                <div key={`round-row-${result.userId}`} className="result-player-row">
+                <div key={`round-row-${result.userId}`} className="result-player-row"
+                style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>
                     <div className="result-player-avatar">
                         {/* TODO: username initial */}
                     </div>
@@ -229,7 +248,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({ train, results, currentRo
         {/*map over overallStandings[] */}
 
         {sortedTotalResults.map((result, index) => (
-            <div key={`total-row-${result.userId}`} className="result-standings-row">
+          <div key={`total-row-${result.userId}`} className="result-standings-row" style={{ borderLeft: `4px solid ${getPlayerColor(result.userId.toString())}` }}>  
           <span className="result-standings-rank">{index+1}.</span>
           <span className="result-standings-name">{result.userId == parseInt(userId) ? ("You"): usernamesMap[result.userId]}</span>
           <span className="result-standings-score">{result.totalPoints}</span>
