@@ -44,7 +44,6 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     // const token = JSON.parse(localStorage.getItem("token") || '""') as string;
-    if (!token) return;
 
 
 
@@ -52,9 +51,11 @@ const Profile: React.FC = () => {
       try {
         const data = await apiService.get<MyUserDTO | UserDTO>(
           `/users/${profileId}`,
-          {
-            headers: { token: token },
-          }
+            {
+              headers: {
+                ...(token ? { token: token } : { token: ""})
+              }
+            }
         );
 
 
