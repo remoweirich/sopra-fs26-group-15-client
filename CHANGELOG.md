@@ -1,3 +1,18 @@
+# [1.2.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.1.1...v1.2.0) (2026-05-11)
+
+
+### Bug Fixes
+
+* resolve merge conflicts ([453e26b](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/453e26b27271fa058d88482c660946e047af7e1a))
+
+
+### Features
+
+* added error message for wrong login credentials, registration name conflicts, wrong lobby code and lobby join conflicts ([9f7a77f](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/9f7a77f3952b0a8fd7810d20e1875b91bc5893f3))
+* created a react component for the iconic SBB clock, created and implemented a loadingscreen between the lobby and game page when starting the game ([2be7ede](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/2be7ede5970fa52774e4b8c2b8c9347c0fb37f56))
+* included sbbclock again ([31794a4](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/31794a4cd0dea6c9c704467446b46bed1fdde63e))
+* RoundOvervview displays usernames with the scores ([96a56c8](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/96a56c8570f27e527ee41f19ff73e88b5fc93eb8))
+
 ## [1.1.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.1.0...v1.1.1) (2026-05-05)
 
 
