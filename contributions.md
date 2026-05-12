@@ -125,8 +125,10 @@ _Continue with the same table format as above._
 |--------------------|----------| ----------------- |------------------------------------------|------------------------------------------------------|
 | **@snowjademusic** | 10.05    | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/e8b8611355ff1df572e415908c0054672bb4d6a4| Add Achievement creation and attribution | As described in userStories this is a wanted feature |
 | **@snowjademusic** | 12.05    | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/818456904d2f2366e876b3be0d9dc74391bb4d70| Prepare Achievements for Transfer        | As described in userStories this is a wanted feature |
-| **@dorianrother** | 8.5 | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/80b00bef401090a4466e7d09a85d1f471d872ded | implement shared colors for player pins based on hash function; fix sorting of userscores #36 | players can identify who set which pin and colors are consistent across devices/players
-| **@dorianrother** | 8.5 | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/e0f591e8d664e99379a96bfb5c379c189011124b | displaying snarky comments based on player guess distance #37 | players receive a funny feedback on their performance
+| **@dorianrother** | 8.5 | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/80b00bef401090a4466e7d09a85d1f471d872ded | implement shared colors for player pins based on hash function; fix sorting of userscores #36 | players can identify who set which pin and colors are consistent across devices/players |
+| **@dorianrother** | 8.5 | https://github.com/remoweirich/sopra-fs26-group-15-client/commit/e0f591e8d664e99379a96bfb5c379c189011124b | displaying snarky comments based on player guess distance #37 | players receive a funny feedback on their performance |
+| **@remoweirich** | 11.05 | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/50bc20bfb6a1670d44933e5675cfbc8c4927e0b3 | Redid all controller and authservice test files, to implement your feedback regarding wrong naming, as well as considering the changes made by refactoring. | Almost all tests failed before, now those work again. |
+| **@remoweirich** | 12.05 | https://github.com/remoweirich/sopra-fs26-group-15-server/commit/722d40eefe035cf42bc3c49255b016836d0149de | Implemented Backend logic to send and receive friend requests as well as getFriends/friendRequestsSent/Received. | Part of user story 13. It should be possible to add friends. |
 
 
 
