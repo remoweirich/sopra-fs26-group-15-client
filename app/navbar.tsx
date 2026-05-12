@@ -1,281 +1,259 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Badge, Input } from "antd";
-import { ApiService } from "./api/apiService";
-import { MyUserDTO, UserDTO } from "./types/user";
-import { Bell, LogOut, Search, Menu, X } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
 
-// ---------------------------------------------------------------------------
-// GuessSBB SVG logo mark (simplified train-pin icon)
-// ---------------------------------------------------------------------------
-function LogoMark() {
+// ─── SBB Cross logo ──────────────────────────────────────────────────────────
+function SBBCross({ size = 20 }: { size?: number }) {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="8" fill="#E30613" />
-      <path
-        d="M16 4C12.134 4 9 7.134 9 11c0 5.25 7 14 7 14s7-8.75 7-14c0-3.866-3.134-7-7-7z"
-        fill="white"
-      />
-      <circle cx="16" cy="11" r="3" fill="#E30613" />
+    <svg width={size} height={size} viewBox="0 0 22 22" fill="#ffffff" aria-hidden="true">
+      <rect x="7" y="0" width="8" height="22" rx="1" />
+      <rect x="0" y="7" width="22" height="8" rx="1" />
     </svg>
   );
 }
 
-// ---------------------------------------------------------------------------
-
-
 export default function Navbar() {
-
-  // const [resolvedUser, setResolvedUser] = useState<{ userId: number; username: string } | null>(null);
-  const [notificationCount, setNotificationCount] = useState(3); // Placeholder for notification count, replace with actual logic to fetch count
-  // const [showLinks, setShowLinks] = useState(false);
-  const{user,logout,isLoading} = useAuth();
-
+  const { user, logout, isLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  // const apiService = new ApiService();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [code, setCode] = useState("");
 
-//   useEffect(() => {
-//     const token = JSON.parse(localStorage.getItem("token") || '""');
-// const userId = JSON.parse(localStorage.getItem("userId") || "-1");
-    
-
-//     console.log("Navbar - Retrieved token from localStorage:", token);
-//     console.log("Navbar - Retrieved userId from localStorage:", userId);
-
-    
-
-//     if (!token || userId === -1) {
-//       setResolvedUser(null);
-//       setShowLinks(true);
-//       return;
-//     }
-
-//     const fetchAndSetUser = async () => {
-//       try {
-//         const userData = await apiService.get(
-//           `/users/${Number(userId)}`,
-//           {
-//             headers: { token: token },
-//           }) as MyUserDTO | UserDTO;
-//         if ("email" in userData) {
-//           setResolvedUser({ userId: userId, username: userData.username });
-//         } else {
-//           setResolvedUser(null);
-//         }
-//       }
-//       catch (error) {
-//         //console.error("Error fetching user data in Navbar:", error);
-//         setResolvedUser(null);
-//       }
-
-//     };
-
-//     fetchAndSetUser();
-//     setShowLinks(true);
-//   }, []);
-
-
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("userId");
-
-  //   setResolvedUser(null);
-
-  //   router.push("/login");
-  // };
-
-
-  function handleLobbySearch(e: React.KeyboardEvent<HTMLInputElement>) {
-    const value = (e.target as HTMLInputElement).value.trim();
-    if (e.key === "Enter" && value) {
-      router.push(`/lobbies/${value}`);
-    }
-  }
-
-  function linkClass(href: string) {
-    const active = pathname === href || pathname.startsWith(href + "/");
-    return `navbar-link${active ? " active" : ""}`;
-  }
-
-const [menuOpen, setMenuOpen] = useState(false);
-
-  // Close the menu automatically on route change
+  // Hide navbar entirely on the in-game screen for a fullscreen experience
+  const onGameScreen = pathname?.startsWith("/game/") && !pathname?.endsWith("/leaderboard");
+  // Close drawer on route change
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Lock body scroll while the mobile menu is open
+  // Lock body scroll while drawer is open
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
 
-  // Helper: route + close menu (for mobile menu links)
-  const go = (href: string) => {
+  function handleCodeJoin() {
+    const c = code.trim();
+    if (!c) return;
+    // Try to navigate — the lobby room page handles 404 / invalid codes itself.
+    router.push(`/lobbies/${c}`);
+    setCode("");
+  }
+
+  function handleCodeKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") handleCodeJoin();
+  }
+
+  function isActive(href: string) {
+    if (!pathname) return false;
+    return pathname === href || pathname.startsWith(href + "/");
+  }
+
+  function go(href: string) {
     setMenuOpen(false);
     router.push(href);
-  };
+  }
+
+  if (onGameScreen) return null;
 
   return (
     <>
       <nav className="navbar">
-        {/* ── Brand ──────────────────────────────────────────────────────── */}
-        <Link href="/" className="navbar-brand">
-          <LogoMark />
-          <span className="navbar-brand-text">
-            Gues<span>SBB</span>
-          </span>
-        </Link>
+        <div className="navbar-shell">
+          {/* Left: brand */}
+          <div className="navbar-col-left">
+            <Link href="/" className="navbar-brand">
+              <SBBCross size={20} />
+              <span className="navbar-brand-text">
+                Gues<span>SBB</span>
+              </span>
+            </Link>
+          </div>
 
-        {/* ── Center: Lobby ID search (desktop only) ─────────────────────── */}
-        <label className="navbar-search" htmlFor="lobby-id-search">
-          <Search size={16} className="navbar-search-icon" />
-          <input
-            id="lobby-id-search"
-            className="navbar-search-input"
-            placeholder="Enter Lobby ID"
-            onKeyDown={handleLobbySearch}
-          />
-        </label>
+          {/* Center: lobby-code pill (desktop only) */}
+          <div className="navbar-col-center">
+            <div
+              className="sbb-pill-input"
+                          >
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 4px 0 14px",
+                  color: "var(--grey)",
+                  flexShrink: 0,
+                }}
+              >
+                {/* Magnifier — inline SVG so it scales independently of
+                    the surrounding font-size and renders crisply. */}
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20 L16.5 16.5" />
+                </svg>
+              </span>
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))}
+                onKeyDown={handleCodeKey}
+                placeholder="LOBBY-CODE"
+                aria-label="Lobby code"
+              />
+              <button type="button" onClick={handleCodeJoin}>
+                Join
+              </button>
+            </div>
+          </div>
 
-        {/* ── Right: desktop actions ─────────────────────────────────────── */}
-        {!isLoading && (
-          <div className="navbar-actions">
-
-            {user && (
-              <Badge count={notificationCount} size="small" offset={[4, -2]}>
-                <button className="navbar-icon-btn" aria-label="Notifications">
-                  <Bell size={20} />
+          {/* Right: nav + auth */}
+          <div className="navbar-col-right">
+            {!isLoading && (
+              <div className="navbar-nav">
+                <button
+                  className={`navbar-link ${isActive("/lobbies") ? "is-active" : ""}`}
+                  onClick={() => go("/lobbies")}
+                >
+                  Züge
                 </button>
-              </Badge>
+                <button
+                  className={`navbar-link ${isActive("/leaderboard") ? "is-active" : ""}`}
+                  onClick={() => go("/leaderboard")}
+                >
+                  Rangliste
+                </button>
+
+                {user ? (
+                  <>
+                    <button
+                      className={`navbar-link ${isActive(`/users/${user.userId}`) ? "is-active" : ""}`}
+                      onClick={() => go(`/users/${user.userId}`)}
+                    >
+                      {user.username.length > 12
+                        ? user.username.slice(0, 12) + "…"
+                        : user.username}
+                    </button>
+                    <button className="navbar-logout" onClick={logout}>
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <button className="navbar-login" onClick={() => go("/login")}>
+                    Login
+                  </button>
+                )}
+              </div>
             )}
 
-            <Link href="/lobbies" className={linkClass("/lobbies")}>
-              Lobbies
-            </Link>
+            <button
+              className={`navbar-burger ${menuOpen ? "is-open" : ""}`}
+              aria-label={menuOpen ? "Menü schließen" : "Menü öffnen"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((m) => !m)}
+              type="button"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
+        </div>
+      </nav>
 
-            <Link href="/leaderboard" className={linkClass("/leaderboard")}>
-              Leaderboard
-            </Link>
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div className="navbar-drawer">
+          <button
+            type="button"
+            className="navbar-drawer-backdrop"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Menü schließen"
+          />
+          <div className="navbar-drawer-panel">
+            {/* Lobby code search */}
+            <div className="navbar-drawer-section">
+              <div className="navbar-drawer-label">Lobby-Code eingeben</div>
+              <div className="sbb-pill-input">
+                <input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))}
+                  onKeyDown={handleCodeKey}
+                  placeholder="A1B2"
+                  style={{ width: "auto", flex: 1 }}
+                />
+                <button type="button" onClick={handleCodeJoin}>
+                  Join
+                </button>
+              </div>
+            </div>
 
-            {user ? (
+            <button
+              className={`navbar-drawer-link ${isActive("/lobbies") ? "is-active" : ""}`}
+              onClick={() => go("/lobbies")}
+            >
+              Züge
+            </button>
+            <button
+              className={`navbar-drawer-link ${isActive("/leaderboard") ? "is-active" : ""}`}
+              onClick={() => go("/leaderboard")}
+            >
+              Rangliste
+            </button>
+
+            <div className="navbar-drawer-divider" />
+
+            {!isLoading && user && (
               <>
-                <Link
-                  href={`/users/${user.userId}`}
-                  className={linkClass(`/users/${user.userId}`)}
+                <button
+                  className={`navbar-drawer-link ${isActive(`/users/${user.userId}`) ? "is-active" : ""}`}
+                  onClick={() => go(`/users/${user.userId}`)}
                 >
                   {user.username}
-                </Link>
+                </button>
                 <button
-                  className="navbar-icon-btn"
-                  onClick={logout}
-                  aria-label="Logout"
-                  title="Abmelden"
+                  className="navbar-drawer-link navbar-drawer-link--muted"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    logout();
+                  }}
                 >
-                  <LogOut size={20} />
+                  Logout
                 </button>
               </>
-            ) : (
+            )}
+
+            {!isLoading && !user && (
               <>
-                <Link href="/login" className={linkClass("/login")}>
+                <button
+                  className="navbar-drawer-link"
+                  onClick={() => go("/login")}
+                >
                   Login
-                </Link>
-                <Link href="/register" className="navbar-register-pill">
-                  Registration
-                </Link>
+                </button>
+                <button
+                  className="navbar-drawer-link navbar-drawer-link--primary"
+                  onClick={() => go("/register")}
+                >
+                  Registrieren
+                </button>
               </>
             )}
           </div>
-        )}
-
-        {/* ── Burger button (mobile/tablet only) ─────────────────────────── */}
-        <button
-          className="navbar-burger"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
-
-      {/* ── Full-screen mobile menu overlay ──────────────────────────────── */}
-      {menuOpen && (
-        <div className="mobile-menu">
-
-          <label className="mobile-menu-search" htmlFor="mobile-lobby-id-search">
-            <Search size={18} className="navbar-search-icon" />
-            <input
-              id="mobile-lobby-id-search"
-              className="navbar-search-input"
-              placeholder="Enter Lobby ID"
-              onKeyDown={handleLobbySearch}
-            />
-          </label>
-
-          <button
-            className="mobile-menu-link"
-            onClick={() => go("/lobbies")}
-          >
-            Lobbies
-          </button>
-
-          <button
-            className="mobile-menu-link"
-            onClick={() => go("/leaderboard")}
-          >
-            Leaderboard
-          </button>
-
-          {!isLoading && user && (
-            <>
-              <button
-                className="mobile-menu-link"
-                onClick={() => go(`/users/${user.userId}`)}
-              >
-                {user.username}
-              </button>
-              <button
-                className="mobile-menu-link mobile-menu-link--muted"
-                onClick={() => {
-                  setMenuOpen(false);
-                  logout();
-                }}
-              >
-                Logout
-              </button>
-            </>
-          )}
-
-          {!isLoading && !user && (
-            <>
-              <button
-                className="mobile-menu-link"
-                onClick={() => go("/login")}
-              >
-                Login
-              </button>
-              <button
-                className="mobile-menu-link mobile-menu-link--primary"
-                onClick={() => go("/register")}
-              >
-                Registration
-              </button>
-            </>
-          )}
         </div>
       )}
     </>

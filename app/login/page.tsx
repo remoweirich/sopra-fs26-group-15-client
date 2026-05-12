@@ -1,106 +1,143 @@
-/* Copied from original template except for class names for cards.
-Classnames used:
--page
--page-center
--card 
--card--form
+"use client";
 
-*/
-
-"use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
-
-import { useRouter } from "next/navigation"; // use NextJS router for navigation
+import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
-// import useLocalStorage from "@/hooks/useLocalStorage";
-import { Button, Form, Input } from "antd";
 import { UserAuthDTO, LoginPostDTO } from "@/types/user";
 import { useAuth } from "@/context/AuthContext";
-import { useState} from "react";
+import { useState, FormEvent } from "react";
 
+// SBB cross — kept here so the auth page stays self-contained
+const SBBCross = ({ size = 34 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 22 22" fill="#fff" aria-hidden="true">
+    <rect x="7" y="0" width="8" height="22" rx="1" />
+    <rect x="0" y="7" width="22" height="8" rx="1" />
+  </svg>
+);
 
 const Login: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
-  const [form] = Form.useForm();
+  const { login } = useAuth();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // const {set: setToken,  } = useLocalStorage<string>("token", "");
-  // const {set: setUserId} = useLocalStorage<number>("userId", -1);
-  const {login} = useAuth(); 
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
 
-  type Error = {
-    status: number;
-  }
+    if (!username.trim() || !password) {
+      setErrorMessage("Bitte gib Benutzername und Passwort ein.");
+      return;
+    }
 
-  const handleLogin = async (values: LoginPostDTO) => {
-      try {
-        const loginCredentials: LoginPostDTO = {
-          username: values.username,
-          password: values.password,
-        }
-        const response = await apiService.post<UserAuthDTO>("/login", loginCredentials)
-        // setToken(response.token)
-        // setUserId(response.userId)
-        await login(response.token, response.userId);
-        router.push(`/users/${response.userId}`)
-  
-      } catch (error: any) {
+    setSubmitting(true);
+    try {
+      const credentials: LoginPostDTO = { username: username.trim(), password };
+      const response = await apiService.post<UserAuthDTO>("/login", credentials);
+      await login(response.token, response.userId);
+      router.push(`/users/${response.userId}`);
+    } catch (error: unknown) {
+      const status = (error as { status?: number })?.status;
+      if (status === 404) setErrorMessage("Login fehlgeschlagen: Benutzer nicht gefunden.");
+      else if (status === 401) setErrorMessage("Login fehlgeschlagen: Falscher Benutzername oder Passwort.");
+      else setErrorMessage("Ein unerwarteter Fehler ist aufgetreten.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-            if (error?.status===404) {
-              setErrorMessage("Login failed: User not found.");
-            console.error("Registration failed:", error);
-            }
-            else if (error?.status===401){
-            setErrorMessage("Login failed: Wrong username or password.");
-            console.error("Registration failed:", error);
-          }
-            else {
-              console.log("An unexpected error occurred during Login.", error);
-            }
-          }
-          
-      
-    };
+  return (
+    <div className="auth-split">
+      {/* Left brand panel */}
+      <div className="auth-left">
+        <div className="auth-left-content">
+          <div className="auth-left-icon">
+            <SBBCross size={34} />
+          </div>
+          <h1>Willkommen zurück!</h1>
+          <p>Logg dich ein und beweise, dass du die Schweizer Strecken kennst.</p>
+          <div className="auth-left-stats">
+            <div className="auth-left-stat">
+              <div className="auth-left-stat-v">12K+</div>
+              <div className="auth-left-stat-l">Spieler</div>
+            </div>
+            <div className="auth-left-stat">
+              <div className="auth-left-stat-v">50K+</div>
+              <div className="auth-left-stat-l">Runden</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-return (
-    <div className="page-center page-content">
-      <div className="card card--form">
-        <h2 className="form-title">Welcome back!</h2>
-        <p className="form-subtitle">Sign in to keep playing.</p>
-        {errorMessage && <div className="form-error">{errorMessage}</div>}
-        <Form
-          form={form}
-          name="login"
-          size="large"
-          variant="outlined"
-          onFinish={handleLogin}
-          layout="vertical"
-        >
-          <Form.Item
-            name="username"
-            label="Username"
-            rules={[{ required: true, message: "Please enter your username!" }]}
-          >
-            <Input placeholder="Your username" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: "Please enter your password!" }]}
-          >
-            <Input.Password placeholder="Your password" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="form-submit-btn">
-              Log in
-            </Button>
-          </Form.Item>
-        </Form>
-        <div className="form-footer">
-          Don&apos;t have an account?{" "}
-          <span className="form-footer-link" onClick={() => router.push("/register")}>
-            Sign up
-          </span>
+      {/* Right form panel */}
+      <div className="auth-right">
+        <div className="auth-right-content">
+          <span className="label">Anmelden</span>
+          <h2>Willkommen zurück</h2>
+          <p>Spiel weiter, wo du aufgehört hast.</p>
+
+          {errorMessage && <div className="sbb-field-error">{errorMessage}</div>}
+
+          <form onSubmit={handleLogin} noValidate>
+            <div className="sbb-field">
+              <div className="sbb-field-label">
+                <span className="label label--grey">Benutzername</span>
+              </div>
+              <input
+                className="sbb-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="ZürichHB_Master"
+                autoComplete="username"
+              />
+            </div>
+
+            <div className="sbb-field">
+              <div className="sbb-field-label">
+                <span className="label label--grey">Passwort</span>
+              </div>
+              <input
+                className="sbb-input"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="sbb-btn sbb-btn--primary sbb-btn--lg sbb-btn--full"
+              disabled={submitting}
+            >
+              {submitting ? "Anmelden…" : "Anmelden"}
+            </button>
+          </form>
+
+          <p className="auth-right-footer">
+            Kein Account?{" "}
+            <button
+              type="button"
+              onClick={() => router.push("/register")}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--red)",
+                cursor: "pointer",
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                font: "inherit",
+                padding: 0,
+              }}
+            >
+              Registrieren
+            </button>
+          </p>
         </div>
       </div>
     </div>

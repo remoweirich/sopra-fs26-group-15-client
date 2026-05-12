@@ -1,11 +1,9 @@
 "use client";
 
+import TrainLoader from "@/components/TrainLoader";
+
 const LoadingScreen: React.FC = () => {
-  return (
-      <div className="page-center">
-        <div>Loading...</div>
-      </div>
-  );
+  return <TrainLoader label="Zug rollt an" />;
 };
 
 export default LoadingScreen;

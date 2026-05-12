@@ -1,293 +1,159 @@
 "use client";
 
-/**
- * Main Page  –  route: /
- *
- * Design ref: /01-home.html prototype
- * Classnames used (all defined in globals.css):
- *   page-root, page-cards-row, page-section, page-hero-actions
- *   card, card--wide
- *   btn-outline-red
- *   home-hero-*, home-step-*, home-stats-*
- */
-
 import { useRouter } from "next/navigation";
-import useLocalStorage from "@/hooks/useLocalStorage";
-import { Button } from "antd";
 
-// ─── SVG Illustrations (inline, decorative only) ────────────────────────────
-const PinIcon = ({ size = 64 }: { size?: number }) => (
-  <svg
-    width={size}
-    height={size * 1.25}
-    viewBox="0 0 48 60"
-    fill="none"
-    aria-hidden="true"
-  >
-    <defs>
-      <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#FF1A2B" />
-        <stop offset="100%" stopColor="#C00010" />
-      </linearGradient>
-    </defs>
-    {/* Bodenschatten – lässt den Pin "stehen" */}
-    <ellipse cx="24" cy="57" rx="7" ry="1.8" fill="rgba(0,0,0,0.2)" />
-    {/* Pin-Körper mit Gradient */}
-    <path
-      d="M24 2C13.5 2 5 10.5 5 21c0 13 19 33 19 33s19-20 19-33c0-10.5-8.5-19-19-19z"
-      fill="url(#pinGrad)"
-    />
-    {/* Weißer Ring */}
-    <circle cx="24" cy="21" r="7.5" fill="#FFFFFF" />
-    {/* Roter Punkt in der Mitte */}
-    <circle cx="24" cy="21" r="3.5" fill="#E30613" />
-    {/* Subtiler Glanz oben links */}
-    <path
-      d="M15 12 Q14 8, 19 6"
-      stroke="rgba(255,255,255,0.45)"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      fill="none"
-    />
-  </svg>
-);
-
-const TrainIllustration = () => (
-  <svg
-    viewBox="0 0 160 100"
-    fill="none"
-    aria-hidden="true"
-    className="home-hero-train"
-    preserveAspectRatio="xMidYMid meet"
-  >
-    <defs>
-      <linearGradient id="trainBody" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#FF1A2B" />
-        <stop offset="100%" stopColor="#C00010" />
-      </linearGradient>
-      <linearGradient id="windowGlass" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#E8F4FF" />
-        <stop offset="100%" stopColor="#B8D8F0" />
-      </linearGradient>
-    </defs>
-
-    {/* Motion Lines links (Speed-Effekt) */}
-    <g opacity="0.5" stroke="#E30613" strokeLinecap="round">
-      <path d="M2 35 L14 35" strokeWidth="2" />
-      <path d="M0 48 L12 48" strokeWidth="2.5" />
-      <path d="M4 61 L16 61" strokeWidth="2" />
-    </g>
-
-    {/* Schatten unter Zug */}
-    <ellipse cx="88" cy="88" rx="60" ry="3" fill="rgba(0,0,0,0.15)" />
-
-    {/* Hauptkorpus */}
-    <rect x="24" y="28" width="120" height="50" rx="10" fill="url(#trainBody)" />
-
-    {/* Abgerundete Nase vorne (rechts) */}
-    <path d="M144 35 Q156 52, 144 72 Z" fill="#B80010" />
-
-    {/* Oberer dunkler Streifen (SBB-Dach) */}
-    <rect x="24" y="28" width="120" height="6" rx="10" fill="rgba(0,0,0,0.18)" />
-
-    {/* Drei Passagierfenster */}
-    <rect x="34" y="42" width="26" height="16" rx="2" fill="url(#windowGlass)" />
-    <rect x="64" y="42" width="26" height="16" rx="2" fill="url(#windowGlass)" />
-    <rect x="94" y="42" width="26" height="16" rx="2" fill="url(#windowGlass)" />
-    {/* Führerstand-Fenster (schräg) */}
-    <path d="M126 42 L138 42 Q142 48, 138 58 L126 58 Z" fill="url(#windowGlass)" />
-
-    {/* SBB-Logo-Quadrat */}
-    <rect x="40" y="64" width="14" height="10" rx="1.5" fill="#FFFFFF" />
-    <text x="47" y="72" textAnchor="middle" fontSize="6" fontWeight="900" fill="#E30613">
-      SBB
+// ─── Decorative SVGs ────────────────────────────────────────────────────────
+const TrainSVG = ({ w = 150 }: { w?: number }) => (
+  <svg viewBox="0 0 180 90" width={w} fill="none" style={{ display: "block" }}>
+    <rect x="6" y="20" width="160" height="46" rx="5" fill="#EB0000" />
+    <rect x="6" y="54" width="160" height="10" fill="#B80000" opacity="0.5" />
+    {[14, 40, 66, 92, 118, 142].map((x, i) => (
+      <rect key={i} x={x} y="28" width="18" height="14" rx="2" fill="#FFFFFF" opacity="0.93" />
+    ))}
+    <rect x="82" y="20" width="3" height="46" fill="#B80000" opacity="0.3" />
+    {[28, 90, 152].map((x, i) => (
+      <g key={i}>
+        <circle cx={x} cy="76" r="9" fill="#1C1917" />
+        <circle cx={x} cy="76" r="5" fill="#C8C3BC" />
+        <circle cx={x} cy="76" r="2.5" fill="#1C1917" />
+      </g>
+    ))}
+    <rect x="0" y="83" width="180" height="3" rx="1.5" fill="#1C1917" opacity="0.18" />
+    <path d="M100 20 L94 7 M100 20 L106 7 M94 7 L106 7" stroke="#1C1917" strokeWidth="1.5" strokeLinecap="round" opacity="0.45" />
+    <text x="46" y="52" fill="#FFFFFF" fontSize="9" fontFamily="var(--font-mono)" fontWeight="700" opacity="0.75">
+      SBB · CFF · FFS
     </text>
-
-    {/* Türlinien */}
-    <line x1="92" y1="60" x2="92" y2="75" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
-    <line x1="122" y1="60" x2="122" y2="75" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
-
-    {/* Zwei Drehgestelle mit Rädern */}
-    <g>
-      <circle cx="48" cy="82" r="7" fill="#1A1A1A" />
-      <circle cx="48" cy="82" r="3.5" fill="#888" />
-      <circle cx="68" cy="82" r="7" fill="#1A1A1A" />
-      <circle cx="68" cy="82" r="3.5" fill="#888" />
-      <circle cx="108" cy="82" r="7" fill="#1A1A1A" />
-      <circle cx="108" cy="82" r="3.5" fill="#888" />
-      <circle cx="128" cy="82" r="7" fill="#1A1A1A" />
-      <circle cx="128" cy="82" r="3.5" fill="#888" />
-    </g>
-
-    {/* Gleis + Schwellen */}
-    <rect x="20" y="92" width="132" height="2" fill="#2D2D2D" />
-    <g fill="#8B6F47">
-      <rect x="24" y="95" width="8" height="2.5" />
-      <rect x="44" y="95" width="8" height="2.5" />
-      <rect x="64" y="95" width="8" height="2.5" />
-      <rect x="84" y="95" width="8" height="2.5" />
-      <rect x="104" y="95" width="8" height="2.5" />
-      <rect x="124" y="95" width="8" height="2.5" />
-      <rect x="140" y="95" width="8" height="2.5" />
-    </g>
-
-    {/* Scheinwerfer vorne */}
-    <circle cx="140" cy="60" r="2" fill="#FFF9C4" />
   </svg>
 );
 
-const MountainScene = () => (
-  <svg
-    viewBox="0 0 600 140"
-    fill="none"
-    aria-hidden="true"
-    className="home-hero-mountains"
-    preserveAspectRatio="xMidYMax slice"
-  >
-    {/* Hintere Bergkette */}
+const MountainSVG = () => (
+  <svg viewBox="0 0 900 110" preserveAspectRatio="none" width="100%" height="110" fill="none">
     <path
-      d="M0 140 L70 55 L130 85 L210 25 L290 75 L360 40 L440 65 L510 20 L570 50 L600 35 V140 Z"
-      fill="#E30613"
-      opacity="0.08"
+      d="M0 110 L0 70 L70 28 L105 52 L170 8 L235 48 L295 22 L355 62 L415 18 L490 58 L540 28 L605 66 L665 22 L730 55 L800 28 L860 62 L900 42 L900 110Z"
+      fill="#EB0000" opacity="0.06"
     />
-    {/* Schneekappen auf den höchsten Peaks */}
-    <path d="M200 30 L210 25 L222 32 L215 35 L210 30 L205 35 Z" fill="#FFFFFF" opacity="0.7" />
-    <path d="M502 25 L510 20 L520 28 L513 30 L510 25 L506 30 Z" fill="#FFFFFF" opacity="0.7" />
-    {/* Vordere Hügelkette (dunkler, mehr Tiefe) */}
     <path
-      d="M0 140 L50 90 L110 105 L190 60 L270 95 L340 70 L420 90 L500 50 L560 80 L600 65 V140 Z"
-      fill="#E30613"
-      opacity="0.05"
+      d="M0 110 L0 82 L90 50 L130 68 L195 36 L260 62 L320 44 L380 72 L440 40 L510 68 L570 46 L635 72 L700 50 L760 68 L840 52 L900 62 L900 110Z"
+      fill="#EB0000" opacity="0.04"
     />
-
-    {/* Sonne – nach den Bergen gerendert, damit sie nicht verdeckt wird */}
-    {/* Sonne – in <g> eingewickelt, damit wir sie mit CSS animieren können */}
-    <g className="home-hero-sun">
-      <circle cx="100" cy="45" r="18" fill="#F4C862" opacity="0.55" />
-      <circle cx="100" cy="45" r="12" fill="#F4B84A" opacity="0.9" />
-    </g>
+    {[[170, 8], [415, 18], [665, 22]].map(([x, y], i) => (
+      <path key={i} d={`M${x} ${y} L${x - 12} ${y + 18} L${x + 12} ${y + 18}Z`} fill="#FFFFFF" opacity="0.7" />
+    ))}
   </svg>
 );
 
-// ─── Page ───────────────────────────────────────────────────────────────────
-const MainPage: React.FC = () => {
+const HomePage: React.FC = () => {
   const router = useRouter();
-  const { value: token } = useLocalStorage<string>("token", "");
-
-  const handlePlay = () => {
-    router.push("/lobbies");
-  };
+  const ticker =
+    "  🚄 GuesSBB – Wo ist der Zug?  ·  IC 1 Genève → St.Gallen  ·  S12 Brugg → Zürich HB  ·  IR 13 Zürich → Chur  ·  RE Basel → Luzern  ·  IC 5 Lausanne → Zürich  ·  ";
 
   return (
-    <div className="page-root">
+    <div className="home-root">
+      {/* Ticker */}
+      <div className="home-ticker">
+        <div className="home-ticker-track">
+          <span>{ticker}</span>
+          <span>{ticker}</span>
+        </div>
+      </div>
 
-      {/* ── Hero section ──────────────────────────────────────────────────── */}
-      <section className="home-hero">
-        <MountainScene />
+      {/* Hero */}
+      <div className="home-hero">
+        <div className="home-hero-inner">
+          <div className="home-hero-badge">DAS SCHWEIZER BAHN-RATESPIEL</div>
 
-        <div className="home-hero-content">
-          <div className="home-hero-illustration">
-            <div className="home-hero-pin">
-              <div className="home-hero-pin-inner">
-                <PinIcon size={64} />
-              </div>
-            </div>
-            <TrainIllustration />
+          <div className="home-hero-train">
+            <TrainSVG w={150} />
           </div>
 
           <h1 className="home-hero-title">
             Gues<span className="u-text-red">SBB</span>
           </h1>
 
-          <p className="home-hero-tagline">Where is the train right now?</p>
+          <p className="home-hero-tagline">Wo zum Teufel ist der Zug gerade?</p>
 
-          <p className="home-hero-description">
-            Guess in real time where SBB trains are on the Swiss rail network. 
-            Play against friends or the world. Who gets closest?
+          <p className="home-hero-sub">
+            ECHTZEIT-POSITION RATEN · PUNKTE SAMMELN · FREUNDE BESIEGEN
           </p>
 
-          <div className="page-hero-actions">
-            <Button type="primary" size="large" onClick={handlePlay}>
-              ▶ Play now
-            </Button>
-
-            <Button
-              size="large"
-              className="btn-outline-red"
-              onClick={() => router.push("/leaderboard")}
+          <div className="home-hero-actions">
+            <button
+              className="sbb-btn sbb-btn--primary sbb-btn--lg"
+              onClick={() => router.push("/lobbies")}
+              type="button"
             >
-              Leaderboard
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How-it-works cards ────────────────────────────────────────────── */}
-      <section className="page-cards-row">
-        <div className="card home-step-card">
-          <div className="home-step-emoji-bg">🚂</div>
-          <div className="home-step-emoji">🚂</div>
-          <div className="home-step-number home-step-number--red">01</div>
-          <div className="home-step-title">Read the train info</div>
-          <div className="home-step-desc">
-            You see the line, departure, and arrival of a real SBB train.
-          </div>
-        </div>
-
-        <div className="card home-step-card">
-          <div className="home-step-emoji-bg">📍</div>
-          <div className="home-step-emoji">📍</div>
-          <div className="home-step-number home-step-number--gold">02</div>
-          <div className="home-step-title">Position guess</div>
-          <div className="home-step-desc">
-            Click on the Swiss map. The closer you are to the real position,
-            the more points you get!
-          </div>
-        </div>
-
-        <div className="card home-step-card">
-          <div className="home-step-emoji-bg">🏆</div>
-          <div className="home-step-emoji">🏆</div>
-          <div className="home-step-number home-step-number--green">03</div>
-          <div className="home-step-title">Collect points</div>
-          <div className="home-step-desc">
-            After each round you see the result. Become the best guesser of
-            Switzerland!
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats bar ─────────────────────────────────────────────────────── */}
-      <div className="page-section">
-        <div className="card card--wide home-stats-bar">
-          <div className="home-stat">
-            <div className="home-stat-emoji">🎮</div>
-            <div className="home-stat-value">2&apos;847</div>
-            <div className="home-stat-label">Games today</div>
-          </div>
-
-          <div className="home-stat">
-            <div className="home-stat-emoji">👥</div>
-            <div className="home-stat-value">342</div>
-            <div className="home-stat-label">Players online</div>
-          </div>
-
-          <div className="home-stat">
-            <div className="home-stat-emoji">🗺️</div>
-            <div className="home-stat-value">12&apos;504</div>
-            <div className="home-stat-label">Trains guessed</div>
-          </div>
-
-          <div className="home-stat">
-            <div className="home-stat-emoji">🏅</div>
-            <div className="home-stat-value home-stat-value--small">ZürichHB_Master</div>
-            <div className="home-stat-label">#1 worldwide</div>
+              ▶ Jetzt spielen
+            </button>
+            <button
+              className="sbb-btn sbb-btn--secondary sbb-btn--lg"
+              onClick={() => router.push("/register")}
+              type="button"
+            >
+              Konto erstellen
+            </button>
           </div>
         </div>
       </div>
 
+      {/* Mountains as visual transition */}
+      <div className="home-mtn-band">
+        <MountainSVG />
+      </div>
+
+      {/* How to play */}
+      <div className="home-steps">
+        <div className="home-steps-head">
+          <span className="label">Spielanleitung</span>
+          <h2>Drei Schritte. Einfach.</h2>
+        </div>
+        <div className="home-steps-grid">
+          <div className="home-step-card">
+            <div className="home-step-num">01</div>
+            <div className="home-step-title">Zuginfo lesen</div>
+            <div className="home-step-desc">
+              Linie, Von, Nach und die aktuelle Uhrzeit. Kein Fahrplan erlaubt!
+            </div>
+          </div>
+          <div className="home-step-card">
+            <div className="home-step-num">02</div>
+            <div className="home-step-title">Auf die Karte klicken</div>
+            <div className="home-step-desc">
+              Klicke auf die Schweizer Karte dort, wo du den Zug vermutest.
+            </div>
+          </div>
+          <div className="home-step-card">
+            <div className="home-step-num">03</div>
+            <div className="home-step-title">Punkte kassieren</div>
+            <div className="home-step-desc">
+              Je näher du liegst, desto mehr Punkte. 5 Runden, dann die Abrechnung.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats bar */}
+      <div className="home-stats">
+        <div className="home-stats-bar">
+          <div className="home-stat">
+            <div className="home-stat-v">2&apos;847</div>
+            <div className="home-stat-l">Spiele heute</div>
+          </div>
+          <div className="home-stat">
+            <div className="home-stat-v">342</div>
+            <div className="home-stat-l">Online</div>
+          </div>
+          <div className="home-stat">
+            <div className="home-stat-v">12&apos;504</div>
+            <div className="home-stat-l">Züge geraten</div>
+          </div>
+          <div className="home-stat">
+            <div className="home-stat-v">ZürichHB</div>
+            <div className="home-stat-l">#1 Weltweit</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default MainPage;
+export default HomePage;
