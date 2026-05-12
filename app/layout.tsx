@@ -4,7 +4,7 @@ import { App as AntdApp, ConfigProvider, theme } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@/styles/globals.css";
 import { WebSocketProvider } from "@/context/WebSocketContext";
-
+import "./styles/globals.css";
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
 
