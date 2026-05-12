@@ -42,6 +42,33 @@ const Profile: React.FC = () => {
 
   const isOwnProfile = currentUser?.userId === profileId;
 
+  const [friends, setFriends] = useState<UserDTO[]>([]);
+  const [pendingReceived, setPendingReceived] = useState<UserDTO[]>([]);
+  const [pendingSent, setPendingSent] = useState<UserDTO[]>([]);
+  const [isLoadingFriends, setIsLoadingFriends] = useState(false);
+
+  const loadFriendsData = async () => {
+    if (!token) return;
+    setIsLoadingFriends(true);
+    try {
+      const friendsData = await apiService.get<UserDTO[]>(`/friends/${profileId}`,
+          { headers: { token: token }
+          });
+      setFriends(friendsData);
+
+      if (isOwnProfile) {
+        const [received, sent] = await Promise.all([
+            apiService.get<UserDTO[]>(`/friends/${profileId}/pendingReceived`, { headers: { token: token } }),
+            apiService.get<UserDTO[]>(`/friends/${profileId}/pendingSent`, { headers: { token: token } })
+        ]);
+        setPendingReceived(received);
+        setPendingSent(sent);
+      }
+    } catch (error) {
+      console.error("Error when loading friends", error);
+    }
+  };
+
   useEffect(() => {
     // const token = JSON.parse(localStorage.getItem("token") || '""') as string;
 
@@ -270,6 +297,11 @@ const Profile: React.FC = () => {
         <div className="profile-tabs-wrapper">
           <Tabs
             defaultActiveKey="history"
+            onChange={(activeKey) => {
+              if (activeKey === "friends") {
+                loadFriendsData();
+              }
+            }}
             items={[
               {
                 key: "history",
@@ -291,8 +323,22 @@ const Profile: React.FC = () => {
               },
               {
                 key: "friends",
-                label: `Friends (${profileData.friends?.length ?? 0})`,
-                children: <p className="u-text-muted">No friends yet.</p>,
+                label: `Friends`,
+                children: (
+                    <div className="profile-friends-list">
+                      {friends.length > 0 ? (
+                          friends.map(f => (
+                              <div key={f.userId} className="profile-history-row" onClick={() => router.push(`/users/${f.userId}`)} style={{cursor: "pointer"}}>
+                                <div className="profile-avatar" style={{ width: 36, height: 36 }}>{f.username[0].toUpperCase()}</div>
+                                <div className="profile-history-info">
+                                  <div className="profile-history-name">{f.username}</div>
+                                </div>
+                                <span className="profile-history-icon">👤</span>
+                              </div>
+                          ))
+                      ) : <p className="u-text-muted">No friends yet.</p>}
+                    </div>
+                ),
               },
               {
                 key: "success",

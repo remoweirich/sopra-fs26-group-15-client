@@ -7,6 +7,7 @@ import { WebSocketProvider } from "@/context/WebSocketContext";
 
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
+import FriendshipListener from "@/websockets/FriendshipListener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -109,6 +110,7 @@ export default function RootLayout({
             <WebSocketProvider>
               <AuthProvider>
                 <AntdApp>
+                  <FriendshipListener />
                   <Navbar />
                   <main className="page-root">
                     {children}

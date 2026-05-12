@@ -37,6 +37,7 @@ export interface MyUserDTO {
 }
 
 export interface UserDTO{
+  userId: number;
   userScoreboard: UserScoreboard;
   username: string,
   userBio: string,
