@@ -46,30 +46,6 @@ const ProfilePage: React.FC = () => {
     const [pendingSent, setPendingSent] = useState<UserDTO[]>([]);
     const [isLoadingFriends, setIsLoadingFriends] = useState(false);
 
-    const loadFriendsData = async () => {
-        if (!token) return;
-        setIsLoadingFriends(true);
-        try {
-            const friendsData = await apiService.get<UserDTO[]>(`/friends/${profileId}`, {
-                headers: { token: token },
-            });
-            setFriends(friendsData);
-
-            if (isOwnProfile) {
-                const [received, sent] = await Promise.all([
-                    apiService.get<UserDTO[]>(`/friends/${profileId}/pendingReceived`, { headers: { token: token } }),
-                    apiService.get<UserDTO[]>(`/friends/${profileId}/pendingSent`, { headers: { token: token } }),
-                ]);
-                setPendingReceived(received);
-                setPendingSent(sent);
-            }
-        } catch (error) {
-            console.error("Error when loading friends", error);
-        } finally {
-            setIsLoadingFriends(false);
-        }
-    };
-
     useEffect(() => {
         const loadProfile = async () => {
             try {
@@ -86,10 +62,54 @@ const ProfilePage: React.FC = () => {
     }, [profileId, token, router, apiService]);
 
     useEffect(() => {
-        if (tab === "friends" && !isGuest) {
-            loadFriendsData();
+        if (tab !== "friends" || !profileData || !token) return;
+
+        const fetchFriends = async () => {
+            setIsLoadingFriends(true);
+            try {
+                const friendsData = await apiService.get<UserDTO[]>(`/friends/${profileId}`, {
+                    headers: { token },
+                });
+                setFriends(friendsData);
+
+                if (isOwnProfile) {
+                    const [received, sent] = await Promise.all([
+                        apiService.get<UserDTO[]>(`/friends/${profileId}/pendingReceived`, { headers: { token } }),
+                        apiService.get<UserDTO[]>(`/friends/${profileId}/pendingSent`, { headers: { token } }),
+                    ]);
+                    setPendingReceived(received);
+                    setPendingSent(sent);
+                }
+            } catch (error) {
+                console.error("Error when loading friends", error);
+            } finally {
+                setIsLoadingFriends(false);
+            }
+        };
+
+        fetchFriends();
+    }, [tab, profileId, profileData, token, isOwnProfile, apiService]);
+
+    const refreshFriends = React.useCallback(async () => {
+        if (!token) return;
+        try {
+            const friendsData = await apiService.get<UserDTO[]>(`/friends/${profileId}`, {
+                headers: { token: token ?? "", userId: profileId.toString() },
+            });
+            setFriends(friendsData);
+
+            if (isOwnProfile) {
+                const [received, sent] = await Promise.all([
+                    apiService.get<UserDTO[]>(`/friends/${profileId}/pendingReceived`, { headers: { token } }),
+                    apiService.get<UserDTO[]>(`/friends/${profileId}/pendingSent`, { headers: { token } }),
+                ]);
+                setPendingReceived(received);
+                setPendingSent(sent);
+            }
+        } catch (error) {
+            console.error("Error when refreshing friends", error);
         }
-    }, [tab, profileId]);
+    }, [token, profileId, isOwnProfile, apiService]);
 
     if (isLoading || !profileData) {
         return <div className="page-loading">Lade Profil…</div>;
@@ -97,8 +117,7 @@ const ProfilePage: React.FC = () => {
 
     const profileAsAny = profileData as Partial<MyUserDTO>;
     const isGuest =
-        profileAsAny.isGuest === true ||
-        profileData.username?.startsWith("guest_") === true ||
+        profileAsAny.isGuest === true || profileData.username?.startsWith("guest_") ||
         profileAsAny.email?.endsWith("@guest.com") === true;
     const showFriends = !isGuest;
     const showPasswordField = !isGuest;
@@ -179,12 +198,28 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+
+    const handleAccept = async (requestingUserId: number) => {
+        try {
+            await apiService.post(`/friends/accept/${requestingUserId}`,
+                {},
+                { headers: { userId: profileId.toString(), token: token ?? "" } }
+            );
+
+            await refreshFriends();
+
+        } catch (error) {
+            console.error("Error when accepting request:", error);
+        }
+    };
+
+
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
         { id: "games", icon: "🎮", label: "Spiele", count: DUMMY_HISTORY.length },
         { id: "achievements", icon: "🏆", label: "Erfolge", count: "0/10" },
         ...(showFriends
-            ? [{ id: "friends" as ProfileTab, icon: "👥", label: "Freunde", count: friends.length }]
+            ? [{ id: "friends" as ProfileTab, icon: "👥", label: "Freunde" }]
             : []),
     ];
 
@@ -344,7 +379,7 @@ const ProfilePage: React.FC = () => {
                                         {pendingReceived.map((req) => (
                                             <div key={req.userId} className="profile-history-row">
                                                 <div className="profile-history-info"><div className="profile-history-name">{req.username}</div><div className="profile-history-meta">Möchte dein Freund sein</div></div>
-                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => {}}>Annehmen</button>
+                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => {handleAccept(req.userId)}}>Annehmen</button>
                                             </div>
                                         ))}
                                     </div>
