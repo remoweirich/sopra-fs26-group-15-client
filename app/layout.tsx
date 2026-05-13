@@ -1,26 +1,33 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { App as AntdApp, ConfigProvider, theme } from "antd";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { WebSocketProvider } from "@/context/WebSocketContext";
 
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
+import FriendshipListener from "@/websockets/FriendshipListener";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Space Grotesk needs weight 800 for the bold hero/section titles
+// used across the SBB redesign. Without it the headings silently
+// fall back to a synthetic-bold of the 700 weight (or worse, the
+// browser default sans-serif), which looks wrong.
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "GuessSBB",
-  description: "Guess where the Swiss train is right now.",
+  title: "GuesSBB",
+  description: "Wo zum Teufel ist der Zug gerade? Das Schweizer Bahn-Ratespiel.",
 };
 
 export default function RootLayout({
@@ -29,95 +36,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ConfigProvider
-          theme={{
-            algorithm: theme.defaultAlgorithm,
-            token: {
-              // Brand colour – SBB red. Controls focus rings, active borders, etc.
-              colorPrimary: "#E30613",
-              // Page background (warm off-white, visible behind cards)
-              colorBgBase: "#F5F0EB",
-              // Surface colour used inside cards, inputs, dropdowns
-              colorBgContainer: "#FFFFFF",
-              // Default body text
-              colorText: "#1A1A1A",
-              colorTextSecondary: "#666666",
-              // Border default
-              colorBorder: "#E0DAD4",
-              colorBorderSecondary: "#EDE8E2",
-              // Shape
-              borderRadius: 12,
-              borderRadiusLG: 16,
-              borderRadiusSM: 8,
-              // Typography – use the Next.js Geist variable
-              fontFamily: "var(--font-geist-sans), sans-serif",
-              fontSize: 15,
-            },
-            components: {
-              Button: {
-                // Primary buttons are SBB red with pill shape
-                colorPrimary: "#E30613",
-                colorPrimaryHover: "#C0000F",
-                colorPrimaryActive: "#A0000C",
-                controlHeight: 42,
-                borderRadius: 999, // pill
-                fontWeight: 600,
-                algorithm: true,
-              },
-              Input: {
-                colorBorder: "#D0CAC4",
-                colorTextPlaceholder: "#AAAAAA",
-                colorBgContainer: "#FFFFFF",
-                borderRadius: 10,
-                controlHeight: 44,
-                algorithm: false,
-              },
-              Form: {
-                labelColor: "#333333",
-                algorithm: theme.defaultAlgorithm,
-              },
-              Card: {
-                colorBgContainer: "#FFFFFF",
-                borderRadius: 16,
-                paddingLG: 28,
-              },
-              Select: {
-                colorBorder: "#D0CAC4",
-                borderRadius: 10,
-                controlHeight: 44,
-              },
-              Menu: {
-                colorItemBg: "transparent",
-                colorItemText: "#333333",
-                colorItemTextSelected: "#E30613",
-                colorItemTextHover: "#E30613",
-                itemBorderRadius: 8,
-              },
-              Tabs: {
-                colorPrimary: "#E30613",
-                inkBarColor: "#E30613",
-              },
-              Tag: {
-                borderRadius: 999,
-              },
-            },
-          }}
-        >
-          <AntdRegistry>
-            <WebSocketProvider>
-              <AuthProvider>
-                <AntdApp>
-                  <Navbar />
-                  <main className="page-root">
-                    {children}
-                  </main>
-                </AntdApp>
-              </AuthProvider>
-            </WebSocketProvider>
-          </AntdRegistry>
-        </ConfigProvider>
+    <html lang="de" className={`${spaceGrotesk.variable} ${ibmPlexMono.variable}`}>
+      <head>
+        {/* Hard fallback: pull Space Grotesk + IBM Plex Mono directly from
+            Google Fonts. Belt-and-suspenders with next/font so the design
+            survives Tailwind preflight resets and prod build oddities.
+            Includes weight 800 for hero/section headlines. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+        />
+      </head>
+      {/* Apply Next.js font className AND variable: className forces the
+          actual font-family on body (winning vs Tailwind preflight),
+          variables let other elements opt into the mono via CSS var. */}
+      <body className={`${spaceGrotesk.className}`}>
+        <WebSocketProvider>
+          <AuthProvider>
+              <FriendshipListener />
+              <Navbar />
+            <main>{children}</main>
+          </AuthProvider>
+        </WebSocketProvider>
       </body>
     </html>
   );

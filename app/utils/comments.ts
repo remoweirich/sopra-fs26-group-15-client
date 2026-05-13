@@ -1,0 +1,3 @@
+ export const COMMENTS: [number, number, string][] =
+ [[0,3,"Achtung! Bist du SBB-Mitarbeiter? 🚨"],[3,15,"Ausgezeichnet! Fast schon unheimlich."],[15,45,"Gut! Du weisst wo die Schweiz ist."],[45,120,"Naja... zumindest auf dem richtigen Kontinent."],[120,300,"Echt? Schon in Bayern?"],[300,9999,"Das ist der Atlantik. Der Zug fährt in der Schweiz."]];
+ //first two elems of array are range of kilometres 

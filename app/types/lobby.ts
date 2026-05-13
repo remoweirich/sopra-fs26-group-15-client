@@ -10,6 +10,10 @@ export interface Lobby {
   maxRounds: number;
   visibility: "PUBLIC" | "PRIVATE";
   lobbyState: "WAITING" | "IN_GAME" | "FINISHING";
+  // Optional: host display name shown as "by {host}" in the lobby list.
+  // The backend may not populate this yet — falls back gracefully when absent.
+  host?: string;
+  adminUsername?: string;
 }
 
 export interface MyLobbyDTO {
