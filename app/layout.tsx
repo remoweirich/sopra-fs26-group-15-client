@@ -5,6 +5,7 @@ import { WebSocketProvider } from "@/context/WebSocketContext";
 
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
+import FriendshipListener from "@/websockets/FriendshipListener";
 
 // Space Grotesk needs weight 800 for the bold hero/section titles
 // used across the SBB redesign. Without it the headings silently
@@ -54,7 +55,8 @@ export default function RootLayout({
       <body className={`${spaceGrotesk.className}`}>
         <WebSocketProvider>
           <AuthProvider>
-            <Navbar />
+              <FriendshipListener />
+              <Navbar />
             <main>{children}</main>
           </AuthProvider>
         </WebSocketProvider>
