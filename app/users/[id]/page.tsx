@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
+import {getApiDomain} from "@/utils/domain";
 
 type ProfileTab = "overview" | "games" | "friends" | "achievements";
 
@@ -27,6 +28,7 @@ const ProfilePage: React.FC = () => {
     const profileId = Number(useParams().id);
     const { user: currentUser, token, login, logout, isLoading } = useAuth();
 
+    const backendBase = getApiDomain()
     const [profileData, setProfileData] = useState<MyUserDTO | UserDTO | null>(null);
     const [editing, setEditing] = useState(false);
     const [tab, setTab] = useState<ProfileTab>("overview");
@@ -140,7 +142,7 @@ const ProfilePage: React.FC = () => {
     const playedRounds = scoreboard?.playedRounds ?? 0;
     const bestRound = scoreboard?.bestRoundPoints ?? 0;
     const precision = scoreboard?.guessingPrecision ?? 0;
-    const avgPoints = playedGames > 0 ? Math.round(totalPoints / playedGames) : 0;
+    const avgPoints = playedGames > 0 ? Math.round(totalPoints / playedRounds) : 0;
 
     const handleStartEdit = () => {
         setEditName(profileData.username || "");
@@ -267,7 +269,7 @@ const ProfilePage: React.FC = () => {
                 <div className="sbb-stat">
                     <div className="sbb-stat-icon">📊</div>
                     <div className="sbb-stat-value">{formatNumber(avgPoints)}</div>
-                    <div className="sbb-stat-label">Ø Pkt / Spiel</div>
+                    <div className="sbb-stat-label">Ø Pkt / Runde</div>
                 </div>
                 <div className="sbb-stat sbb-stat--green">
                     <div className="sbb-stat-icon">🎯</div>
@@ -367,7 +369,7 @@ const ProfilePage: React.FC = () => {
                                             }}
                                         >
                                             <img
-                                                src={achievement.iconUrl}
+                                                src={`${backendBase}${achievement.iconUrl}`}
                                                 alt={achievement.name}
                                                 style={{ width: 40, height: 40, objectFit: "contain", flexShrink: 0 }}
                                             />
