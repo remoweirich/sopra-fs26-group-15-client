@@ -33,6 +33,7 @@ export interface MyUserDTO {
   isGuest: boolean;     // ← neu
   isOnline: boolean;    // ← neu
   userScoreboard: UserScoreboard;
+  userAchievementDTOList?: UserAchievementDTO[]
   friends: UserDTO[];
 }
 
@@ -53,3 +54,17 @@ export interface UserResult {
   yCoordinate: number;
   distance: number;
 }
+
+export interface UserAchievementDTO {
+  achievement: Achievement;
+  unlockedAt: string;
+  userId: number;
+}
+
+export interface Achievement {
+  achievementId: number;
+  name: string;
+  description: string;
+  iconUrl: string;
+}
+

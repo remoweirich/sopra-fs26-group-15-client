@@ -217,7 +217,7 @@ const ProfilePage: React.FC = () => {
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
         { id: "games", icon: "🎮", label: "Spiele", count: DUMMY_HISTORY.length },
-        { id: "achievements", icon: "🏆", label: "Erfolge", count: "0/10" },
+        { id: "achievements", icon: "🏆", label: "Erfolge", count: `${(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0}/10` },
         ...(showFriends
             ? [{ id: "friends" as ProfileTab, icon: "👥", label: "Freunde" }]
             : []),
@@ -339,8 +339,54 @@ const ProfilePage: React.FC = () => {
 
                 {tab === "achievements" && (
                     <section className="profile-section">
-                        <div className="profile-section-head"><h2>🏆 Erfolge</h2></div>
-                        <div className="lb-empty">Noch keine Erfolge freigeschaltet.</div>
+                        <div className="profile-section-head">
+                            <h2>🏆 Erfolge</h2>
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--grey)", letterSpacing: "0.08em" }}>
+                            {(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0} freigeschaltet
+                            </span>
+                        </div>
+
+                        {(() => {
+                            const list = (profileData as Partial<MyUserDTO>).userAchievementDTOList ?? [];
+                            if (list.length === 0) {
+                                return <div className="lb-empty">Noch keine Erfolge freigeschaltet.</div>;
+                            }
+                            return (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                    {list.map(({ achievement, unlockedAt }) => (
+                                        <div
+                                            key={achievement.achievementId}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 16,
+                                                padding: "14px 16px",
+                                                background: "rgba(255,255,255,0.03)",
+                                                border: "1px solid var(--warm)",
+                                                borderRadius: 6,
+                                            }}
+                                        >
+                                            <img
+                                                src={achievement.iconUrl}
+                                                alt={achievement.name}
+                                                style={{ width: 40, height: 40, objectFit: "contain", flexShrink: 0 }}
+                                            />
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 15, color: "var(--black)" }}>
+                                                    {achievement.name}
+                                                </div>
+                                                <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--grey)", marginTop: 2 }}>
+                                                    {achievement.description}
+                                                </div>
+                                            </div>
+                                            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--grey)", whiteSpace: "nowrap", flexShrink: 0 }}>
+                                                {new Date(unlockedAt).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </section>
                 )}
 
