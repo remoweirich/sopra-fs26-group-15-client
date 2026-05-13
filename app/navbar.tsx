@@ -129,7 +129,7 @@ export default function Navbar() {
                   className={`navbar-link ${isActive("/lobbies") ? "is-active" : ""}`}
                   onClick={() => go("/lobbies")}
                 >
-                  Züge
+                  Lobbies
                 </button>
                 <button
                   className={`navbar-link ${isActive("/leaderboard") ? "is-active" : ""}`}
@@ -206,7 +206,7 @@ export default function Navbar() {
               className={`navbar-drawer-link ${isActive("/lobbies") ? "is-active" : ""}`}
               onClick={() => go("/lobbies")}
             >
-              Züge
+              Lobbies
             </button>
             <button
               className={`navbar-drawer-link ${isActive("/leaderboard") ? "is-active" : ""}`}
