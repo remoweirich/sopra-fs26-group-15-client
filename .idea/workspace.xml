@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat(Achievements): Display achievements in the user page">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: change url">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/users/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/users/[id]/page.tsx" afterDir="false" />
     </list>
@@ -46,7 +46,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
-    &quot;accountId&quot;: &quot;6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f&quot;
+    &quot;accountId&quot;: &quot;b7bb69f4-867a-425b-873b-42f0cdfe52de&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -118,7 +118,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-WS-261.22158.274" />
       </set>
     </attachedChunks>
   </component>
@@ -156,12 +156,6 @@
       <workItem from="1776702584032" duration="3717000" />
       <workItem from="1776775376427" duration="3659000" />
       <workItem from="1778046333371" duration="603000" />
-      <workItem from="1778051590571" duration="342000" />
-      <workItem from="1778052141196" duration="1702000" />
-      <workItem from="1778067411471" duration="6605000" />
-      <workItem from="1778589579844" duration="7316000" />
-      <workItem from="1778653268965" duration="3702000" />
-      <workItem from="1778668217039" duration="5229000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -347,31 +341,7 @@
       <option name="project" value="LOCAL" />
       <updated>1778023574358</updated>
     </task>
-    <task id="LOCAL-00024" summary="chore(contributions): add my contributions.md">
-      <option name="closed" value="true" />
-      <created>1778052222653</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1778052222653</updated>
-    </task>
-    <task id="LOCAL-00025" summary="chore(contributions): add my contributions.md">
-      <option name="closed" value="true" />
-      <created>1778599854106</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1778599854106</updated>
-    </task>
-    <task id="LOCAL-00026" summary="feat(Achievements): Display achievements in the user page">
-      <option name="closed" value="true" />
-      <created>1778670725023</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1778670725023</updated>
-    </task>
-    <option name="localTasksCounter" value="27" />
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -411,9 +381,7 @@
     <MESSAGE value="feat: migrate app with new implementation npm install" />
     <MESSAGE value="feat: change semantic release npm version" />
     <MESSAGE value="fix: change url" />
-    <MESSAGE value="chore(contributions): add my contributions.md" />
-    <MESSAGE value="feat(Achievements): Display achievements in the user page" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(Achievements): Display achievements in the user page" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: change url" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

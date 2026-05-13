@@ -354,35 +354,20 @@ const ProfilePage: React.FC = () => {
                                 return <div className="lb-empty">Noch keine Erfolge freigeschaltet.</div>;
                             }
                             return (
-                                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
                                     {list.map(({ achievement, unlockedAt }) => (
-                                        <div
-                                            key={achievement.achievementId}
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 16,
-                                                padding: "14px 16px",
-                                                background: "rgba(255,255,255,0.03)",
-                                                border: "1px solid var(--warm)",
-                                                borderRadius: 6,
-                                            }}
-                                        >
+                                        <div key={achievement.achievementId} className="profile-history-row">
                                             <img
                                                 src={`${backendBase}${achievement.iconUrl}`}
                                                 alt={achievement.name}
-                                                style={{ width: 40, height: 40, objectFit: "contain", flexShrink: 0 }}
+                                                style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }}
                                             />
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 15, color: "var(--black)" }}>
-                                                    {achievement.name}
-                                                </div>
-                                                <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--grey)", marginTop: 2 }}>
-                                                    {achievement.description}
-                                                </div>
+                                            <div className="profile-history-info">
+                                                <div className="profile-history-score">{achievement.name}</div>
+                                                <div className={"profile-history-meta"}>{new Date(unlockedAt).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })}</div>
                                             </div>
-                                            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--grey)", whiteSpace: "nowrap", flexShrink: 0 }}>
-                                                {new Date(unlockedAt).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })}
+                                            <div className="profile-history-meta">
+                                                <div className="profile-history-name">{achievement.description}</div>
                                             </div>
                                         </div>
                                     ))}
