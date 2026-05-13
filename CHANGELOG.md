@@ -1,3 +1,20 @@
+# [1.3.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.2.0...v1.3.0) (2026-05-13)
+
+
+### Bug Fixes
+
+* **navbar:** update button labels from "Züge" to "Lobbies" ([d53f78a](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/d53f78a0ba98ccb89af0b760e3cdbdad28bcee09))
+* **user:** allowed to look at profile without being logged in ([f135877](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f1358774edfb8ed0ae1b44526a2135a7e44acae6))
+
+
+### Features
+
+* **client:** complete SBB design redesign across all pages ([b8e8bd6](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/b8e8bd6ba47589fb3a8cdd9c2bb9e88eabc9169e)), closes [#EB0000](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/EB0000)
+* displaying snarky comments based on player guess distance [#37](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/37) ([e0f591e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/e0f591e8d664e99379a96bfb5c379c189011124b))
+* implement shared colors for player pins based on hash function; fix sorting of userscores [#36](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/36) ([80b00be](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/80b00bef401090a4466e7d09a85d1f471d872ded))
+* **userPage:** Reintegrated into new frontend. Also pending request are now shown in own profile. Accept button works [#40](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/40) ([b922207](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/b9222078634c9c5e17ec5b0fa690a4895cfc794a))
+* **userPage:** WebSocketConnection/PersonalTopicSubscription for notifications [#40](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/40) ([f653398](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f653398f5076a79f4131da8ec8a91e67b2138aa5))
+
 # [1.2.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.1.1...v1.2.0) (2026-05-11)
 
 
