@@ -4,14 +4,16 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useWebSocket } from "@/context/WebSocketContext";
+import { useApi } from "@/hooks/useApi";
 import { Train } from "@/types/train";
+import ResyncDTO  from "@/types/resyncDTO";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { RMap, RMarker } from "maplibre-react-components";
 import { MapLayerMouseEvent, MapLayerTouchEvent } from "maplibre-gl";
 import RoundOverview from "./RoundOverview";
 import LoadingScreen from "./LoadingScreen";
 import { latLngToEpsg, epsgToLatLng } from "./coordinateConverter";
-import { GameMessage } from "@/types/gameMessage";
+import { GameMessage, ResultDTO, RoundStartDTO } from "@/types/gameMessage";
 import { UserResult } from "@/types/user";
 import SBBClock from "./SBBClock";
 import { playerColors } from "@/utils/colors";
@@ -21,8 +23,9 @@ type GameState = "ROUND_IN_PROGRESS" | "LOADING" | "BETWEEN_ROUNDS" | "GAME_ENDE
 const GamePage: React.FC = () => {
   const router = useRouter();
   const { id: gameId } = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user: currentUser, token, login, logout, isLoading } = useAuth();
   const { subscribe, publish, isConnected } = useWebSocket();
+  const apiService = useApi();
 
   const [gameState, setGameState] = useState<GameState | null>("LOADING");
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -79,7 +82,7 @@ const GamePage: React.FC = () => {
     const [x, y] = latLngToEpsg(lat, lon);
     const payload = {
       lobbyId: Number(gameId),
-      userId: user!.userId,
+      userId: currentUser!.userId,
       xCoordinate: x,
       yCoordinate: y,
     };
@@ -116,6 +119,7 @@ const GamePage: React.FC = () => {
     return () => clearInterval(timer);
   }, [gameState, timerActive]);
 
+  const maxRoundsRef = useRef(maxRounds);
   // ── WebSocket handler ───────────────────────────────────────────────────
   const handleMessage = useCallback((message: GameMessage) => {
     const {
@@ -126,7 +130,7 @@ const GamePage: React.FC = () => {
 
     switch (message.type) {
       case "ROUND_START":
-        secondsRef.current = 45;
+        
         setGuessSubmitted(false);
         setClickPosition(null);
         setCurrentTrain(message.payload.train);
@@ -141,8 +145,16 @@ const GamePage: React.FC = () => {
         }
         setCurrentRound(message.payload.roundNumber);
         setMaxRounds(message.payload.maxRounds);
+        maxRoundsRef.current = message.payload.maxRounds;
         setGameState("ROUND_IN_PROGRESS");
-        setSecondsRemaining(45);
+        if (reloadTimer.current) {
+          setSecondsRemaining(reloadTimer.current);
+          secondsRef.current = reloadTimer.current;
+        }
+        else {
+          setSecondsRemaining(45);
+          secondsRef.current = 45;
+        }
         setTimerActive(true);
         break;
 
@@ -162,6 +174,9 @@ const GamePage: React.FC = () => {
           const [trainLat, trainLon] = epsgToLatLng(trainPayload.currentX, trainPayload.currentY);
           const train = { ...trainPayload, currentX: trainLat, currentY: trainLon };
           setCurrentTrain(train);
+          setCurrentRound(message.payload.currentRound);
+          reloadTimer.current = null;
+          setMaxRounds(maxRoundsRef.current); 
         }
         setGameState("BETWEEN_ROUNDS");
         break;
@@ -174,7 +189,24 @@ const GamePage: React.FC = () => {
   // WebSocket flicker after the initial /ready means we re-subscribe but
   // never re-announce, and the server has nothing pending to broadcast.
   const roundStarted = useRef(false);
+  const isReload = useRef(false);
+  
+  //detecting reload
   useEffect(() => {
+    const key = `game-${gameId}-visited`;
+    isReload.current = sessionStorage.getItem(key) === "true";
+    sessionStorage.setItem(key, "true");
+
+    const handleBeforeUnload = () => {
+        sessionStorage.setItem(key, "true");
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+}, [gameId]);
+
+const reloadTimer = useRef<number | null>(null);
+
+useEffect(() => {
     if (!isConnected) return;
     console.log(`[Game] Subscribing to /topic/game/${gameId}`);
     const subscription = subscribe<GameMessage>(`/topic/game/${gameId}`, (update) => {
@@ -183,13 +215,46 @@ const GamePage: React.FC = () => {
       handleMessage(update);
     });
 
-    // Delay the /ready publish briefly so the SUBSCRIBE frame is fully
-    // registered server-side first — otherwise the server's ROUND_START
-    // response can be broadcast before this client is listening.
     if (!roundStarted.current) {
-      const t = setTimeout(() => {
-        console.log(`[Game] Publishing /ready to /app/game/${gameId}/ready`);
-        publish(`/app/game/${gameId}/ready`, {});
+      const t = setTimeout(async () => {
+        if (isReload.current) {
+          isReload.current = false;
+          try {
+            const data = await apiService.get<ResyncDTO>(
+              `/game/${gameId}/resync`,
+              {
+                headers: {
+                  token: token ?? "",
+                  userId: currentUser?.userId?.toString() ?? "",
+                },
+              }
+            );
+            if (data.type === "ROUND_START") {
+              reloadTimer.current = data.remainingTime;
+              roundStarted.current = true;
+              handleMessage({
+                type: "ROUND_START",
+                payload: data.payload as RoundStartDTO,
+              });
+              
+              
+            } else if (data.type === "SCORES") {
+              roundStarted.current = true;
+              maxRoundsRef.current = data.maxRounds;
+              setMaxRounds(data.maxRounds);
+              handleMessage({
+                type: "SCORES",
+                payload: data.payload as ResultDTO,
+              });
+            }
+          } catch (err) {
+            console.error("[Game] Resync failed:", err);
+            publish(`/app/game/${gameId}/ready`, {});
+          }
+        } else {
+          console.log(`[Game] Publishing /ready to /app/game/${gameId}/ready`);
+          publish(`/app/game/${gameId}/ready`, {});
+        }
       }, 250);
       return () => {
         clearTimeout(t);
@@ -200,6 +265,7 @@ const GamePage: React.FC = () => {
       if (subscription) subscription.unsubscribe();
     };
   }, [isConnected, subscribe, publish, gameId, handleMessage]);
+
 
   // ── Map click handlers ──────────────────────────────────────────────────
   const handleMapClick = (e: MapLayerMouseEvent) => setClickPosition(e.lngLat.toArray());
@@ -213,7 +279,7 @@ const GamePage: React.FC = () => {
         train={currentTrain}
         results={results?.userResults || []}
         currentRound={currentRound}
-        maxRounds={maxRounds}
+        maxRounds={maxRoundsRef.current}
         publish={publish}
         getPlayerColor={getPlayerColor}
       />
