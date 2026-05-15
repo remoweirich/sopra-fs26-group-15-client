@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { UserAuthDTO } from "@/types/user";
 import LobbyLoadingScreen from "./LobbyLoadingScreen";
 import { playerColors } from "@/utils/colors";
+import {StompSubscription} from "@stomp/stompjs";
 
 // Pick a stable color from the playerColors palette for a given username.
 // Same string always gets the same color across rerenders without needing
@@ -65,16 +66,23 @@ const LobbyWaitPage: React.FC = () => {
   useEffect(() => {
     if (!isConnected || !lobbyId) return;
     console.log(`[LobbyRoom] Subscribing to /topic/lobby/${lobbyId}`);
-    const subscription = subscribe<LobbyMessage>(`/topic/lobby/${lobbyId}`, (msg) => {
-      console.log("[LobbyRoom] WS message:", msg);
-      if (msg.type === "LOBBY_STATE") {
-        setLobby(msg.payload);
-      } else if (msg.type === "GAME_START") {
-        console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
-        router.push(`/game/${lobbyId}`);
-      }
-    });
+
+    let subscription: StompSubscription | undefined;
+
+    const t = setTimeout(() => {
+      subscription = subscribe<LobbyMessage>(`/topic/lobby/${lobbyId}`, (msg) => {
+        console.log("[LobbyRoom] WS message:", msg);
+        if (msg.type === "LOBBY_STATE") {
+          setLobby(msg.payload);
+        } else if (msg.type === "GAME_START") {
+          console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
+          router.push(`/game/${lobbyId}`);
+        }
+      });
+    }, 150);
+
     return () => {
+      clearTimeout(t);
       subscription?.unsubscribe();
     };
   }, [isConnected, lobbyId, router, subscribe]);
