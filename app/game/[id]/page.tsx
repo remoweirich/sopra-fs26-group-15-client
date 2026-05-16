@@ -168,6 +168,16 @@ const GamePage: React.FC = () => {
     }
   }, []);
 
+  // Keep latest handleMessage in a ref so the subscribe-effect below does
+  // NOT depend on it. Otherwise any re-render that re-creates handleMessage
+  // would tear down + re-create the STOMP subscription, and with the
+  // RabbitMQ relay broker on live the new SUBSCRIBE can race against an
+  // inflight ROUND_START broadcast — exactly the "loads forever" symptom.
+  const handleMessageRef = useRef(handleMessage);
+  useEffect(() => {
+    handleMessageRef.current = handleMessage;
+  }, [handleMessage]);
+
   // ── WebSocket subscribe ─────────────────────────────────────────────────
   // Track whether ROUND_START has actually been received — controls whether
   // we keep re-publishing /ready on every (re)connect. Without this, a
@@ -180,17 +190,21 @@ const GamePage: React.FC = () => {
     const subscription = subscribe<GameMessage>(`/topic/game/${gameId}`, (update) => {
       console.log("[Game] WS message received:", update);
       if (update.type === "ROUND_START") roundStarted.current = true;
-      handleMessage(update);
+      handleMessageRef.current(update);
     });
 
-    // Delay the /ready publish briefly so the SUBSCRIBE frame is fully
-    // registered server-side first — otherwise the server's ROUND_START
-    // response can be broadcast before this client is listening.
+    // Delay the /ready publish so the SUBSCRIBE frame is fully propagated
+    // through the STOMP relay (RabbitMQ on live) before the server can
+    // broadcast ROUND_START back. 250ms is too tight over real network
+    // links — 1500ms gives the relay enough headroom even on slow
+    // mobile connections. Locally with the SimpleBroker this delay is
+    // irrelevant; on live it's the difference between "loads forever"
+    // and a clean start.
     if (!roundStarted.current) {
       const t = setTimeout(() => {
         console.log(`[Game] Publishing /ready to /app/game/${gameId}/ready`);
         publish(`/app/game/${gameId}/ready`, {});
-      }, 250);
+      }, 1500);
       return () => {
         clearTimeout(t);
         if (subscription) subscription.unsubscribe();
@@ -199,7 +213,7 @@ const GamePage: React.FC = () => {
     return () => {
       if (subscription) subscription.unsubscribe();
     };
-  }, [isConnected, subscribe, publish, gameId, handleMessage]);
+  }, [isConnected, subscribe, publish, gameId]);
 
   // ── Map click handlers ──────────────────────────────────────────────────
   const handleMapClick = (e: MapLayerMouseEvent) => setClickPosition(e.lngLat.toArray());
