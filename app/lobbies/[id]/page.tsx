@@ -36,6 +36,7 @@ const LobbyWaitPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [connectionWarning, setConnectionWarning] = useState<string | null>(null);
   const webSocket = useWebSocket();
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -57,6 +58,7 @@ const LobbyWaitPage: React.FC = () => {
   // ── Reconnect if needed ──────────────────────────────────────────────────
   useEffect(() => {
     if (!isConnected && token && currentUser) {
+      setIsSubscribed(false);
       connect(currentUser.userId.toString(), token);
     }
   }, [isConnected, token, currentUser, connect]);
@@ -65,6 +67,7 @@ const LobbyWaitPage: React.FC = () => {
   useEffect(() => {
     if (!isConnected || !lobbyId) return;
     console.log(`[LobbyRoom] Subscribing to /topic/lobby/${lobbyId}`);
+    setIsSubscribed(true);
     const subscription = subscribe<LobbyMessage>(`/topic/lobby/${lobbyId}`, (msg) => {
       console.log("[LobbyRoom] WS message:", msg);
       if (msg.type === "LOBBY_STATE") {
@@ -76,6 +79,7 @@ const LobbyWaitPage: React.FC = () => {
     });
     return () => {
       subscription?.unsubscribe();
+      setIsSubscribed(false);
     };
   }, [isConnected, lobbyId, router, subscribe]);
 
@@ -245,27 +249,31 @@ const LobbyWaitPage: React.FC = () => {
                   }}
                   aria-label="Verbunden"
                 >
+                  {isMe && (
+                  <>  
                   <span
                     style={{
                       width: 9,
                       height: 9,
                       borderRadius: "50%",
-                      background: "var(--green)",
+                      background: isSubscribed ? "var(--green)" : "var(--red)",
                       boxShadow: "0 0 0 2px rgba(45,106,79,0.22)",
                     }}
                   />
+                  
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: 10,
                       fontWeight: 700,
-                      color: "var(--green)",
+                      color: isSubscribed ? "var(--green)" : "var(--red)",
                       letterSpacing: "0.06em",
                       textTransform: "uppercase",
                     }}
                   >
-                    Verbunden
+                    {isSubscribed ? "VERBUNDEN" : "NICHT VERBUNDEN"}
                   </span>
+                </>)}
                 </div>
               </div>
             );
