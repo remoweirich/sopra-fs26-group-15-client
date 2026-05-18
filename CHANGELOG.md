@@ -1,3 +1,11 @@
+## [1.3.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.3.0...v1.3.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* on unintentional websocket disconnect flag isConnected is set to false ([14c346c](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/14c346c0484cb25adc1147f073ff4951e03ce3f5))
+* send a rest request to resync if a player refreshes the browser in game, synchronize remaining time, rounds and results [#79](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/79) ([ed8cce1](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ed8cce1328b0eee3a49009584b135890d0a46c17))
+
 # [1.3.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.2.0...v1.3.0) (2026-05-13)
 
 
