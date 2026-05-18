@@ -44,12 +44,18 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setIsConnected(true);
       },
       onDisconnect: () => {
-        console.log("WebSocket disconnected");
+        console.log("WebSocket disconnected (intentionally)");
         setIsConnected(false);
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame);
+        setIsConnected(false);
       },
+      onWebSocketClose: () => {
+        console.log("WebSocket disconnected (connection lost)");
+
+      setIsConnected(false);
+    },
     });
 
     client.activate();
