@@ -6,7 +6,7 @@ import { App as AntdApp } from "antd";
 
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
-import FriendshipListener from "@/websockets/FriendshipListener";
+import NotificationListener from "@/websockets/NotificationListener";
 
 // Space Grotesk needs weight 800 for the bold hero/section titles
 // used across the SBB redesign. Without it the headings silently
@@ -57,7 +57,7 @@ export default function RootLayout({
         <WebSocketProvider>
             <AuthProvider>
                 <AntdApp>
-                    <FriendshipListener />
+                    <NotificationListener />
                     <Navbar />
                     <main>{children}</main>
                 </AntdApp>
