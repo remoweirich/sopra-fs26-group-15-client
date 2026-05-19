@@ -132,6 +132,22 @@ const LobbiesPage: React.FC = () => {
     }
   };
 
+  const fetchLobbies = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.get<Lobby[]>("/lobbies");
+      setLobbies(response);
+    } catch (error) {
+      console.error("Error fetching lobbies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLobbies();
+  }, [apiService]);
+
   return (
     <div className="page-root">
       <div className="section-head">
@@ -140,13 +156,23 @@ const LobbiesPage: React.FC = () => {
             <span className="label">Abfahrt / Departures</span>
             <h1>Offene Lobbies</h1>
           </div>
-          <button
-            className="sbb-btn sbb-btn--primary sbb-btn--sm"
-            onClick={handleCreateNewLobby}
-            type="button"
-          >
-            + Neu
-          </button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button
+              className="sbb-btn sbb-btn--secondary sbb-btn--sm"
+              onClick={() => fetchLobbies()}
+              type="button"
+              aria-label="Lobbies aktualisieren"
+            >
+              ↻
+            </button>
+            <button
+              className="sbb-btn sbb-btn--primary sbb-btn--sm"
+              onClick={handleCreateNewLobby}
+              type="button"
+            >
+              + Neu
+            </button>
+          </div>
         </div>
       </div>
 
