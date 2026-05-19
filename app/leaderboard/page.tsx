@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
 import { UserDTO } from "@/types/user";
+import {router} from "next/client";
 
 type Tab = "weekly" | "alltime";
 type SortKey = "totalPoints" | "playedGames" | "guessingPrecision";
@@ -223,7 +224,16 @@ const LeaderboardInner: React.FC = () => {
                         >
                           {/* Schützt das Layout vor zu langen Namen */}
                           <span style={{ flexGrow: 1, textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
-                            {p.username}
+                            <Link
+                                href={`/users/${p.userId}`}
+                                style={{
+                                  color: "inherit",
+                                  textDecoration: "none",
+                                }}
+                                className="lb-user-link"
+                            >
+                              {p.username}
+                            </Link>
                           </span>
 
                           {user && !isMe && !(friends.includes(p.userId)) ? (
