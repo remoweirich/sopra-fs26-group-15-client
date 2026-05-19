@@ -2832,6 +2832,333 @@ img, svg { display: block; max-width: 100%; }
   }
 }
 
+/* ── PROFILE ─────────────────────────────────────────────────────────────── */
+
+.profile-root {
+  min-height: 100vh;
+  background: var(--cream);
+  padding-top: var(--nav-h);
+}
+
+.profile-head {
+  background: var(--black);
+  padding: 26px 28px 28px;
+}
+
+.profile-head-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.profile-avatar {
+  width: 68px;
+  height: 68px;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: 30px;
+  color: var(--white);
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: 0 4px 18px rgba(235,0,0,0.35);
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.profile-name {
+  font-family: var(--font-sans);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.profile-status-online {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(45,140,92,0.18);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.profile-status-online span:last-child {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--green);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-status-online span:first-child {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulseDot 1.6s ease-in-out infinite;
+}
+
+.profile-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--grey-l);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.profile-bio-shell {
+  max-width: 1000px;
+  margin: 14px auto 0;
+  padding-left: 88px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.55;
+}
+
+.profile-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 28px 0;
+}
+
+.profile-tabs {
+  position: sticky;
+  top: var(--nav-h);
+  background: var(--cream);
+  z-index: 5;
+  margin-top: 30px;
+  box-shadow: 0 1px 0 var(--warm);
+}
+
+.profile-tabs-shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  gap: 6px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.profile-tab {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey);
+  padding: 14px 18px;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: color 0.18s;
+}
+
+.profile-tab.is-active {
+  color: var(--black);
+  font-weight: 800;
+}
+
+.profile-tab.is-active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  background: var(--red);
+  border-radius: 3px 3px 0 0;
+}
+
+.profile-tab-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: rgba(232,226,217,0.8);
+  color: var(--grey);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.profile-tab.is-active .profile-tab-count {
+  background: var(--red);
+  color: var(--white);
+}
+
+.profile-body {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 28px 50px;
+}
+
+.profile-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.profile-detail-stat {
+  background: var(--white);
+  padding: 14px 16px;
+  border-left: 3px solid var(--charcoal);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.profile-detail-stat-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.profile-detail-stat-v {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--black);
+  letter-spacing: -0.02em;
+}
+
+.profile-detail-stat-l {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--grey);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.profile-section {
+  margin-bottom: 40px;
+}
+
+.profile-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-section-head h2 {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--black);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.profile-history-row {
+  background: var(--white);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border-left: 3px solid var(--warm);
+}
+
+.profile-history-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.profile-history-info { flex: 1; min-width: 0; }
+
+.profile-history-name {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 2px;
+}
+
+.profile-history-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--grey);
+  letter-spacing: 0.06em;
+}
+
+.profile-history-score {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--black);
+}
+
+.profile-friends-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.profile-friend-card {
+  background: var(--white);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-left: 3px solid var(--warm);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.profile-friend-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.profile-friend-name {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--black);
+}
+
+.profile-friend-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--grey);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    15. ANIMATIONS
    ═══════════════════════════════════════════════════════════════════════════ */
