@@ -953,6 +953,332 @@ img, svg { display: block; max-width: 100%; }
   margin: 8px 0;
 }
 
+/* ── Navbar: Notification Center ─────────────────────────────────────────── */
+ 
+.navbar-notif-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  padding: 7px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.14s;
+  margin-right: 2px;
+}
+ 
+.navbar-notif-btn:hover { background: rgba(255,255,255,0.16); }
+ 
+.navbar-notif-badge {
+  position: absolute;
+  top: -3px;
+  right: -5px;
+  background: var(--white);
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+ 
+.navbar-notif-backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: default;
+  z-index: 1099;
+}
+ 
+.navbar-notif-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: -40px;
+  width: 360px;
+  max-height: 440px;
+  overflow-y: auto;
+  background: var(--white);
+  border-top: 4px solid var(--red);
+  box-shadow: var(--shadow-elev);
+  z-index: 1100;
+  animation: modalIn 0.2s ease both;
+  scrollbar-width: thin;
+}
+ 
+.navbar-notif-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--warm);
+  position: sticky;
+  top: 0;
+  background: var(--white);
+  z-index: 1;
+}
+ 
+.navbar-notif-head-title {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+ 
+.navbar-notif-count {
+  background: var(--red);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+ 
+.navbar-notif-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--warm);
+  align-items: flex-start;
+  transition: background 0.12s;
+}
+ 
+.navbar-notif-item:last-child { border-bottom: none; }
+.navbar-notif-item:hover { background: rgba(0,0,0,0.015); }
+ 
+.navbar-notif-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+ 
+.navbar-notif-icon--friend { background: rgba(43,108,176,0.12); }
+.navbar-notif-icon--game   { background: rgba(235,0,0,0.08); }
+.navbar-notif-icon--achieve { background: rgba(200,150,12,0.14); }
+.navbar-notif-icon--info   { background: rgba(139,132,128,0.12); }
+ 
+.navbar-notif-info {
+  flex: 1;
+  min-width: 0;
+}
+ 
+.navbar-notif-text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--black);
+  line-height: 1.45;
+  margin-bottom: 2px;
+}
+ 
+.navbar-notif-text strong { font-weight: 700; }
+ 
+.navbar-notif-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+ 
+.navbar-notif-accept,
+.navbar-notif-reject {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.14s ease;
+  padding: 0;
+}
+ 
+.navbar-notif-accept {
+  background: rgba(45,106,79,0.12);
+  color: var(--green);
+}
+ 
+.navbar-notif-accept:hover {
+  background: var(--green);
+  color: var(--white);
+  transform: scale(1.1);
+}
+ 
+.navbar-notif-reject {
+  background: rgba(139,132,128,0.10);
+  color: var(--grey);
+}
+ 
+.navbar-notif-reject:hover {
+  background: rgba(235,0,0,0.10);
+  color: var(--red);
+  transform: scale(1.1);
+}
+ 
+.navbar-notif-time {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--grey-l);
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+ 
+.navbar-notif-empty {
+  padding: 32px 18px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--grey);
+  letter-spacing: 0.06em;
+}
+ 
+/* Mobile: full-width dropdown */
+@media (max-width: 480px) {
+  .navbar-notif-dropdown {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: calc(100vh - var(--nav-h));
+    border-top-width: 3px;
+  }
+}
+ 
+@media (min-width: 481px) and (max-width: 767px) {
+  .navbar-notif-dropdown {
+    right: -20px;
+    width: 320px;
+  }
+}
+
+/* ── Ant Design Notification Override (SBB Style) ────────────────────────── */
+.ant-notification-notice {
+  background: var(--white) !important;
+  border-top: 4px solid var(--red) !important;
+  border-radius: 0 !important;
+  box-shadow: var(--shadow-elev) !important;
+  padding: 16px 18px !important;
+}
+
+.ant-notification-notice-title {
+  font-family: var(--font-sans) !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  color: var(--black) !important;
+  letter-spacing: -0.01em !important;
+}
+
+.ant-notification-notice-description {
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  color: var(--charcoal) !important;
+  line-height: 1.45 !important;
+}
+
+.ant-notification-notice-icon-info {
+  color: var(--red) !important;
+}
+
+.ant-notification-notice-close {
+  color: var(--grey) !important;
+  transition: color 0.14s !important;
+}
+
+.ant-notification-notice-close:hover {
+  color: var(--red) !important;
+}
+
+.ant-notification-notice-actions {
+  margin-top: 10px !important;
+}
+
+/* ── Notification + Toast: Mobile (≤ 480px) ──────────────────────────────── */
+@media (max-width: 480px) {
+  .navbar-notif-dropdown {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: calc(100vh - var(--nav-h));
+    border-top-width: 3px;
+  }
+
+  .navbar-notif-head { padding: 12px 16px; }
+
+  .navbar-notif-item { padding: 12px 16px; gap: 10px; }
+
+  .navbar-notif-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .navbar-notif-text { font-size: 12px; }
+
+  .navbar-notif-accept,
+  .navbar-notif-reject {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+  /* Toast: full-width on mobile */
+  .ant-notification {
+    width: calc(100% - 24px) !important;
+    margin-right: 12px !important;
+  }
+
+  .ant-notification-notice {
+    padding: 12px 14px !important;
+  }
+
+  .ant-notification-notice-title { font-size: 13px !important; }
+  .ant-notification-notice-description { font-size: 12px !important; }
+}
+
+/* ── Notification: small mobile (≤ 320px) ────────────────────────────────── */
+@media (max-width: 320px) {
+  .navbar-notif-btn { padding: 5px; }
+  .navbar-notif-badge { font-size: 8px; min-width: 14px; height: 14px; }
+
+  .navbar-notif-item { padding: 10px 12px; gap: 8px; }
+
+  .navbar-notif-icon {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .navbar-notif-text { font-size: 11px; }
+  .navbar-notif-time { font-size: 8px; }
+
+  .navbar-notif-accept,
+  .navbar-notif-reject {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    9. HOME PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -3253,7 +3579,9 @@ img, svg { display: block; max-width: 100%; }
 
 /* ── Mobile portrait (≤ 480px) ───────────────────────────────────────────── */
 @media (max-width: 480px) {
-  .navbar-nav { display: none; }
+  .navbar-nav .navbar-link,
+  .navbar-nav .navbar-logout,
+  .navbar-nav .navbar-login { display: none; }
   .navbar-burger { display: flex; }
   .navbar-col-center { display: none; }
   .navbar-shell { padding: 0 14px; }
@@ -3337,7 +3665,9 @@ img, svg { display: block; max-width: 100%; }
 
 /* ── Mobile landscape / large phone (481px – 767px) ──────────────────────── */
 @media (min-width: 481px) and (max-width: 767px) {
-  .navbar-nav { display: none; }
+  .navbar-nav .navbar-link,
+  .navbar-nav .navbar-logout,
+  .navbar-nav .navbar-login { display: none; }
   .navbar-burger { display: flex; }
   .navbar-col-center { display: none; }
 

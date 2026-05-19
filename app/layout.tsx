@@ -7,6 +7,8 @@ import { App as AntdApp } from "antd";
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
 import NotificationListener from "@/websockets/NotificationListener";
+import { NotificationProvider } from "@/context/NotificationContext";
+
 
 // Space Grotesk needs weight 800 for the bold hero/section titles
 // used across the SBB redesign. Without it the headings silently
@@ -55,13 +57,15 @@ export default function RootLayout({
           variables let other elements opt into the mono via CSS var. */}
       <body className={`${spaceGrotesk.className}`}>
         <WebSocketProvider>
-            <AuthProvider>
-                <AntdApp>
-                    <NotificationListener />
-                    <Navbar />
-                    <main>{children}</main>
-                </AntdApp>
-            </AuthProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <AntdApp>
+                <NotificationListener />
+                <Navbar />
+                <main>{children}</main>
+              </AntdApp>
+            </NotificationProvider>
+          </AuthProvider>
         </WebSocketProvider>
       </body>
     </html>
