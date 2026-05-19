@@ -215,6 +215,21 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    const handleReject = async (requestingUserId: number) => {
+        try {
+            await apiService.post(`/friends/reject/${requestingUserId}`,
+                {},
+                {
+                    headers: { userId: profileId.toString(), token: token ?? "" }
+                });
+
+            await refreshFriends();
+
+        } catch (error) {
+            console.error("Error when reject request:", error);
+        }
+    };
+
 
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
@@ -413,6 +428,11 @@ const ProfilePage: React.FC = () => {
                                             <div key={req.userId} className="profile-history-row">
                                                 <div className="profile-history-info"><div className="profile-history-name">{req.username}</div><div className="profile-history-meta">Möchte dein Freund sein</div></div>
                                                 <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => {handleAccept(req.userId)}}>Annehmen</button>
+                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm"
+                                                        onClick={() => {handleReject(req.userId)}}
+                                                        style={{ background: "grey", borderColor: "black" }}
+                                                >Ablehnen
+                                                </button>
                                             </div>
                                         ))}
                                     </div>

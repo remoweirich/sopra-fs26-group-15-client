@@ -7,4 +7,5 @@ export interface FriendRequestDTO {
 export type notificationMessage =
     | { type: "FRIEND_REQUEST"; payload: FriendRequestDTO }
     | { type: "FRIEND_ACCEPT"; payload: FriendRequestDTO }
+    | { type: "FRIEND_REJECT"; payload: FriendRequestDTO };
 

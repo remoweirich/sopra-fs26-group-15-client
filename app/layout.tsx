@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { WebSocketProvider } from "@/context/WebSocketContext";
+import { App as AntdApp } from "antd";
 
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
@@ -54,11 +55,13 @@ export default function RootLayout({
           variables let other elements opt into the mono via CSS var. */}
       <body className={`${spaceGrotesk.className}`}>
         <WebSocketProvider>
-          <AuthProvider>
-              <FriendshipListener />
-              <Navbar />
-            <main>{children}</main>
-          </AuthProvider>
+            <AuthProvider>
+                <AntdApp>
+                    <FriendshipListener />
+                    <Navbar />
+                    <main>{children}</main>
+                </AntdApp>
+            </AuthProvider>
         </WebSocketProvider>
       </body>
     </html>
