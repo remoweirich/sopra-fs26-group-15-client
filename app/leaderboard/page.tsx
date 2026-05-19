@@ -7,7 +7,7 @@ import { useApi } from "@/hooks/useApi";
 import { UserDTO } from "@/types/user";
 
 type Tab = "weekly" | "alltime";
-type SortKey = "totalPoints" | "playedGames";
+type SortKey = "totalPoints" | "playedGames" | "guessingPrecision";
 
 const LeaderboardInner: React.FC = () => {
   const { user, token } = useAuth();
@@ -19,6 +19,7 @@ const LeaderboardInner: React.FC = () => {
   const [rows, setRows] = useState<UserDTO[]>([]);
   const [top3, setTop3] = useState<UserDTO[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("totalPoints");
+  const [friends, setFriends] = useState<number[]>([]);
 
   const podiumColors = ["var(--gold)", "var(--grey-l)", "#CD7F32"];
 
@@ -47,6 +48,7 @@ const LeaderboardInner: React.FC = () => {
             `/users/search?username=${encodeURIComponent(search)}`
         );
         setRows(data ?? []);
+        console.log(data);
       } catch (err) {
         console.error("Search failed", err);
       } finally {
@@ -56,6 +58,31 @@ const LeaderboardInner: React.FC = () => {
 
     return () => clearTimeout(debounce);
   }, [search, tab, apiService]);
+
+  useEffect(() => {
+    if (!user || !token) return;
+    const getFriends = async () => {
+    try {
+      const data = await apiService.get<UserDTO[]>(
+          `/friends/${user?.userId}`,
+          {
+            headers : { userId: user.userId.toString() ?? "", token: token ?? ""}
+          }
+      );
+      const friendIdList: number[] = [];
+      for (let i = 0; i<data.length; i++) {
+        const friend = data.at(i)
+        if (friend != null) {
+          friendIdList.push(friend.userId);
+        }
+      }
+      setFriends(friendIdList);
+      console.log("Friends: ", friendIdList);
+    } catch (e) {
+      console.log(e, "Error while fetching friends")
+    }}
+    getFriends();
+  }, [user, token, apiService]);
 
   const filtered = [...(rows ?? [])].sort(
       (a, b) => (b.userScoreboard?.[sortBy] ?? 0) - (a.userScoreboard?.[sortBy] ?? 0)
@@ -165,7 +192,13 @@ const LeaderboardInner: React.FC = () => {
               >
                 SPIELE {sortBy === "playedGames" ? "↓" : ""}
               </button>
-              <span className="hide-md col-avg">{user ? "AKTION" : "GENAUIGKEIT"}</span>
+              <button
+                  type="button"
+                  className={`lb-sort-btn hide-md col-games ${sortBy === "guessingPrecision" ? "is-active" : ""}`}
+                  onClick={() => setSortBy("guessingPrecision")}
+              >
+                GENAUIGKEIT {sortBy === "guessingPrecision" ? "↓" : ""}
+              </button>
             </div>
             {isLoading ? (
                 <div className="lb-empty">Lade…</div>
@@ -179,30 +212,80 @@ const LeaderboardInner: React.FC = () => {
                   return (
                       <div key={p.userId} className="lb-row">
                         <div className={`lb-row-rank ${i < 3 ? "is-medal" : ""}`}>{i + 1}</div>
-                        <div className="lb-row-name">{p.username}</div>
+                        <div
+                            className="lb-row-name"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              width: "100%"
+                            }}
+                        >
+                          {/* Schützt das Layout vor zu langen Namen */}
+                          <span style={{ flexGrow: 1, textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                            {p.username}
+                          </span>
+
+                          {user && !isMe && !(friends.includes(p.userId)) ? (
+                              <button
+                                  type="button"
+                                  className="sbb-btn sbb-btn--primary sbb-btn--sm"
+                                  style={{ marginLeft: "12px", flexShrink: 0 }}
+                                  aria-label={`Freundschaftsanfrage an ${p.username}`}
+                                  onClick={() => handleFriendRequest(p.userId)}
+                              >
+                                + Freund
+                              </button>
+
+                          ) : user && friends.includes(p.userId) ? (
+                              <span
+                                  className="lb-row-avg"
+                                  style={{
+                                    backgroundColor: "#f3f4f6",
+                                    color: "#4b5563",
+                                    padding: "2px 8px",
+                                    borderRadius: "12px",
+                                    fontSize: "0.75rem",
+                                    fontWeight: "500",
+                                    marginLeft: "12px",
+                                    display: "inline-block",
+                                    flexShrink: 0 // Verhindert das Stauchen des Badges bei langen Namen
+                                  }}
+                              >
+                                Freund
+                              </span>
+                          ) : user ? (
+                              <span
+                                  className="lb-row-avg"
+                                  style={{
+                                    backgroundColor: "#f3f4f6",
+                                    color: "#4b5563",
+                                    padding: "2px 8px",
+                                    borderRadius: "12px",
+                                    fontSize: "0.75rem",
+                                    fontWeight: "500",
+                                    marginLeft: "12px",
+                                    display: "inline-block",
+                                    flexShrink: 0 // Verhindert das Stauchen des Badges bei langen Namen
+                                  }}
+                              >
+                                Du
+                              </span>): (<span></span>)
+                          }
+                        </div>
+
                         <div className="lb-row-score">
                           {p.userScoreboard?.totalPoints?.toLocaleString("de-CH") ?? "–"}
                         </div>
                         <div className="lb-row-meta hide-md">
                           {p.userScoreboard?.playedGames ?? "–"}
                         </div>
-                        <div className="hide-md" style={{ display: "flex", justifyContent: "flex-end" }}>
-                          {user && !isMe ? (
-                              <button
-                                  type="button"
-                                  className="sbb-btn sbb-btn--primary sbb-btn--sm"
-                                  aria-label={`Freundschaftsanfrage an ${p.username}`}
-                                  onClick={() => handleFriendRequest(p.userId)}
-                              >
-                                + Freund
-                              </button>
-                          ) : (
-                              <span className="lb-row-avg">
-                        {p.userScoreboard?.guessingPrecision?.toLocaleString("de-CH") ?? "–"}
-                      </span>
-                          )}
+                        <div className="lb-row-meta hide-md">
+                          {(p.userScoreboard?.guessingPrecision*100).toLocaleString("de-CH") ?? "–"}
+                          %
                         </div>
                       </div>
+
                   );
                 })
             )}
