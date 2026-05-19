@@ -2499,164 +2499,38 @@ img, svg { display: block; max-width: 100%; }
   margin: 0 auto;
   padding: 28px;
 }
-
-.lb-tabs {
+ 
+/* Search */
+.lb-search {
   display: flex;
-  border: 1.5px solid var(--warm);
-  margin-bottom: 22px;
-  border-radius: 999px;
-  padding: 3px;
-  gap: 3px;
+  align-items: center;
   background: var(--white);
+  border: 2px solid var(--warm);
+  border-radius: 999px;
+  overflow: hidden;
+  padding: 0 16px;
+  margin-bottom: 16px;
 }
-
-.lb-tab {
+ 
+.lb-search-icon {
+  color: var(--grey);
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+ 
+.lb-search input {
   flex: 1;
-  padding: 10px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  cursor: pointer;
-  background: transparent;
-  color: var(--grey);
   border: none;
-  transition: all 0.18s;
-  border-radius: 999px;
-}
-
-.lb-tab:hover:not(.is-active) { background: var(--parch); }
-.lb-tab.is-active { background: var(--red); color: var(--white); }
-
-.lb-podium {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.lb-podium-card {
-  background: var(--white);
-  padding: 18px 14px;
-  text-align: center;
-  border-top: 4px solid var(--gold);
-  box-shadow: var(--shadow-sm);
-}
-
-.lb-podium-card.is-2 { border-top-color: var(--grey-l); }
-.lb-podium-card.is-3 { border-top-color: #CD7F32; }
-
-.lb-podium-card-rank {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.lb-podium-card-name {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--black);
-  margin-bottom: 3px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lb-podium-card-score {
-  font-family: var(--font-mono);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--black);
-}
-
-.lb-podium-card-meta {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--grey);
-  margin-top: 3px;
-}
-
-.lb-table {
-  background: var(--white);
-  border-top: 4px solid var(--red);
-}
-
-.lb-table-head {
-  display: grid;
-  grid-template-columns: 36px 1fr 100px 70px 90px;
-  gap: 12px;
-  align-items: center;
-  padding: 9px 18px;
-  background: var(--charcoal);
-}
-
-.lb-table-head span {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--grey-l);
-  letter-spacing: 0.14em;
-}
-
-.lb-row {
-  display: grid;
-  grid-template-columns: 36px 1fr 100px 70px 90px;
-  gap: 12px;
-  align-items: center;
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--warm);
-}
-
-.lb-row:last-child { border-bottom: none; }
-
-.lb-row-rank {
+  outline: none;
+  padding: 11px 10px;
   font-family: var(--font-mono);
   font-size: 14px;
-  font-weight: 700;
-  color: var(--grey);
+  letter-spacing: 0.04em;
+  background: transparent;
 }
-
-.lb-row-rank.is-medal { color: var(--gold); }
-
-.lb-row-name {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--black);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lb-row-score {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--black);
-}
-
-.lb-row-meta {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--grey);
-}
-
-.lb-row-avg {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--gold);
-  font-weight: 600;
-}
-
-.lb-empty {
-  text-align: center;
-  padding: 40px 20px;
-  font-family: var(--font-mono);
-  color: var(--grey);
-}
-
+ 
+/* Guest banner */
 .lb-guest-banner {
   background: rgba(200,150,12,0.10);
   border: 1px solid rgba(200,150,12,0.30);
@@ -2668,366 +2542,294 @@ img, svg { display: block; max-width: 100%; }
   letter-spacing: 0.04em;
   line-height: 1.6;
 }
-
-.lb-search {
-  display: flex;
-  align-items: center;
+ 
+/* Podium */
+.lb-podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+ 
+.lb-podium-card {
   background: var(--white);
-  border: 2px solid var(--warm);
-  border-radius: 999px;
-  overflow: hidden;
-  padding: 0 14px;
-  margin-bottom: 16px;
+  padding: 18px 14px;
+  text-align: center;
+  border-top: 4px solid var(--gold);
+  box-shadow: var(--shadow-sm);
 }
-
-.lb-search input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: 10px 8px;
+ 
+.lb-podium-card.is-2 { border-top-color: var(--grey-l); }
+.lb-podium-card.is-3 { border-top-color: #CD7F32; }
+ 
+.lb-podium-card-rank {
   font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  background: transparent;
-}
-
-/* Profile */
-.profile-root {
-  min-height: 100vh;
-  background: var(--cream);
-  padding-top: var(--nav-h);
-}
-
-.profile-head {
-  background: var(--black);
-  padding: 26px 28px 28px;
-}
-
-.profile-head-row {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.profile-avatar {
-  width: 68px;
-  height: 68px;
-  background: var(--red);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-sans);
-  font-weight: 800;
-  font-size: 30px;
-  color: var(--white);
-  flex-shrink: 0;
-  border-radius: 50%;
-  box-shadow: 0 4px 18px rgba(235,0,0,0.35);
-}
-
-.profile-name-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  font-size: 24px;
+  font-weight: 700;
   margin-bottom: 4px;
 }
-
-.profile-name {
+ 
+.lb-podium-card-name {
   font-family: var(--font-sans);
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--white);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin: 0;
-}
-
-.profile-status-online {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(45,140,92,0.18);
-  padding: 2px 9px;
-  border-radius: 999px;
-}
-
-.profile-status-online span:last-child {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--green);
-  letter-spacing: 0.12em;
+  font-size: 13px;
   font-weight: 700;
-  text-transform: uppercase;
+  color: var(--black);
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-.profile-status-online span:first-child {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulseDot 1.6s ease-in-out infinite;
+ 
+.lb-podium-card-score {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--black);
 }
-
-.profile-meta {
+ 
+.lb-podium-card-meta {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: var(--grey-l);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  color: var(--grey);
+  margin-top: 3px;
 }
-
-.profile-bio {
-  margin-top: 14px;
-  padding-left: 88px;
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  color: rgba(255,255,255,0.7);
-  line-height: 1.55;
-  max-width: 600px;
-  max-width: 1280px;
-  margin-left: auto;
-  margin-right: auto;
+ 
+/* Table */
+.lb-table {
+  background: var(--white);
+  border-top: 4px solid var(--red);
 }
-
-.profile-bio-shell {
-  max-width: 1000px;
-  margin: 14px auto 0;
-  padding-left: 88px;
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  color: rgba(255,255,255,0.7);
-  line-height: 1.55;
-}
-
-.profile-hero-stats {
+ 
+.lb-table-head {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 24px 28px 0;
+  grid-template-columns: 36px 1fr 90px 70px 100px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 18px;
+  background: var(--charcoal);
 }
-
-.profile-tabs {
-  position: sticky;
-  top: var(--nav-h);
-  background: var(--cream);
-  z-index: 5;
-  margin-top: 30px;
-  box-shadow: 0 1px 0 var(--warm);
+ 
+.lb-table-head span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--grey-l);
+  letter-spacing: 0.12em;
 }
-
-.profile-tabs-shell {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 28px;
+ 
+/* Rows */
+.lb-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 90px 70px 100px;
+  gap: 8px;
+  align-items: center;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--warm);
+}
+ 
+.lb-row:last-child { border-bottom: none; }
+ 
+.lb-row--you {
+  background: rgba(235,0,0,0.03);
+  border-left: 3px solid var(--red);
+}
+ 
+.lb-row-rank {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--grey);
+}
+ 
+.lb-row-rank.is-medal { color: var(--gold); }
+ 
+/* Player cell */
+.lb-row-player {
   display: flex;
-  gap: 6px;
-  overflow: auto;
-  scrollbar-width: none;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
-
-.profile-tab {
-  background: transparent;
-  border: none;
+ 
+.lb-row-name {
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 600;
-  color: var(--grey);
-  padding: 14px 18px;
-  cursor: pointer;
-  position: relative;
+  color: var(--black);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: color 0.18s;
+  text-decoration: none;
+  flex: 1;
+  min-width: 0;
 }
-
-.profile-tab.is-active {
-  color: var(--black);
-  font-weight: 800;
-}
-
-.profile-tab.is-active::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 8px;
-  right: 8px;
-  height: 3px;
-  background: var(--red);
-  border-radius: 3px 3px 0 0;
-}
-
-.profile-tab-count {
+ 
+.lb-row-name:hover { color: var(--red); }
+ 
+/* Data cells */
+.lb-row-score {
   font-family: var(--font-mono);
-  font-size: 10px;
-  background: rgba(232,226,217,0.8);
-  color: var(--grey);
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.profile-tab.is-active .profile-tab-count {
-  background: var(--red);
-  color: var(--white);
-}
-
-.profile-body {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 30px 28px 50px;
-}
-
-.profile-detail-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-.profile-detail-stat {
-  background: var(--white);
-  padding: 14px 16px;
-  border-left: 3px solid var(--charcoal);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-
-.profile-detail-stat-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.profile-detail-stat-v {
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--black);
-  letter-spacing: -0.02em;
-}
-
-.profile-detail-stat-l {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  color: var(--grey);
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
-
-.profile-section {
-  margin-bottom: 40px;
-}
-
-.profile-section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.profile-section-head h2 {
-  font-family: var(--font-sans);
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--black);
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.profile-history-row {
-  background: var(--white);
-  padding: 14px 16px;
-  margin-bottom: 8px;
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border-left: 3px solid var(--warm);
-}
-
-.profile-history-icon {
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.profile-history-info { flex: 1; min-width: 0; }
-
-.profile-history-name {
-  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 700;
-  color: var(--black);
-  margin-bottom: 2px;
-}
-
-.profile-history-meta {
-  font-family: var(--font-mono);
-  font-size: 10px;
   color: var(--grey);
-  letter-spacing: 0.06em;
+  text-align: right;
 }
-
-.profile-history-score {
+ 
+.lb-row-meta {
   font-family: var(--font-mono);
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 13px;
+  color: var(--grey);
+  text-align: right;
+}
+ 
+.lb-row-score.is-sort-active,
+.lb-row-meta.is-sort-active {
   color: var(--black);
+  font-weight: 700;
 }
-
-.profile-friends-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+ 
+/* Sortable column headers */
+.lb-col-sort {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--grey-l);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: right;
+  transition: color 0.14s;
+  white-space: nowrap;
 }
-
-.profile-friend-card {
-  background: var(--white);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border-left: 3px solid var(--warm);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+ 
+.lb-col-sort:hover { color: var(--white); }
+.lb-col-sort.is-active { color: var(--white); }
+ 
+/* Full / short labels: desktop shows full, mobile shows short */
+.lb-col-sort-full  { display: inline; }
+.lb-col-sort-short { display: none; }
+ 
+/* Badges */
+.lb-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
-
-.profile-friend-avatar {
-  width: 42px;
-  height: 42px;
+ 
+.lb-badge--you {
+  background: rgba(235,0,0,0.10);
+  color: var(--red);
+}
+ 
+.lb-badge--friend {
+  background: rgba(45,106,79,0.12);
+  color: var(--green);
+}
+ 
+/* Add-friend button */
+.lb-add-friend {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: var(--blue);
-  display: flex;
+  border: 1.5px solid var(--grey-l);
+  background: var(--white);
+  color: var(--grey);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--white);
+  cursor: pointer;
   flex-shrink: 0;
+  transition: all 0.16s ease;
+  padding: 0;
 }
-
-.profile-friend-name {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--black);
+ 
+.lb-add-friend:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(235,0,0,0.06);
+  transform: scale(1.1);
 }
-
-.profile-friend-meta {
+ 
+.lb-empty {
+  text-align: center;
+  padding: 40px 20px;
   font-family: var(--font-mono);
-  font-size: 10px;
   color: var(--grey);
-  letter-spacing: 0.06em;
-  margin-top: 2px;
+}
+
+.lb-col-sort--rank {
+  text-align: left;
+  font-size: 13px;
+}
+ 
+/* ── Leaderboard Responsive ──────────────────────────────────────────────── */
+ 
+/* Ultra-small (≤ 320px) */
+@media (max-width: 320px) {
+  .lb-shell { padding: 16px 12px; }
+  .lb-podium { grid-template-columns: 1fr; gap: 8px; }
+  .lb-col-extra { display: none; }
+  .lb-table-head,
+  .lb-row {
+    grid-template-columns: 30px 1fr 60px;
+    gap: 4px;
+    padding: 10px 10px;
+  }
+  .lb-col-sort--rank { font-size: 10px; }
+  .lb-row-name { font-size: 12px; }
+  .lb-add-friend { width: 20px; height: 20px; font-size: 13px; }
+  .lb-badge { font-size: 7px; padding: 1px 4px; }
+  .lb-search-icon { width: 16px; height: 16px; }
+}
+
+/* Mobile portrait (321px – 480px) */
+@media (min-width: 321px) and (max-width: 480px) {
+  .lb-shell { padding: 20px 14px; }
+  .lb-podium { grid-template-columns: 1fr; }
+  .lb-col-extra { display: none; }
+  .lb-table-head,
+  .lb-row {
+    grid-template-columns: 32px 1fr 64px;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+  .lb-col-sort--rank { font-size: 11px; }
+  .lb-row-name { font-size: 13px; }
+  .lb-add-friend { width: 22px; height: 22px; font-size: 14px; }
+  .lb-badge { font-size: 8px; padding: 1px 5px; }
+  .lb-search-icon { width: 17px; height: 17px; }
+}
+ 
+/* Mobile landscape (481px – 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .lb-col-precision { display: none; }
+  .lb-table-head,
+  .lb-row {
+    grid-template-columns: 32px 1fr 70px 56px;
+    gap: 6px;
+  }
+}
+
+/* Tablet (768px – 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .lb-col-precision { display: none; }
+  .lb-table-head,
+  .lb-row {
+    grid-template-columns: 36px 1fr 80px 64px;
+    gap: 8px;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
