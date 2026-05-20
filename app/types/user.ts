@@ -20,6 +20,7 @@ export interface UserScoreboard {
   totalPoints: number;
   playedGames: number;
   playedRounds: number;
+  gamesWon: number;
   bestRoundPoints: number;
   guessingPrecision: number;
 }

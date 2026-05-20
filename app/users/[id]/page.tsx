@@ -142,7 +142,7 @@ const ProfilePage: React.FC = () => {
     const playedRounds = scoreboard?.playedRounds ?? 0;
     const bestRound = scoreboard?.bestRoundPoints ?? 0;
     const precision = scoreboard?.guessingPrecision ?? 0;
-    const avgPoints = playedGames > 0 ? Math.round(totalPoints / playedRounds) : 0;
+    const gamesWon = scoreboard?.gamesWon ?? 0;
 
     const handleStartEdit = () => {
         setEditName(profileData.username || "");
@@ -267,14 +267,9 @@ const ProfilePage: React.FC = () => {
                     <div className="sbb-stat-label">Spiele</div>
                 </div>
                 <div className="sbb-stat">
-                    <div className="sbb-stat-icon">📊</div>
-                    <div className="sbb-stat-value">{formatNumber(avgPoints)}</div>
-                    <div className="sbb-stat-label">Ø Pkt / Runde</div>
-                </div>
-                <div className="sbb-stat sbb-stat--green">
-                    <div className="sbb-stat-icon">🎯</div>
-                    <div className="sbb-stat-value">{(precision * 100).toFixed(1)}%</div>
-                    <div className="sbb-stat-label">Präzision</div>
+                    <div className="sbb-stat-icon">🥇</div>
+                    <div className="sbb-stat-value">{gamesWon}</div>
+                    <div className="sbb-stat-label">Spiele gewonnen</div>
                 </div>
             </div>
 
@@ -304,10 +299,6 @@ const ProfilePage: React.FC = () => {
                             <div className="profile-section-head"><h2>Statistik im Detail</h2></div>
                             <div className="profile-detail-stats">
                                 <div className="profile-detail-stat">
-                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{formatNumber(totalPoints)}</div><div>🏆</div></div>
-                                    <div className="profile-detail-stat-l">Gesamtpunkte</div>
-                                </div>
-                                <div className="profile-detail-stat">
                                     <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{playedRounds}</div><div>🚂</div></div>
                                     <div className="profile-detail-stat-l">Runden gespielt</div>
                                 </div>
@@ -316,7 +307,7 @@ const ProfilePage: React.FC = () => {
                                     <div className="profile-detail-stat-l">Beste Runde</div>
                                 </div>
                                 <div className="profile-detail-stat">
-                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{(precision * 100).toFixed(1)}%</div><div>✔</div></div>
+                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{(precision).toFixed(1)}%</div><div>✔</div></div>
                                     <div className="profile-detail-stat-l">Präzision</div>
                                 </div>
                             </div>
