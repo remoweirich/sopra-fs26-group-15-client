@@ -353,7 +353,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({
                 <div className="result-score-cell">
                   <div className="result-score-cell-l">DISTANZ</div>
                   <div className="result-score-cell-v">
-                    {myDistance != null ? `${Math.round(myDistance)} km` : "—"}
+                    {myDistance != null && myDistance<9999? `${Math.round(myDistance)} km` : "—"}
                   </div>
                 </div>
                 <div className="result-score-cell">
@@ -441,7 +441,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({
                           marginLeft: 8,
                         }}
                       >
-                        {Math.round(r.distance)} km
+                        {r.distance<9999 ? Math.round(r.distance):"-"} km
                       </span>
                     </div>
                     <div className="result-ranking-row-pts">+{r.roundPoints}</div>
