@@ -5,6 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
+import {getApiDomain} from "@/utils/domain";
+import {Image} from "antd";
 
 type ProfileTab = "overview" | "games" | "friends" | "achievements";
 
@@ -27,6 +29,7 @@ const ProfilePage: React.FC = () => {
     const profileId = Number(useParams().id);
     const { user: currentUser, token, login, logout, isLoading } = useAuth();
 
+    const backendBase = getApiDomain()
     const [profileData, setProfileData] = useState<MyUserDTO | UserDTO | null>(null);
     const [editing, setEditing] = useState(false);
     const [tab, setTab] = useState<ProfileTab>("overview");
@@ -140,7 +143,7 @@ const ProfilePage: React.FC = () => {
     const playedRounds = scoreboard?.playedRounds ?? 0;
     const bestRound = scoreboard?.bestRoundPoints ?? 0;
     const precision = scoreboard?.guessingPrecision ?? 0;
-    const avgPoints = playedGames > 0 ? Math.round(totalPoints / playedGames) : 0;
+    const gamesWon = scoreboard?.gamesWon ?? 0;
 
     const handleStartEdit = () => {
         setEditName(profileData.username || "");
@@ -213,11 +216,26 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    const handleReject = async (requestingUserId: number) => {
+        try {
+            await apiService.post(`/friends/reject/${requestingUserId}`,
+                {},
+                {
+                    headers: { userId: profileId.toString(), token: token ?? "" }
+                });
+
+            await refreshFriends();
+
+        } catch (error) {
+            console.error("Error when reject request:", error);
+        }
+    };
+
 
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
         { id: "games", icon: "🎮", label: "Spiele", count: DUMMY_HISTORY.length },
-        { id: "achievements", icon: "🏆", label: "Erfolge", count: "0/10" },
+        { id: "achievements", icon: "🏆", label: "Erfolge", count: `${(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0}/10` },
         ...(showFriends
             ? [{ id: "friends" as ProfileTab, icon: "👥", label: "Freunde" }]
             : []),
@@ -265,14 +283,9 @@ const ProfilePage: React.FC = () => {
                     <div className="sbb-stat-label">Spiele</div>
                 </div>
                 <div className="sbb-stat">
-                    <div className="sbb-stat-icon">📊</div>
-                    <div className="sbb-stat-value">{formatNumber(avgPoints)}</div>
-                    <div className="sbb-stat-label">Ø Pkt / Spiel</div>
-                </div>
-                <div className="sbb-stat sbb-stat--green">
-                    <div className="sbb-stat-icon">🎯</div>
-                    <div className="sbb-stat-value">{(precision * 100).toFixed(1)}%</div>
-                    <div className="sbb-stat-label">Präzision</div>
+                    <div className="sbb-stat-icon">🥇</div>
+                    <div className="sbb-stat-value">{gamesWon}</div>
+                    <div className="sbb-stat-label">Spiele gewonnen</div>
                 </div>
             </div>
 
@@ -302,10 +315,6 @@ const ProfilePage: React.FC = () => {
                             <div className="profile-section-head"><h2>Statistik im Detail</h2></div>
                             <div className="profile-detail-stats">
                                 <div className="profile-detail-stat">
-                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{formatNumber(totalPoints)}</div><div>🏆</div></div>
-                                    <div className="profile-detail-stat-l">Gesamtpunkte</div>
-                                </div>
-                                <div className="profile-detail-stat">
                                     <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{playedRounds}</div><div>🚂</div></div>
                                     <div className="profile-detail-stat-l">Runden gespielt</div>
                                 </div>
@@ -314,7 +323,7 @@ const ProfilePage: React.FC = () => {
                                     <div className="profile-detail-stat-l">Beste Runde</div>
                                 </div>
                                 <div className="profile-detail-stat">
-                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{(precision * 100).toFixed(1)}%</div><div>✔</div></div>
+                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{(precision).toFixed(1)}%</div><div>✔</div></div>
                                     <div className="profile-detail-stat-l">Präzision</div>
                                 </div>
                             </div>
@@ -339,8 +348,39 @@ const ProfilePage: React.FC = () => {
 
                 {tab === "achievements" && (
                     <section className="profile-section">
-                        <div className="profile-section-head"><h2>🏆 Erfolge</h2></div>
-                        <div className="lb-empty">Noch keine Erfolge freigeschaltet.</div>
+                        <div className="profile-section-head">
+                            <h2>🏆 Erfolge</h2>
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--grey)", letterSpacing: "0.08em" }}>
+                            {(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0} freigeschaltet
+                            </span>
+                        </div>
+
+                        {(() => {
+                            const list = (profileData as Partial<MyUserDTO>).userAchievementDTOList ?? [];
+                            if (list.length === 0) {
+                                return <div className="lb-empty">Noch keine Erfolge freigeschaltet.</div>;
+                            }
+                            return (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                                    {list.map(({ achievement, unlockedAt }) => (
+                                        <div key={achievement.achievementId} className="profile-history-row">
+                                            <Image
+                                                src={`${backendBase}${achievement.iconUrl}`}
+                                                alt={achievement.name}
+                                                style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }}
+                                            />
+                                            <div className="profile-history-info">
+                                                <div className="profile-history-score">{achievement.name}</div>
+                                                <div className={"profile-history-meta"}>{new Date(unlockedAt).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })}</div>
+                                            </div>
+                                            <div className="profile-history-meta">
+                                                <div className="profile-history-name">{achievement.description}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </section>
                 )}
 
@@ -380,6 +420,11 @@ const ProfilePage: React.FC = () => {
                                             <div key={req.userId} className="profile-history-row">
                                                 <div className="profile-history-info"><div className="profile-history-name">{req.username}</div><div className="profile-history-meta">Möchte dein Freund sein</div></div>
                                                 <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => {handleAccept(req.userId)}}>Annehmen</button>
+                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm"
+                                                        onClick={() => {handleReject(req.userId)}}
+                                                        style={{ background: "grey", borderColor: "black" }}
+                                                >Ablehnen
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
