@@ -168,6 +168,23 @@ export default function NotificationListener() {
                             }
                         });
                         break;
+
+                    case "FEEDBACK":
+                        console.log("[FEEBACK]", message.payload);
+
+                        addNotification({
+                            type: "feedback",
+                            from: message.payload.username,
+                        });
+
+                        notification.success({
+                            title: "Anfrage gesendet!",
+                            description: `Freundschaftsanfrage wurde erfolgreich an ${message.payload.username} gesendet`,
+                            placement: "topRight",
+                            duration: 4
+                        });
+                        break;
+
                 }
             });
 

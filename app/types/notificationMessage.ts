@@ -18,6 +18,7 @@ export type notificationMessage =
     | { type: "FRIEND_ACCEPT"; payload: FriendRequestDTO }
     | { type: "FRIEND_REJECT"; payload: FriendRequestDTO }
     | { type: "ACHIEVEMENT"; payload: AchievementDTO }
+    | { type: "FEEDBACK"; payload: FriendRequestDTO }
     ;
 
 

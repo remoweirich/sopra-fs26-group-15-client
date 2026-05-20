@@ -230,7 +230,7 @@ useEffect(() => {
               }
             );
             if (data.type === "ROUND_START") {
-              reloadTimer.current = data.remainingTime;
+              reloadTimer.current = data.remainingTime-3;
               roundStarted.current = true;
               handleMessage({
                 type: "ROUND_START",
@@ -351,7 +351,7 @@ useEffect(() => {
           <div className="game-clue-timer-cell">
             <div className="game-clue-timer-label">SEK</div>
             <div className={`game-clue-timer-v ${timerCls}`}>
-              {String(secondsRemaining).padStart(2, "0")}
+              {secondsRemaining>=0 ? String(secondsRemaining).padStart(2, "0") : "00"}
             </div>
           </div>
 
