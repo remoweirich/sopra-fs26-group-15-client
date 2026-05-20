@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.4.0...v1.4.1) (2026-05-20)
+
+
+### Bug Fixes
+
+* **release:** disable semantic-release issue comments via releaserc ([5dfc0b2](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/5dfc0b2f3126ab0c7e66f5b6911cb801aa66e255))
+
 # [1.4.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.3.1...v1.4.0) (2026-05-20)
 
 
