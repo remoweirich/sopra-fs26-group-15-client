@@ -1,3 +1,30 @@
+# [1.4.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.3.1...v1.4.0) (2026-05-20)
+
+
+### Bug Fixes
+
+* **Achievements:** now with proprietary svg's ([c149f16](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/c149f16e7fe816083001f78f475a48b4806ea22d))
+* **Achievements:** row spacing consistent with game history ([9488283](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/9488283e2c70794da16fbcc83b358e3a37411862))
+* **lobbyActions:** change recieved error from any to unknown in handlejoin ([ef7cee2](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ef7cee2dfc469ba092f9325ea31502010bcd20a7))
+* **navbar:** join via lobby code uses auth instead of localstorage ([77e2cd0](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/77e2cd098ed27314790246ba848a9d111bab048d))
+
+
+### Features
+
+* **Achievements:** Display achievements in the user page ([cf50cc9](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/cf50cc9a61db96477178213a5bd1110e401a0847))
+* **design:** add refresh button to lobbies page ([3f6cf88](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/3f6cf884ff5a0bf416e3379ad4a4a7fa33b24c92))
+* **design:** notification center, friend removal, toast styling ([9523cb7](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/9523cb7f843187a09fcd8f4dfbf320fc667bd90f))
+* **FriendshipListener:** notifications reintegrated into new design and buttons added to accept/reject closes [#40](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/40) ([f68ad20](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f68ad20a39d6de937ff85c117c7a278643ed4f63))
+* **leaderboard:** can search for users in leaderboard and send them a friend request. [#40](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/40) ([2d51d97](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/2d51d9728b1f3e09d71a8db061172896ab8298ef))
+* **leaderboard:** corrected fetch and added friends fetch as well as different buttons depending on if user in leaderboard is friend/user/unregistered closes [#52](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/52) ([5b64c10](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/5b64c1025f4a18c4643fd6e07f8c7cecdfe90300))
+* **Leaderboard:** implement search functionality and improve layout ([14cf92e](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/14cf92e9154b9bb4a0a46461069945c79d12ad18))
+* **leaderboard:** users are clickable in leaderboard closes [#52](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/52) ([877c8ff](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/877c8ffa67a5a6a227479c7f017c5edca8ac10bd))
+* **navbar:** join via lobby code now possible ([94e6b84](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/94e6b84302d2fcf30e79d814b3fe21cf5255f407))
+* **Notifications:** Users are now notified of Achievements via the NotificationListener.tsx closes [#122](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/122) ([be63e4d](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/be63e4dea929c6cfa90b4699114dc5291e3d4faf))
+* **Notifications:** Users are now notified of Achievements via the NotificationListener.tsx closes remoweirich/sopra-fs26-group-15-client[#122](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/122) ([7daf312](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/7daf312596713097dac053e7760434560e2cc842))
+* **Profile:** add styles for profile layout and components ([28648ec](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/28648ece010e1957f44973c5d740d9b1a434e5fb))
+* **profile:** update scoreboard display and add gamesWon field ([4ee10bb](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/4ee10bb70b218f239dc91d9a9ecd190f8165a76b))
+
 ## [1.3.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.3.0...v1.3.1) (2026-05-18)
 
 
