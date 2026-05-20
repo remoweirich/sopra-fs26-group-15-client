@@ -146,6 +146,23 @@ export default function NotificationListener() {
                             icon: <Image src={`${backendBase}${message.payload.iconUrl}`} alt={message.payload.name} style={{ width: 24, height: 24 }} />
                         });
                         break;
+
+                    case "FEEDBACK":
+                        console.log("[FEEBACK]", message.payload);
+
+                        addNotification({
+                            type: "feedback",
+                            from: message.payload.username,
+                        });
+
+                        notification.success({
+                            title: "Anfrage gesendet!",
+                            description: `Freundschaftsanfrage wurde erfolgreich an ${message.payload.username} gesendet`,
+                            placement: "topRight",
+                            duration: 4
+                        });
+                        break;
+
                 }
             });
 

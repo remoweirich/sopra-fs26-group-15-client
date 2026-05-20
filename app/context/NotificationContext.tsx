@@ -14,6 +14,7 @@ export type NewNotification =
   | { type: "friend_request"; from: string; fromId: number }
   | { type: "friend_accepted"; from: string }
   | { type: "friend_rejected"; from: string }
+  | { type: "feedback"; from: string }
   | { type: "achievement"; name: string; description: string; iconUrl?: string }
   | { type: "game_invite"; from: string; fromId: number; lobbyName: string; lobbyId: number }
   | { type: "game_declined"; from: string };
