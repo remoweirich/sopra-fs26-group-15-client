@@ -1,38 +1,107 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useApi } from "@/hooks/useApi";
+import { UserDTO } from "@/types/user";
 
-type Tab = "weekly" | "alltime";
+type SortKey = "rank" | "totalPoints" | "playedGames" | "guessingPrecision";
 
 const LeaderboardInner: React.FC = () => {
-  const { user } = useAuth();
-  const searchParams = useSearchParams();
-  // When the profile sends users here via "Freund hinzufügen", the URL has
-  // ?addFriend=1. We use that to surface the request button more prominently.
-  const addFriendMode = searchParams?.get("addFriend") === "1";
+  const { user, token } = useAuth();
+  const apiService = useApi();
 
-  const [tab, setTab] = useState<Tab>("weekly");
   const [search, setSearch] = useState("");
-  const [sentRequests, setSentRequests] = useState<Record<string, boolean>>({});
-
-  // NOTE: leaderboard data is intentionally empty until the API is wired up.
-  // The empty state below renders when no rows are available.
-  const rows: { username: string; total: number; games: number; avg: number }[] = [];
-
-  const filtered = rows.filter((r) =>
-    r.username.toLowerCase().includes(search.toLowerCase())
-  );
-  const top3 = filtered.slice(0, 3);
+  const [isLoading, setIsLoading] = useState(false);
+  const [rows, setRows] = useState<UserDTO[]>([]);
+  const [top3, setTop3] = useState<UserDTO[]>([]);
+  const [sortBy, setSortBy] = useState<SortKey>("totalPoints");
+  const [friends, setFriends] = useState<number[]>([]);
 
   const podiumColors = ["var(--gold)", "var(--grey-l)", "#CD7F32"];
 
-  // Local-only optimistic toggle; backend wiring lives in the friends endpoint
-  // and will replace this when available.
-  const handleSendRequest = (username: string) => {
-    setSentRequests((prev) => ({ ...prev, [username]: true }));
+  useEffect(() => {
+    const fetchTop3 = async () => {
+      try {
+        const data = await apiService.get<UserDTO[]>(`/users/search?username=`);
+        setTop3(
+          [...(data ?? [])]
+            .sort((a, b) => (b.userScoreboard?.totalPoints ?? 0) - (a.userScoreboard?.totalPoints ?? 0))
+            .slice(0, 3)
+        );
+      } catch (err) {
+        console.error("Top 3 fetch failed", err);
+      }
+    };
+    fetchTop3();
+  }, []);
+
+  useEffect(() => {
+    const debounce = setTimeout(async () => {
+      try {
+        const data = await apiService.get<UserDTO[]>(
+          `/users/search?username=${encodeURIComponent(search)}`
+        );
+        setRows(data ?? []);
+      } catch (err) {
+        console.error("Search failed", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }, search.trim() === "" ? 0 : 400);
+
+    return () => clearTimeout(debounce);
+  }, [search, apiService]);
+
+  useEffect(() => {
+    if (!user || !token) return;
+    const getFriends = async () => {
+      try {
+        const data = await apiService.get<UserDTO[]>(
+          `/friends/${user?.userId}`,
+          {
+            headers: { userId: user.userId.toString() ?? "", token: token ?? "" },
+          }
+        );
+        const friendIdList: number[] = [];
+        for (let i = 0; i < data.length; i++) {
+          const friend = data.at(i);
+          if (friend != null) {
+            friendIdList.push(friend.userId);
+          }
+        }
+        setFriends(friendIdList);
+      } catch (e) {
+        console.log(e, "Error while fetching friends");
+      }
+    };
+    getFriends();
+  }, [user, token, apiService]);
+
+  // Feste Ränge basierend auf Punkte (bleibt immer gleich)
+  const rankMap = new Map<number, number>();
+  [...(rows ?? [])]
+    .sort((a, b) => (b.userScoreboard?.totalPoints ?? 0) - (a.userScoreboard?.totalPoints ?? 0))
+    .forEach((u, i) => rankMap.set(u.userId, i + 1));
+
+  // Sortierung nach gewählter Spalte
+  const filtered = [...(rows ?? [])].sort((a, b) => {
+    if (sortBy === "rank") {
+      return (rankMap.get(a.userId) ?? 0) - (rankMap.get(b.userId) ?? 0);
+    }
+    return (b.userScoreboard?.[sortBy as keyof typeof a.userScoreboard] ?? 0)
+         - (a.userScoreboard?.[sortBy as keyof typeof a.userScoreboard] ?? 0);
+  });
+
+  const handleFriendRequest = async (receivingUserId: number) => {
+    try {
+      await apiService.post(`/friends/request/${receivingUserId}`, {}, {
+        headers: { userId: user?.userId.toString() ?? "", token: token ?? "" },
+      });
+    } catch (e) {
+      console.error("Error while sending friend request", e);
+    }
   };
 
   return (
@@ -41,43 +110,22 @@ const LeaderboardInner: React.FC = () => {
         <div className="section-head-row">
           <div>
             <span className="label">Rangliste / Leaderboard</span>
-            <h1>
-              {addFriendMode && user
-                ? "Freund auf der Rangliste suchen"
-                : "Die besten Bahnkenner der Schweiz"}
-            </h1>
+            <h1>Die besten Bahnkenner der Schweiz</h1>
           </div>
         </div>
       </div>
 
       <div className="lb-shell">
-        {/* Tab toggle */}
-        <div className="lb-tabs">
-          <button
-            type="button"
-            className={`lb-tab ${tab === "weekly" ? "is-active" : ""}`}
-            onClick={() => setTab("weekly")}
-          >
-            Diese Woche
-          </button>
-          <button
-            type="button"
-            className={`lb-tab ${tab === "alltime" ? "is-active" : ""}`}
-            onClick={() => setTab("alltime")}
-          >
-            Allzeit
-          </button>
-        </div>
-
         {/* Search */}
         <div className="lb-search">
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--grey)" }}>
-            ⌕
-          </span>
+          <svg className="lb-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={addFriendMode && user ? "Freund suchen…" : "Spieler suchen…"}
+            placeholder="Spieler suchen…"
             aria-label="Spieler suchen"
           />
         </div>
@@ -96,15 +144,17 @@ const LeaderboardInner: React.FC = () => {
         {top3.length > 0 && (
           <div className="lb-podium">
             {top3.map((p, i) => (
-              <div key={p.username} className={`lb-podium-card is-${i + 1}`}>
+              <div key={p.userId} className={`lb-podium-card is-${i + 1}`}>
                 <div className="lb-podium-card-rank" style={{ color: podiumColors[i] }}>
                   {i + 1}
                 </div>
                 <div className="lb-podium-card-name">{p.username}</div>
                 <div className="lb-podium-card-score">
-                  {p.total.toLocaleString("de-CH")}
+                  {p.userScoreboard?.totalPoints?.toLocaleString("de-CH") ?? "–"}
                 </div>
-                <div className="lb-podium-card-meta">{p.games} Spiele</div>
+                <div className="lb-podium-card-meta">
+                  {p.userScoreboard?.playedGames ?? "–"} Spiele
+                </div>
               </div>
             ))}
           </div>
@@ -113,42 +163,86 @@ const LeaderboardInner: React.FC = () => {
         {/* Table */}
         <div className="lb-table">
           <div className="lb-table-head">
-            <span>#</span>
-            <span>SPIELER</span>
-            <span>PUNKTE</span>
-            <span className="hide-md col-games">SPIELE</span>
-            <span className="hide-md col-avg">{user ? "AKTION" : "Ø/SPIEL"}</span>
+              <button
+                type="button"
+                className={`lb-col-sort lb-col-sort--rank ${sortBy === "rank" ? "is-active" : ""}`}
+                onClick={() => setSortBy("rank")}
+              >
+                # {sortBy === "rank" && "↓"}
+              </button>
+              <span>SPIELER</span>
+            <button
+              type="button"
+              className={`lb-col-sort ${sortBy === "totalPoints" ? "is-active" : ""}`}
+              onClick={() => setSortBy("totalPoints")}
+            >
+              <span className="lb-col-sort-full">PUNKTE</span>
+              <span className="lb-col-sort-short">PKT</span>
+              {sortBy === "totalPoints" && " ↓"}
+            </button>
+            <button
+              type="button"
+              className={`lb-col-sort lb-col-extra ${sortBy === "playedGames" ? "is-active" : ""}`}
+              onClick={() => setSortBy("playedGames")}
+            >
+              <span className="lb-col-sort-full">SPIELE</span>
+              <span className="lb-col-sort-short">SP</span>
+              {sortBy === "playedGames" && " ↓"}
+            </button>
+            <button
+              type="button"
+              className={`lb-col-sort lb-col-extra lb-col-precision ${sortBy === "guessingPrecision" ? "is-active" : ""}`}
+              onClick={() => setSortBy("guessingPrecision")}
+            >
+              <span className="lb-col-sort-full">GENAUIGKEIT</span>
+              <span className="lb-col-sort-short">GEN</span>
+              {sortBy === "guessingPrecision" && " ↓"}
+            </button>
           </div>
-          {filtered.length === 0 ? (
+          {isLoading ? (
+            <div className="lb-empty">Lade…</div>
+          ) : filtered.length === 0 ? (
             <div className="lb-empty">
               Noch keine Daten verfügbar. Spiel jetzt und sichere dir den ersten Platz!
             </div>
           ) : (
             filtered.map((p, i) => {
-              const isMe = user && user.username === p.username;
-              const alreadySent = sentRequests[p.username];
+              const isMe = user?.username === p.username;
+              const isFriend = friends.includes(p.userId);
               return (
-                <div key={p.username} className="lb-row">
-                  <div className={`lb-row-rank ${i < 3 ? "is-medal" : ""}`}>{i + 1}</div>
-                  <div className="lb-row-name">{p.username}</div>
-                  <div className="lb-row-score">
-                    {p.total.toLocaleString("de-CH")}
+                <div key={p.userId} className={`lb-row ${isMe ? "lb-row--you" : ""}`}>
+                  <div className={`lb-row-rank ${(rankMap.get(p.userId) ?? i + 1) <= 3 ? "is-medal" : ""}`}>
+                    {rankMap.get(p.userId) ?? i + 1}
                   </div>
-                  <div className="lb-row-meta hide-md">{p.games}</div>
-                  <div className="hide-md" style={{ display: "flex", justifyContent: "flex-end" }}>
-                    {user && !isMe ? (
+                  <div className="lb-row-player">
+                    <Link href={`/users/${p.userId}`} className="lb-row-name">
+                      {p.username}
+                    </Link>
+                    {user && isMe && (
+                      <span className="lb-badge lb-badge--you">Du</span>
+                    )}
+                    {user && !isMe && isFriend && (
+                      <span className="lb-badge lb-badge--friend">✓ Freund</span>
+                    )}
+                    {user && !isMe && !isFriend && (
                       <button
                         type="button"
-                        className={`sbb-btn ${alreadySent ? "sbb-btn--secondary" : "sbb-btn--primary"} sbb-btn--sm`}
-                        onClick={() => handleSendRequest(p.username)}
-                        disabled={alreadySent}
+                        className="lb-add-friend"
                         aria-label={`Freundschaftsanfrage an ${p.username}`}
+                        onClick={() => handleFriendRequest(p.userId)}
                       >
-                        {alreadySent ? "✓ Gesendet" : "+ Anfrage"}
+                        +
                       </button>
-                    ) : (
-                      <span className="lb-row-avg">{p.avg}</span>
                     )}
+                  </div>
+                  <div className={`lb-row-score ${sortBy === "totalPoints" ? "is-sort-active" : ""}`}>
+                    {p.userScoreboard?.totalPoints?.toLocaleString("de-CH") ?? "–"}
+                  </div>
+                  <div className={`lb-row-meta lb-col-extra ${sortBy === "playedGames" ? "is-sort-active" : ""}`}>
+                    {p.userScoreboard?.playedGames ?? "–"}
+                  </div>
+                  <div className={`lb-row-meta lb-col-extra lb-col-precision ${sortBy === "guessingPrecision" ? "is-sort-active" : ""}`}>
+                    {(p.userScoreboard?.guessingPrecision ?? 0).toFixed(1)}%
                   </div>
                 </div>
               );

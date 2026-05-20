@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { WebSocketProvider } from "@/context/WebSocketContext";
+import { App as AntdApp } from "antd";
 
 import Navbar from "./navbar";
 import { AuthProvider } from "./context/AuthContext";
-import FriendshipListener from "@/websockets/FriendshipListener";
+import NotificationListener from "@/websockets/NotificationListener";
 
 // Space Grotesk needs weight 800 for the bold hero/section titles
 // used across the SBB redesign. Without it the headings silently
@@ -54,11 +55,13 @@ export default function RootLayout({
           variables let other elements opt into the mono via CSS var. */}
       <body className={`${spaceGrotesk.className}`}>
         <WebSocketProvider>
-          <AuthProvider>
-              <FriendshipListener />
-              <Navbar />
-            <main>{children}</main>
-          </AuthProvider>
+            <AuthProvider>
+                <AntdApp>
+                    <NotificationListener />
+                    <Navbar />
+                    <main>{children}</main>
+                </AntdApp>
+            </AuthProvider>
         </WebSocketProvider>
       </body>
     </html>

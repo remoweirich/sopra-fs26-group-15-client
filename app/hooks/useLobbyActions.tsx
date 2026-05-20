@@ -38,7 +38,7 @@ export const useLobbyActions = () => {
       await login(response.token, response.userId);
       connect(response.userId.toString(), response.token);
       router.push(`/lobbies/${lobbyId}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Propagate error to caller for UI handling
       throw error;
     }

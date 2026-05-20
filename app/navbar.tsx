@@ -19,7 +19,7 @@ function SBBCross({ size = 20 }: { size?: number }) {
 export default function Navbar() {
   // COMBINED: Only call useAuth once
   const { user, logout, isLoading, login, token } = useAuth();
-
+  const isLoggedIn = !!user;
   const pathname = usePathname();
   const router = useRouter();
   const apiService = useApi();
@@ -61,7 +61,7 @@ export default function Navbar() {
     const c = code.trim().toUpperCase();
     if (!c) return;
 
-    if (!token) {
+    if (!isLoggedIn) {
       setPendingJoinCode(c);
       setIsAuthModalVisible(true);
       return;

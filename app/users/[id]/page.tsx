@@ -6,6 +6,7 @@ import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
 import {getApiDomain} from "@/utils/domain";
+import {Image} from "antd";
 
 type ProfileTab = "overview" | "games" | "friends" | "achievements";
 
@@ -215,6 +216,21 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    const handleReject = async (requestingUserId: number) => {
+        try {
+            await apiService.post(`/friends/reject/${requestingUserId}`,
+                {},
+                {
+                    headers: { userId: profileId.toString(), token: token ?? "" }
+                });
+
+            await refreshFriends();
+
+        } catch (error) {
+            console.error("Error when reject request:", error);
+        }
+    };
+
 
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
@@ -348,7 +364,7 @@ const ProfilePage: React.FC = () => {
                                 <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
                                     {list.map(({ achievement, unlockedAt }) => (
                                         <div key={achievement.achievementId} className="profile-history-row">
-                                            <img
+                                            <Image
                                                 src={`${backendBase}${achievement.iconUrl}`}
                                                 alt={achievement.name}
                                                 style={{ width: 32, height: 32, objectFit: "contain", flexShrink: 0 }}
@@ -404,6 +420,11 @@ const ProfilePage: React.FC = () => {
                                             <div key={req.userId} className="profile-history-row">
                                                 <div className="profile-history-info"><div className="profile-history-name">{req.username}</div><div className="profile-history-meta">Möchte dein Freund sein</div></div>
                                                 <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => {handleAccept(req.userId)}}>Annehmen</button>
+                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm"
+                                                        onClick={() => {handleReject(req.userId)}}
+                                                        style={{ background: "grey", borderColor: "black" }}
+                                                >Ablehnen
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
