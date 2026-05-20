@@ -5,6 +5,7 @@ import { ApiService } from "@/api/apiService";
 import { AuthContextType } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useWebSocket } from "@/context/WebSocketContext";
+import {useNotifications} from "@/context/NotificationContext";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const apiService = new ApiService();
@@ -15,6 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
     const { connect, disconnect } = useWebSocket();
+    const { clearAll } = useNotifications();
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -69,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const login = async (token: string, userId: number) => {
         localStorage.setItem("token", JSON.stringify(token));
         localStorage.setItem("userId", JSON.stringify(userId));
+        clearAll();
         setToken(token);
         await fetchUser(token, userId);
         connect(String(userId), token);
