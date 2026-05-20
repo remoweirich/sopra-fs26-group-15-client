@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, FormEvent } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
@@ -32,7 +32,9 @@ const ProfilePage: React.FC = () => {
     const backendBase = getApiDomain()
     const [profileData, setProfileData] = useState<MyUserDTO | UserDTO | null>(null);
     const [editing, setEditing] = useState(false);
-    const [tab, setTab] = useState<ProfileTab>("overview");
+    const searchParams = useSearchParams();
+    const initialTab = (searchParams.get("tab") as ProfileTab) || "overview";
+    const [tab, setTab] = useState<ProfileTab>(initialTab);
 
     // Edit form state
     const [editName, setEditName] = useState("");

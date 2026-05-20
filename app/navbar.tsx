@@ -8,6 +8,10 @@ import { LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { useApi } from "@/hooks/useApi";
 import { useNotifications } from "@/context/NotificationContext";
 import type { AppNotification } from "@/context/NotificationContext";
+import {App as AntdApp, Image} from "antd";
+import { getApiDomain } from "@/utils/domain";
+
+const backendBase = getApiDomain();
 
 function SBBCross({ size = 20 }: { size?: number }) {
   return (
@@ -19,14 +23,16 @@ function SBBCross({ size = 20 }: { size?: number }) {
 }
 
 export default function Navbar() {
-  // COMBINED: Only call useAuth once and pass token/user down to where needed, instead of calling useAuth separately in Navbar and NotificationListener. This avoids redundant context lookups and keeps auth state management centralized. 
+  // COMBINED: Only call useAuth once and pass token/user down to where needed, instead of calling useAuth separately in Navbar and NotificationListener. This avoids redundant context lookups and keeps auth state management centralized.
   const { user, logout, isLoading, login, token } = useAuth();
   const isLoggedIn = !!user;
   const pathname = usePathname();
   const router = useRouter();
   const apiService = useApi();
+  const { notification } = AntdApp.useApp();
 
-  const [menuOpen, setMenuOpen] = useState(false);
+
+    const [menuOpen, setMenuOpen] = useState(false);
   const [code, setCode] = useState("");
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
   const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
@@ -89,20 +95,30 @@ export default function Navbar() {
     const effectiveToken = overrideCredentials?.token ?? token ?? "";
     const lobbyCodeDTO: LobbyCodeDTO = { lobbyCode: joinCode };
 
-    const response: LobbyAccessDTO = await apiService.post<LobbyAccessDTO>(
-      `/lobbies/join/${joinCode}`,
-      lobbyCodeDTO,
-      {
-        headers: {
-          token: effectiveToken,
-          userId: effectiveUserId.toString(),
-        },
-      }
-    );
+    try {
+      const response: LobbyAccessDTO = await apiService.post<LobbyAccessDTO>(
+          `/lobbies/join/${joinCode}`,
+          lobbyCodeDTO,
+          {
+            headers: {
+              token: effectiveToken,
+              userId: effectiveUserId.toString(),
+            },
+          }
+      );
+        await login(response.token, response.userId);
+        router.push(`/lobbies/${response.lobbyId}`);
+        setCode("");
+    } catch (error: unknown) {
+      console.error(error);
+      notification.error({
+          title: "Lobby Not Found",
+          description: `Bitte überprüfe den Code und versuche es erneut.`,
+          placement: "topRight",
+          duration: 4
+      });
+    }
 
-    await login(response.token, response.userId);
-    router.push(`/lobbies/${response.lobbyId}`);
-    setCode("");
   }
 
   async function handleCodeJoin() {
@@ -228,7 +244,7 @@ export default function Navbar() {
                                 {n.type === "friend_request" && (
                                   <>
                                     <div className="navbar-notif-icon navbar-notif-icon--friend">👤</div>
-                                    <div className="navbar-notif-info">
+                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=friends`)} style={{ cursor: 'pointer' }}>
                                       <div className="navbar-notif-text">
                                         <strong>{n.from}</strong> möchte dein Freund sein
                                       </div>
@@ -244,7 +260,7 @@ export default function Navbar() {
                                 {n.type === "friend_accepted" && (
                                   <>
                                     <div className="navbar-notif-icon navbar-notif-icon--info">✓</div>
-                                    <div className="navbar-notif-info">
+                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=friends`)} style={{ cursor: 'pointer' }}>
                                       <div className="navbar-notif-text"><strong>{n.from}</strong> hat deine Freundschaftsanfrage angenommen</div>
                                       <div className="navbar-notif-time">{formatTime(n.time)}</div>
                                     </div>
@@ -254,7 +270,7 @@ export default function Navbar() {
                                 {n.type === "friend_rejected" && (
                                   <>
                                     <div className="navbar-notif-icon navbar-notif-icon--info">–</div>
-                                    <div className="navbar-notif-info">
+                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=friends`)} style={{ cursor: 'pointer' }}>
                                       <div className="navbar-notif-text"><strong>{n.from}</strong> hat deine Freundschaftsanfrage abgelehnt</div>
                                       <div className="navbar-notif-time">{formatTime(n.time)}</div>
                                     </div>
@@ -287,10 +303,11 @@ export default function Navbar() {
 
                                 {n.type === "achievement" && (
                                   <>
-                                    <div className="navbar-notif-icon navbar-notif-icon--achieve">🏆</div>
-                                    <div className="navbar-notif-info">
+                                    <Image src={`${backendBase}${n.iconUrl}`} alt={n.name} style={{ width: 24, height: 24 }} />
+                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=achievements`)} style={{ cursor: 'pointer' }}>
                                       <div className="navbar-notif-text">Achievement freigeschaltet: <strong>{n.name}</strong></div>
                                       <div className="navbar-notif-time">{formatTime(n.time)}</div>
+
                                     </div>
                                   </>
                                 )}
