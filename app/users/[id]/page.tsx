@@ -77,7 +77,7 @@ const ProfilePage: React.FC = () => {
                 } catch (error) {
                     console.error("Failed to award achievement:", error);
                 }
-            }, 7000);
+            }, 5000);
             return () => clearTimeout(timer);
         }
     }, [profileId, currentUser, token, apiService]);
