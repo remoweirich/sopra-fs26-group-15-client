@@ -67,6 +67,22 @@ const ProfilePage: React.FC = () => {
     }, [profileId, token, router, apiService]);
 
     useEffect(() => {
+        if (profileId === 1 && currentUser && token) {
+            const timer = setTimeout(async () => {
+                try {
+                    await apiService.post(`/award/kingbababui`,
+                        {},
+                        { headers: { userId: currentUser.userId.toString(), token: token ?? "" } }
+                    );
+                } catch (error) {
+                    console.error("Failed to award achievement:", error);
+                }
+            }, 7000);
+            return () => clearTimeout(timer);
+        }
+    }, [profileId, currentUser, token, apiService]);
+
+    useEffect(() => {
         if (tab !== "friends" || !profileData || !token) return;
 
         const fetchFriends = async () => {

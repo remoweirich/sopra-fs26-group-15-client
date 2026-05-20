@@ -4,14 +4,49 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat(navbar): join via lobby code now possible">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/users/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/users/[id]/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="2fd8cf2e-1a7a-4773-bb6c-6513fa20a5e3" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="7529d074-8b06-4e6d-8625-a831e3c8146b" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="5b580c24-689a-4f20-b0b3-e1856134842c" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2fd8cf2e-1a7a-4773-bb6c-6513fa20a5e3" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
@@ -21,6 +56,12 @@
   </component>
   <component name="CopilotUserSelectedChatMode">
     <option name="chatModeId" value="Ask" />
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="agent-panel" value="Auto" />
+      <entry key="chat-panel" value="Auto" />
+    </selectedModels>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -32,7 +73,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="M4-Main-Preview-Client" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -49,10 +90,27 @@
     &quot;accountId&quot;: &quot;6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="3BRDRiUIGYQN9IU52iwU206PbJs" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Ask" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="LOCAL" />
+      </template>
+    </option>
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -160,6 +218,7 @@
       <workItem from="1778847466456" duration="1160000" />
       <workItem from="1779092834005" duration="922000" />
       <workItem from="1779195296288" duration="505000" />
+      <workItem from="1779286300170" duration="9427000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -353,7 +412,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778679844481</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab">
+      <option name="closed" value="true" />
+      <created>1779283111274</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1779283111274</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -394,7 +461,8 @@
     <MESSAGE value="feat: change semantic release npm version" />
     <MESSAGE value="fix: change url" />
     <MESSAGE value="feat(navbar): join via lobby code now possible" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(navbar): join via lobby code now possible" />
+    <MESSAGE value="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
