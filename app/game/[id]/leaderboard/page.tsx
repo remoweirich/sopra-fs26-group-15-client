@@ -111,7 +111,7 @@ const EndLeaderboardPage: React.FC = () => {
       <div className="end-shell">
         <div className="end-head">
           <span className="label">Spielende / Game Over</span>
-          <h1>Endabrechnung</h1>
+          <h1>Rangliste</h1>
           <div
             style={{
               fontFamily: "var(--font-mono)",

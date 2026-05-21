@@ -3239,6 +3239,31 @@ img, svg { display: block; max-width: 100%; }
   animation: pulseDot 1.6s ease-in-out infinite;
 }
 
+.profile-status-offline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(45,140,92,0.18);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+
+.profile-status-offline span:first-child {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--grey);
+}
+
+.profile-status-offline span:last-child {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--grey);
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .profile-meta {
   font-family: var(--font-mono);
   font-size: 10px;

@@ -180,7 +180,7 @@ const LobbiesPage: React.FC = () => {
           while the grid of column labels stays centred to the shell. */}
       <div className="lobby-stripe is-head">
         <div className="lobby-table-head">
-          <span>ID</span>
+          <span>CODE</span>
           <span>NAME</span>
           <span className="hide-md col-players">SPIELER</span>
           <span className="hide-md col-rounds">RUNDEN</span>
@@ -223,9 +223,6 @@ const LobbiesPage: React.FC = () => {
               </div>
               <div>
                 <div className="lobby-row-name">{lobby.lobbyName}</div>
-                <div className="lobby-row-meta">
-                  by {lobby.host ?? lobby.adminUsername ?? "Anonymous"}
-                </div>
               </div>
               <Pips n={lobby.currentPlayers} max={lobby.maxPlayers} />
               <div className="lobby-row-rounds">{lobby.maxRounds}×</div>
