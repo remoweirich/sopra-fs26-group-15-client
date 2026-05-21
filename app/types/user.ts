@@ -27,13 +27,13 @@ export interface UserScoreboard {
 }
 
 export interface MyUserDTO {
-  userId: number;       // ← neu
+  userId: number;       
   username: string;
   email: string;
   userBio: string;
   creationDate: Date;
-  isGuest: boolean;     // ← neu
-  isOnline: boolean;    // ← neu
+  isGuest: boolean;     
+  isOnline: boolean;    
   userScoreboard: UserScoreboard;
   userAchievementDTOList?: UserAchievementDTO[]
   friends: UserDTO[];

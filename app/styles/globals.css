@@ -1175,7 +1175,7 @@ a, button, input, select, textarea {
   align-items: center;
   flex-shrink: 1; 
   min-width: 0; 
-  overflow: hidden;
+  overflow: visible;
 }
 
 .navbar-link {
@@ -1371,10 +1371,14 @@ a, button, input, select, textarea {
 
 .navbar-notif-btn {
   position: relative;
+  isolation: isolate;
+  overflow: visible;
   background: transparent;
   border: none;
   color: var(--white);
-  padding: 7px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
   cursor: pointer;
   border-radius: 50%;
   display: flex;
@@ -1382,6 +1386,7 @@ a, button, input, select, textarea {
   justify-content: center;
   transition: background 0.14s;
   margin-right: 2px;
+  flex-shrink: 0;
 }
 
 .navbar-notif-btn:hover {
@@ -1390,22 +1395,25 @@ a, button, input, select, textarea {
 
 .navbar-notif-badge {
   position: absolute;
-  top: -3px;
-  right: -5px;
+  top: 2px;
+  right: 1px;
+  z-index: 2;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
   background: var(--white);
   color: var(--red);
+  border: 1px solid var(--red);
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 800;
-  min-width: 17px;
-  height: 17px;
-  border-radius: 999px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
-  line-height: 1;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.16);
+  pointer-events: none;
 }
 
 .navbar-notif-backdrop {
