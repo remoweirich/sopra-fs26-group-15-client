@@ -1,6 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import React, {useEffect, useState} from "react";
+import { useApi } from "@/hooks/useApi";
+import {UserDTO} from "@/types/user";
+import {Lobby} from "@/types/lobby";
+import Link from "next/link";
 
 // ─── Decorative SVGs ────────────────────────────────────────────────────────
 const TrainSVG = ({ w = 150 }: { w?: number }) => (
@@ -46,6 +51,55 @@ const HomePage: React.FC = () => {
   const router = useRouter();
   const ticker =
     "  🚄 GuesSBB – Wo ist der Zug?  ·  IC 1 Genève → St.Gallen  ·  S12 Brugg → Zürich HB  ·  IR 13 Zürich → Chur  ·  RE Basel → Luzern  ·  IC 5 Lausanne → Zürich  ·  ";
+
+    const apiService = useApi();
+    const [users, setUsers] = useState<number>(0);
+    const [bestPlayer, setBestPlayer] = useState<UserDTO | null>(null);
+    const [bestPlayerName, setBestPlayerName] = useState<string>("KingBabaBui");
+    const [activeLobbies, setActiveLobbies] = useState<number>(0);
+    const [activePlayers, setActivePlayers] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const data = await apiService.get<UserDTO[]>(`/users/search?username=`);
+
+                const userCount = data.length;
+                setUsers(userCount);
+
+                // 2. Besten Spieler ermitteln (Sicherheit gegen leere Arrays eingebaut)
+                if (data && data.length > 0) {
+                    const topUser = data.reduce((maxUser, currentUser) => {
+                        const currentPoints = currentUser.userScoreboard?.leaderboardPoints ?? 0;
+                        const maxPoints = maxUser.userScoreboard?.leaderboardPoints ?? 0;
+                        return currentPoints > maxPoints ? currentUser : maxUser;
+                    }, data[0]);
+
+                    setBestPlayer(topUser);
+                    setBestPlayerName(topUser.username);
+                }
+            } catch (e) {
+                console.error("Fehler beim Laden der User:", e);
+            }
+        }
+
+        const fetchLobbies = async () => {
+            try {
+                const data = await apiService.get<Lobby[]>(`/lobbies`);
+                setActiveLobbies(data.length);
+
+                const totalPlayersInLobbies = data.reduce((sum, lobby) => {
+                    return sum + (lobby?.currentPlayers ?? 0);
+                }, 0);
+                setActivePlayers(totalPlayersInLobbies);
+            } catch (e) {
+                console.error("Fehler beim Laden der Lobbies:", e);
+            }
+        }
+
+        fetchUsers();
+        fetchLobbies();
+    }, [apiService]);
 
   return (
     <div className="home-root">
@@ -135,19 +189,27 @@ const HomePage: React.FC = () => {
       <div className="home-stats">
         <div className="home-stats-bar">
           <div className="home-stat">
-            <div className="home-stat-v">2&apos;847</div>
-            <div className="home-stat-l">Spiele heute</div>
+              <Link href={`/lobbies`} className="home-stat-v">
+                  {activeLobbies}
+              </Link>
+            <div className="home-stat-l">Aktive Lobbies</div>
+          </div>
+            <div className="home-stat">
+                <div className="home-stat-v">{activePlayers}</div>
+                <div className="home-stat-l">Aktive (Gast-)Spieler</div>
+            </div>
+          <div className="home-stat">
+              <Link href={`/leaderboard`} className="home-stat-v">
+                  {users}
+              </Link>
+            <div className="home-stat-l">Spieler</div>
           </div>
           <div className="home-stat">
-            <div className="home-stat-v">342</div>
-            <div className="home-stat-l">Online</div>
-          </div>
-          <div className="home-stat">
-            <div className="home-stat-v">12&apos;504</div>
-            <div className="home-stat-l">Züge geraten</div>
-          </div>
-          <div className="home-stat">
-            <div className="home-stat-v">ZürichHB</div>
+              <div className="home-stat-v">
+              <Link href={`/users/${bestPlayer?.userId}`} className="home-stat-v">
+                  {bestPlayerName}
+              </Link>
+              </div>
             <div className="home-stat-l">#1 Weltweit</div>
           </div>
         </div>

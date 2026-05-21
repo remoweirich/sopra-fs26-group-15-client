@@ -46,6 +46,7 @@ export interface UserDTO{
   userBio: string,
   creationDate: Date,
   friends: UserDTO[]
+  isOnline: boolean;
 }
 
 export interface UserResult {

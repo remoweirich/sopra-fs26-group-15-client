@@ -59,6 +59,7 @@ const ProfilePage: React.FC = () => {
     const [pendingSent, setPendingSent] = useState<UserDTO[]>([]);
     const [isLoadingFriends, setIsLoadingFriends] = useState(false);
     const [friendToRemove, setFriendToRemove] = useState<UserDTO | null>(null);
+    // const [online, setOnline] = useState(false);
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -67,6 +68,7 @@ const ProfilePage: React.FC = () => {
                     headers: { token: token ?? "" },
                 });
                 setProfileData(data);
+                // setIsOnline(data.isOnline);
             } catch (error) {
                 console.error(error);
                 router.push("/lobbies");
@@ -274,7 +276,7 @@ const ProfilePage: React.FC = () => {
                 {},
                 { headers: { userId: currentUser.userId.toString(), token } }
             );
-            
+
             dismissNotif(`friend-request-${requestingUserId}`);
             notification.destroy(`friend-request-${requestingUserId}`);
 
@@ -287,7 +289,7 @@ const ProfilePage: React.FC = () => {
 
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
-        { id: "games", icon: "🎮", label: "Spiele", count: DUMMY_HISTORY.length },
+        // { id: "games", icon: "🎮", label: "Spiele", count: DUMMY_HISTORY.length },
         { id: "achievements", icon: "🏆", label: "Erfolge", count: `${(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0}/11` },
         ...(showFriends
             ? [{ id: "friends" as ProfileTab, icon: "👥", label: "Freunde" }]
@@ -302,10 +304,18 @@ const ProfilePage: React.FC = () => {
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="profile-name-row">
                             <h1 className="profile-name">{profileData.username}</h1>
-                            <div className="profile-status-online">
-                                <span />
-                                <span>Online</span>
-                            </div>
+
+                            {/*<div*/}
+                            {/*    className={`profile-status-${online ? "online" : "offline"}`}*/}
+                            {/*    style={!online ? {*/}
+                            {/*        background: "rgba(255, 255, 255, 0.15)",*/}
+                            {/*        color: "#F4F4F5", // Sehr helles Grau/Weiss für perfekten Kontrast*/}
+                            {/*    } : undefined}*/}
+                            {/*>*/}
+                            {/*    <span />*/}
+                            {/*    <span>{online ? "Online" : "Offline"}</span>*/}
+                            {/*</div>*/}
+
                         </div>
                         <div className="profile-meta">
                             {creationDate ? `Mitglied seit ${creationDate}` : "Mitglied"}
@@ -385,23 +395,23 @@ const ProfilePage: React.FC = () => {
                                 </div>
                             </div>
                         </section>
-                        <section className="profile-section">
-                            <div className="profile-section-head"><h2>🎮 Letzte Spiele</h2><button type="button" className="sbb-link" onClick={() => setTab("games")} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", padding: 0 }}>Alle ansehen →</button></div>
-                            {DUMMY_HISTORY.slice(0, 3).map((g) => (
-                                <div key={g.name} className="profile-history-row"><span className="profile-history-icon">⚡</span><div className="profile-history-info"><div className="profile-history-name">{g.name}</div><div className="profile-history-meta">{g.date} · {g.rounds}</div></div><div className="profile-history-score">{formatNumber(g.score)}</div></div>
-                            ))}
-                        </section>
+                        {/*<section className="profile-section">*/}
+                        {/*    <div className="profile-section-head"><h2>🎮 Letzte Spiele</h2><button type="button" className="sbb-link" onClick={() => setTab("games")} style={{ background: "transparent", border: "none", cursor: "pointer", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", padding: 0 }}>Alle ansehen →</button></div>*/}
+                        {/*    {DUMMY_HISTORY.slice(0, 3).map((g) => (*/}
+                        {/*        <div key={g.name} className="profile-history-row"><span className="profile-history-icon">⚡</span><div className="profile-history-info"><div className="profile-history-name">{g.name}</div><div className="profile-history-meta">{g.date} · {g.rounds}</div></div><div className="profile-history-score">{formatNumber(g.score)}</div></div>*/}
+                        {/*    ))}*/}
+                        {/*</section>*/}
                     </>
                 )}
 
-                {tab === "games" && (
-                    <section className="profile-section">
-                        <div className="profile-section-head"><h2>🎮 Spielverlauf</h2></div>
-                        {DUMMY_HISTORY.map((g) => (
-                            <div key={g.name} className="profile-history-row"><span className="profile-history-icon">⚡</span><div className="profile-history-info"><div className="profile-history-name">{g.name}</div><div className="profile-history-meta">{g.date} · {g.rounds}</div></div><div className="profile-history-score">{formatNumber(g.score)}</div></div>
-                        ))}
-                    </section>
-                )}
+                {/*{tab === "games" && (*/}
+                {/*    <section className="profile-section">*/}
+                {/*        <div className="profile-section-head"><h2>🎮 Spielverlauf</h2></div>*/}
+                {/*        {DUMMY_HISTORY.map((g) => (*/}
+                {/*            <div key={g.name} className="profile-history-row"><span className="profile-history-icon">⚡</span><div className="profile-history-info"><div className="profile-history-name">{g.name}</div><div className="profile-history-meta">{g.date} · {g.rounds}</div></div><div className="profile-history-score">{formatNumber(g.score)}</div></div>*/}
+                {/*        ))}*/}
+                {/*    </section>*/}
+                {/*)}*/}
 
                 {tab === "achievements" && (
                     <section className="profile-section">

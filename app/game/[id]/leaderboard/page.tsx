@@ -10,10 +10,10 @@ const MEDAL = ["🥇", "🥈", "🥉"];
 
 // Verdict label shown next to each player on the ranking list — same
 // thresholds as the design mockup so the tone matches.
-const getVerdict = (pts: number): string => {
-  if (pts >= 900) return "SBB-Insider 🚆";
-  if (pts >= 600) return "Sehr gut!";
-  if (pts >= 350) return "Solide.";
+const getVerdict = (pts: number, rnds: number): string => {
+  if (pts/rnds >= 900) return "SBB-Insider 🚆";
+  if (pts/rnds >= 600) return "Sehr gut!";
+  if (pts/rnds >= 350) return "Solide.";
   return "Üben nicht vergessen.";
 };
 
@@ -111,7 +111,7 @@ const EndLeaderboardPage: React.FC = () => {
       <div className="end-shell">
         <div className="end-head">
           <span className="label">Spielende / Game Over</span>
-          <h1>Endabrechnung</h1>
+          <h1>Rangliste</h1>
           <div
             style={{
               fontFamily: "var(--font-mono)",
@@ -198,7 +198,7 @@ const EndLeaderboardPage: React.FC = () => {
                   textAlign: "right",
                 }}
               >
-                {getVerdict(p.points ?? 0)}
+                {getVerdict(p.points ?? 0, gameResult.rounds.length)}
               </div>
             </div>
           );
