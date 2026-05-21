@@ -1,3 +1,20 @@
+# [1.5.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.4.1...v1.5.0) (2026-05-21)
+
+
+### Bug Fixes
+
+* change user page and add totalpoints as well as 4 columns ([f6a82ed](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f6a82edd09ba9fb5cf1c9fadc4bde727769ba3b8))
+* clear navbar when logging in to delete notifications ([eca1d93](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/eca1d93478080d9261fa4d7d0924d73e6fc6fb78))
+* masked high default values and negative timer when no guess is submitted [#55](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/55) ([7613e32](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/7613e328720ed553c602d004359ad3ba25bef46a))
+* navbar auth context ([fae1846](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/fae184693297227ef259cdecadd7159ecf0cdce1))
+* navbar auth context 2 ([ec03a38](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ec03a389ce5fac5b12768f02a3eb8a9fb7e57a80))
+
+
+### Features
+
+* **notifications:** Feedback notification added when sending friend request closes [#40](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/40) ([4a78ffa](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/4a78ffa1153d52600e26f3464de3ce9f8eddf2b3))
+* **notifications:** notifications and bell notifications are now clickable and send you to the correct user profile tab ([77a1125](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/77a1125be4438ff45849d815b1dbbfdb2c8bd36c))
+
 ## [1.4.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.4.0...v1.4.1) (2026-05-20)
 
 
