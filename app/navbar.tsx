@@ -266,7 +266,7 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <button className={`navbar-link ${isActive(`/users/${user.userId}`) ? "is-active" : ""}`} onClick={() => go(`/users/${user.userId}`)}>
-                      {user.username.length > 12 ? user.username.slice(0, 12) + "…" : user.username}
+                      {user.username.length > 8 ? user.username.slice(0, 8) + "…" : user.username}
                     </button>
                     <button className="navbar-logout" onClick={logout}>Logout</button>
                   </>
@@ -287,6 +287,18 @@ export default function Navbar() {
         <div className="navbar-drawer">
           <button type="button" className="navbar-drawer-backdrop" onClick={() => setMenuOpen(false)} />
           <div className="navbar-drawer-panel">
+            <div className="navbar-drawer-section">
+              <div className="sbb-pill-input" style={{ width: "100%" }}>
+                <span style={{ padding: "0 4px 0 14px", color: "var(--grey)", display: "flex" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M20 20 L16.5 16.5" />
+                  </svg>
+                </span>
+                <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))} onKeyDown={handleCodeKey} placeholder="LOBBY-CODE" />
+                <button type="button" onClick={() => { handleCodeJoin(); setMenuOpen(false); }}>Join</button>
+              </div>
+            </div>
             <div className="navbar-drawer-section">
               <button className="navbar-drawer-link" onClick={() => go("/lobbies")}>Lobbies</button>
               <button className="navbar-drawer-link" onClick={() => go("/leaderboard")}>Rangliste</button>
