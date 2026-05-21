@@ -27,6 +27,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         router.push("/login");
     };
 
+    const softLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        setToken(null);
+        setUser(null);
+        disconnect();
+    };
+
     const fetchUser = async (token: string, userId: number, isInitial = false) => {
         try {
             const userData = await apiService.get<MyUserDTO | UserDTO>(
@@ -35,12 +43,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             );
             if (userData && "email" in userData) {
                 setUser({ userId, username: userData.username });
+
+                setToken(token);
+                connect(String(userId), token);
+
+
             } else {
-                if (!isInitial) logout();
+                localStorage.removeItem("token");
+                localStorage.removeItem("userId");
+                setToken(null);
+                setUser(null);
+                disconnect();
+                if (!isInitial) router.push("/login");
             }
-        } catch (e) {
-            if (!isInitial) logout();
-        } finally {
+        }  catch (e) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        setToken(null);
+        setUser(null);
+        disconnect();
+        if (!isInitial) router.push("/login");
+    } finally {
             setIsLoading(false);
         }
     };
@@ -55,8 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const parsedToken = JSON.parse(rawToken);
                     const parsedUserId = JSON.parse(rawUserId);
                     await fetchUser(parsedToken, Number(parsedUserId), true);
-                    setToken(parsedToken);
-                    connect(String(parsedUserId), parsedToken);
+
                 } catch (e) {
                     console.error("Fehler beim Parsen der Auth-Daten", e);
                     setIsLoading(false);
@@ -72,13 +94,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("token", JSON.stringify(token));
         localStorage.setItem("userId", JSON.stringify(userId));
         clearAll();
-        setToken(token);
+        //setToken(token);
         await fetchUser(token, userId);
-        connect(String(userId), token);
+        //connect(String(userId), token);
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ user, token, isLoading, login, logout, softLogout }}>
             {children}
         </AuthContext.Provider>
     );

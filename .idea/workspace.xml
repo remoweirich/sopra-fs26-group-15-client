@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: clear navbar when logging in to delete notifications">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/types/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/users/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/users/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/context/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/context/AuthContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/game/[id]/leaderboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/leaderboard/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/types/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/types/auth.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +68,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "M4-Main-Preview-Client",
+    "git-widget-placeholder": "ClaudeStuff",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
@@ -364,7 +365,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779212805404</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="fix: clear navbar when logging in to delete notifications">
+      <option name="closed" value="true" />
+      <created>1779289288858</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1779289288858</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -406,7 +415,8 @@
     <MESSAGE value="fix: change url" />
     <MESSAGE value="update contributions" />
     <MESSAGE value="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)" />
+    <MESSAGE value="fix: clear navbar when logging in to delete notifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: clear navbar when logging in to delete notifications" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

@@ -23,11 +23,11 @@ const EndLeaderboardPage: React.FC = () => {
   const gameId = Number(params.id);
 
   const apiService = useApi();
-  const { user: currentUser, token } = useAuth();
 
   const [gameResult, setGameResult] = useState<GameResultDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { user: currentUser, token, softLogout } = useAuth();
 
   useEffect(() => {
     if (!gameId || !currentUser || !token) return;
@@ -98,6 +98,13 @@ const EndLeaderboardPage: React.FC = () => {
   if (totalScores[2]) {
     podiumCells.push({ entry: totalScores[2], rank: 3, height: 96, color: "#CD7F32" });
   }
+
+  const handleNavigate = (path: string) => {
+    if (currentUser?.username?.startsWith("guest_")) {
+      softLogout();
+    }
+    router.push(path);
+  };
 
   return (
     <div className="end-root">
@@ -256,14 +263,14 @@ const EndLeaderboardPage: React.FC = () => {
           <button
             type="button"
             className="sbb-btn sbb-btn--primary sbb-btn--lg"
-            onClick={() => router.push("/lobbies")}
+            onClick={() => handleNavigate("/lobbies")}
           >
             Nochmal spielen
           </button>
           <button
             type="button"
             className="sbb-btn sbb-btn--outline sbb-btn--lg"
-            onClick={() => router.push("/leaderboard")}
+            onClick={() => handleNavigate("/leaderboard")}
           >
             Globale Rangliste
           </button>
