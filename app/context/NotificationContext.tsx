@@ -1,30 +1,28 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 export type AppNotification =
   | { id: string; type: "friend_request"; from: string; fromId: number; time: Date }
   | { id: string; type: "friend_accepted"; from: string; time: Date }
   | { id: string; type: "friend_rejected"; from: string; time: Date }
   | { id: string; type: "achievement"; name: string; description: string; iconUrl?: string; time: Date }
-  | { id: string; type: "game_invite"; from: string; fromId: number; lobbyName: string; lobbyId: number; time: Date }
-  | { id: string; type: "game_declined"; from: string; time: Date };
 
 export type NewNotification =
   | { type: "friend_request"; from: string; fromId: number }
   | { type: "friend_accepted"; from: string }
   | { type: "friend_rejected"; from: string }
-  | { type: "feedback"; from: string }
   | { type: "achievement"; name: string; description: string; iconUrl?: string }
-  | { type: "game_invite"; from: string; fromId: number; lobbyName: string; lobbyId: number }
-  | { type: "game_declined"; from: string };
 
 interface NotificationContextType {
   notifications: AppNotification[];
   unreadCount: number;
   add: (notif: NewNotification, customId?: string) => void;
   dismiss: (id: string) => void;
+  clearInfoNotifications: () => void;
   clearAll: () => void;
+  friendsVersion: number;
+  bumpFriendsVersion: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType>({
@@ -32,7 +30,10 @@ const NotificationContext = createContext<NotificationContextType>({
   unreadCount: 0,
   add: () => {},
   dismiss: () => {},
+  clearInfoNotifications: () => {},
   clearAll: () => {},
+  friendsVersion: 0,
+  bumpFriendsVersion: () => {},
 });
 
 export function useNotifications() {
@@ -41,29 +42,54 @@ export function useNotifications() {
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [friendsVersion, setFriendsVersion] = useState(0);
 
   const add = useCallback((notif: NewNotification, customId?: string) => {
+    const id =
+      customId ??
+      `${notif.type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
-    console.log("[NotificationContext] add called:", notif);
-    const id = customId ?? `${notif.type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const entry = { ...notif, id, time: new Date() } as AppNotification;
-    setNotifications((prev) => [entry, ...prev]);
+
+    setNotifications((prev) => {
+      // Important: fixed ids such as friend-request-123 must not appear twice.
+      const withoutDuplicate = prev.filter((n) => n.id !== id);
+      return [entry, ...withoutDuplicate];
+    });
   }, []);
 
   const dismiss = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
+  const clearInfoNotifications = useCallback(() => {
+    // Keep actionable friend requests until the user accepts/rejects them.
+    setNotifications((prev) => prev.filter((n) => n.type === "friend_request"));
+  }, []);
+
   const clearAll = useCallback(() => {
     setNotifications([]);
   }, []);
 
-  const unreadCount = notifications.filter(
-    (n) => n.type === "friend_request" || n.type === "game_invite" || n.type === "achievement"
-  ).length;
+  const bumpFriendsVersion = useCallback(() => {
+    setFriendsVersion((v) => v + 1);
+  }, []);
+
+  const unreadCount = notifications.length;
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, add, dismiss, clearAll }}>
+    <NotificationContext.Provider
+      value={{
+        notifications,
+        unreadCount,
+        add,
+        dismiss,
+        clearInfoNotifications,
+        clearAll,
+        friendsVersion,
+        bumpFriendsVersion,
+      }}
+    >
       {children}
     </NotificationContext.Provider>
   );

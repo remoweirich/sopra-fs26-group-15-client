@@ -8,7 +8,7 @@ import { LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { useApi } from "@/hooks/useApi";
 import { useNotifications } from "@/context/NotificationContext";
 import type { AppNotification } from "@/context/NotificationContext";
-import {App as AntdApp, Image} from "antd";
+import { App as AntdApp, Image } from "antd";
 import { getApiDomain } from "@/utils/domain";
 
 const backendBase = getApiDomain();
@@ -23,7 +23,6 @@ function SBBCross({ size = 20 }: { size?: number }) {
 }
 
 export default function Navbar() {
-  // COMBINED: Only call useAuth once and pass token/user down to where needed, instead of calling useAuth separately in Navbar and NotificationListener. This avoids redundant context lookups and keeps auth state management centralized.
   const { user, logout, isLoading, login, token } = useAuth();
   const isLoggedIn = !!user;
   const pathname = usePathname();
@@ -31,47 +30,47 @@ export default function Navbar() {
   const apiService = useApi();
   const { notification } = AntdApp.useApp();
 
-
-    const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [code, setCode] = useState("");
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
   const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
 
-  /* ── Notifications from shared context ───────────────────────────────── */
-  const { notifications, unreadCount, dismiss: dismissNotif } = useNotifications();
+  const { notifications, unreadCount, dismiss: dismissNotif, clearInfoNotifications, bumpFriendsVersion, } = useNotifications();
 
-  const handleAcceptFriend = async (notif: AppNotification & { type: "friend_request" }) => {
+  const handleAcceptFriend = async (notif: AppNotification) => {
+    if (notif.type !== "friend_request") return;
     try {
-      await apiService.post(`/friends/accept/${notif.fromId}`, {}, {
-        headers: { userId: user?.userId.toString() ?? "", token: token ?? "" },
-      });
+      await apiService.post(
+        `/friends/accept/${notif.fromId}`,
+        {},
+        { headers: { userId: user?.userId.toString() ?? "", token: token ?? "" } }
+      );
+
+      dismissNotif(notif.id);
+      notification.destroy(notif.id);
+      bumpFriendsVersion();
     } catch (error) {
-      console.error("Error accepting friend:", error);
+      console.error("Error when accepting request from bell:", error);
     }
-    dismissNotif(notif.id);
   };
 
-  const handleRejectFriend = async (notif: AppNotification & { type: "friend_request" }) => {
+  const handleRejectFriend = async (notif: AppNotification) => {
+    if (notif.type !== "friend_request") return;
+
     try {
-      await apiService.post(`/friends/reject/${notif.fromId}`, {}, {
-        headers: { userId: user?.userId.toString() ?? "", token: token ?? "" },
-      });
+      await apiService.post(
+        `/friends/reject/${notif.fromId}`,
+        {},
+        { headers: { userId: user?.userId.toString() ?? "", token: token ?? "" } }
+      );
+
+      dismissNotif(notif.id);
+      notification.destroy(notif.id);
+      bumpFriendsVersion();
     } catch (error) {
-      console.error("Error rejecting friend:", error);
+      console.error("Error when rejecting request from bell:", error);
     }
-    dismissNotif(notif.id);
-  };
-
-  const handleAcceptGame = async (notif: AppNotification & { type: "game_invite" }) => {
-    /* TODO [Backend]: Game invitation system doesn't exist yet */
-    dismissNotif(notif.id);
-    setNotifOpen(false);
-  };
-
-  const handleDeclineGame = async (notif: AppNotification & { type: "game_invite" }) => {
-    /* TODO [Backend]: Send decline to requestor */
-    dismissNotif(notif.id);
   };
 
   const formatTime = (date: Date) => {
@@ -82,7 +81,6 @@ export default function Navbar() {
     return date.toLocaleDateString("de-CH", { day: "numeric", month: "short" });
   };
 
-  /* ── Lobby join logic (unchanged) ────────────────────────────────────── */
   const onGameScreen = pathname?.startsWith("/game/") && !pathname?.endsWith("/leaderboard");
 
   useEffect(() => {
@@ -97,79 +95,44 @@ export default function Navbar() {
 
     try {
       const response: LobbyAccessDTO = await apiService.post<LobbyAccessDTO>(
-          `/lobbies/join/${joinCode}`,
-          lobbyCodeDTO,
-          {
-            headers: {
-              token: effectiveToken,
-              userId: effectiveUserId.toString(),
-            },
-          }
+        `/lobbies/join/${joinCode}`, lobbyCodeDTO,
+        { headers: { token: effectiveToken, userId: effectiveUserId.toString() } }
       );
-        await login(response.token, response.userId);
-        router.push(`/lobbies/${response.lobbyId}`);
-        setCode("");
+      await login(response.token, response.userId);
+      router.push(`/lobbies/${response.lobbyId}`);
+      setCode("");
     } catch (error: unknown) {
       console.error(error);
       notification.error({
-          title: "Lobby Not Found",
-          description: `Bitte überprüfe den Code und versuche es erneut.`,
-          placement: "topRight",
-          duration: 4
+        title: "Lobby Not Found",
+        description: `Bitte überprüfe den Code und versuche es erneut.`,
+        placement: "topRight",
+        duration: 4,
       });
     }
-
   }
 
   async function handleCodeJoin() {
     const c = code.trim().toUpperCase();
     if (!c) return;
-
-    if (!isLoggedIn) {
-      setPendingJoinCode(c);
-      setIsAuthModalVisible(true);
-      return;
-    }
-
-    try {
-      await performCodeJoin(c);
-    } catch (error: unknown) {
-      console.error("Failed to join lobby:", error);
-    }
+    if (!isLoggedIn) { setPendingJoinCode(c); setIsAuthModalVisible(true); return; }
+    try { await performCodeJoin(c); } catch (error: unknown) { console.error("Failed to join lobby:", error); }
   }
 
   async function handleContinueAsGuest() {
     if (!pendingJoinCode) return;
-
     const codeToJoin = pendingJoinCode;
     setIsAuthModalVisible(false);
     setPendingJoinCode(null);
-
-    try {
-      await performCodeJoin(codeToJoin, { userId: -1, token: "" });
-    } catch (error: unknown) {
-      console.error("Guest join failed:", error);
-    }
+    try { await performCodeJoin(codeToJoin, { userId: -1, token: "" }); } catch (error: unknown) { console.error("Guest join failed:", error); }
   }
 
-  function handleCodeKey(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") handleCodeJoin();
-  }
-
-  function isActive(href: string) {
-    if (!pathname) return false;
-    return pathname === href || pathname.startsWith(href + "/");
-  }
-
-  function go(href: string) {
-    setMenuOpen(false);
-    setNotifOpen(false);
-    router.push(href);
-  }
+  function handleCodeKey(e: React.KeyboardEvent<HTMLInputElement>) { if (e.key === "Enter") handleCodeJoin(); }
+  function isActive(href: string) { if (!pathname) return false; return pathname === href || pathname.startsWith(href + "/"); }
+  function go(href: string) { setMenuOpen(false); setNotifOpen(false); router.push(href); }
 
   if (onGameScreen) return null;
 
-  /* ── Render ──────────────────────────────────────────────────────────── */
   return (
     <>
       <nav className="navbar">
@@ -177,9 +140,7 @@ export default function Navbar() {
           <div className="navbar-col-left">
             <Link href="/" className="navbar-brand">
               <SBBCross size={20} />
-              <span className="navbar-brand-text">
-                Gues<span>SBB</span>
-              </span>
+              <span className="navbar-brand-text">Gues<span>SBB</span></span>
             </Link>
           </div>
 
@@ -191,12 +152,7 @@ export default function Navbar() {
                   <path d="M20 20 L16.5 16.5" />
                 </svg>
               </span>
-              <input
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))}
-                onKeyDown={handleCodeKey}
-                placeholder="LOBBY-CODE"
-              />
+              <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))} onKeyDown={handleCodeKey} placeholder="LOBBY-CODE" />
               <button type="button" onClick={handleCodeJoin}>Join</button>
             </div>
           </div>
@@ -211,7 +167,12 @@ export default function Navbar() {
                     <button
                       type="button"
                       className="navbar-notif-btn"
-                      onClick={() => setNotifOpen((o) => !o)}
+                      onClick={() => {
+                        setNotifOpen((o) => {
+                          if (o) clearInfoNotifications();
+                          return !o;
+                        });
+                      }}
                       aria-label="Benachrichtigungen"
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -226,7 +187,10 @@ export default function Navbar() {
                         <button
                           type="button"
                           className="navbar-notif-backdrop"
-                          onClick={() => setNotifOpen(false)}
+                          onClick={() => {
+                            clearInfoNotifications();
+                            setNotifOpen(false);
+                          }}
                           aria-label="Schliessen"
                         />
                         <div className="navbar-notif-dropdown">
@@ -244,8 +208,8 @@ export default function Navbar() {
                                 {n.type === "friend_request" && (
                                   <>
                                     <div className="navbar-notif-icon navbar-notif-icon--friend">👤</div>
-                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=friends`)} style={{ cursor: 'pointer' }}>
-                                      <div className="navbar-notif-text">
+                                    <div className="navbar-notif-info">
+                                      <div className="navbar-notif-text" onClick={() => { go(`/users/${user?.userId}?tab=friends`); }} style={{ cursor: "pointer" }}>
                                         <strong>{n.from}</strong> möchte dein Freund sein
                                       </div>
                                       <div className="navbar-notif-actions">
@@ -260,7 +224,7 @@ export default function Navbar() {
                                 {n.type === "friend_accepted" && (
                                   <>
                                     <div className="navbar-notif-icon navbar-notif-icon--info">✓</div>
-                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=friends`)} style={{ cursor: 'pointer' }}>
+                                    <div className="navbar-notif-info" onClick={() => go(`/users/${user?.userId}?tab=friends`)} style={{ cursor: "pointer" }}>
                                       <div className="navbar-notif-text"><strong>{n.from}</strong> hat deine Freundschaftsanfrage angenommen</div>
                                       <div className="navbar-notif-time">{formatTime(n.time)}</div>
                                     </div>
@@ -270,32 +234,8 @@ export default function Navbar() {
                                 {n.type === "friend_rejected" && (
                                   <>
                                     <div className="navbar-notif-icon navbar-notif-icon--info">–</div>
-                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=friends`)} style={{ cursor: 'pointer' }}>
+                                    <div className="navbar-notif-info" onClick={() => go(`/users/${user?.userId}?tab=friends`)} style={{ cursor: "pointer" }}>
                                       <div className="navbar-notif-text"><strong>{n.from}</strong> hat deine Freundschaftsanfrage abgelehnt</div>
-                                      <div className="navbar-notif-time">{formatTime(n.time)}</div>
-                                    </div>
-                                  </>
-                                )}
-
-                                {n.type === "game_invite" && (
-                                  <>
-                                    <div className="navbar-notif-icon navbar-notif-icon--game">🎮</div>
-                                    <div className="navbar-notif-info">
-                                      <div className="navbar-notif-text"><strong>{n.from}</strong> lädt dich ein: <strong>{n.lobbyName}</strong></div>
-                                      <div className="navbar-notif-actions">
-                                        <button type="button" className="navbar-notif-accept" aria-label="Beitreten" onClick={() => handleAcceptGame(n as AppNotification & { type: "game_invite" })}>✓</button>
-                                        <button type="button" className="navbar-notif-reject" aria-label="Ablehnen" onClick={() => handleDeclineGame(n as AppNotification & { type: "game_invite" })}>✕</button>
-                                      </div>
-                                      <div className="navbar-notif-time">{formatTime(n.time)}</div>
-                                    </div>
-                                  </>
-                                )}
-
-                                {n.type === "game_declined" && (
-                                  <>
-                                    <div className="navbar-notif-icon navbar-notif-icon--info">🎮</div>
-                                    <div className="navbar-notif-info">
-                                      <div className="navbar-notif-text"><strong>{n.from}</strong> ist der Einladung leider nicht beigetreten</div>
                                       <div className="navbar-notif-time">{formatTime(n.time)}</div>
                                     </div>
                                   </>
@@ -304,13 +244,13 @@ export default function Navbar() {
                                 {n.type === "achievement" && (
                                   <>
                                     <Image src={`${backendBase}${n.iconUrl}`} alt={n.name} style={{ width: 24, height: 24 }} />
-                                    <div className="navbar-notif-info" onClick={() => router.push(`/users/${user?.userId}?tab=achievements`)} style={{ cursor: 'pointer' }}>
+                                    <div className="navbar-notif-info" onClick={() => go(`/users/${user?.userId}?tab=achievements`)} style={{ cursor: "pointer" }}>
                                       <div className="navbar-notif-text">Achievement freigeschaltet: <strong>{n.name}</strong></div>
                                       <div className="navbar-notif-time">{formatTime(n.time)}</div>
-
                                     </div>
                                   </>
                                 )}
+                                
                               </div>
                             ))
                           )}
@@ -326,7 +266,7 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <button className={`navbar-link ${isActive(`/users/${user.userId}`) ? "is-active" : ""}`} onClick={() => go(`/users/${user.userId}`)}>
-                      {user.username.length > 12 ? user.username.slice(0, 12) + "…" : user.username}
+                      {user.username.length > 8 ? user.username.slice(0, 8) + "…" : user.username}
                     </button>
                     <button className="navbar-logout" onClick={logout}>Logout</button>
                   </>
@@ -336,28 +276,33 @@ export default function Navbar() {
               </div>
             )}
 
-            <button
-              className={`navbar-burger ${menuOpen ? "is-open" : ""}`}
-              onClick={() => setMenuOpen((m) => !m)}
-              type="button"
-            >
+            <button className={`navbar-burger ${menuOpen ? "is-open" : ""}`} onClick={() => setMenuOpen((m) => !m)} type="button">
               <span /><span /><span />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Drawer */}
       {menuOpen && (
         <div className="navbar-drawer">
           <button type="button" className="navbar-drawer-backdrop" onClick={() => setMenuOpen(false)} />
           <div className="navbar-drawer-panel">
             <div className="navbar-drawer-section">
+              <div className="sbb-pill-input" style={{ width: "100%" }}>
+                <span style={{ padding: "0 4px 0 14px", color: "var(--grey)", display: "flex" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M20 20 L16.5 16.5" />
+                  </svg>
+                </span>
+                <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))} onKeyDown={handleCodeKey} placeholder="LOBBY-CODE" />
+                <button type="button" onClick={() => { handleCodeJoin(); setMenuOpen(false); }}>Join</button>
+              </div>
+            </div>
+            <div className="navbar-drawer-section">
               <button className="navbar-drawer-link" onClick={() => go("/lobbies")}>Lobbies</button>
               <button className="navbar-drawer-link" onClick={() => go("/leaderboard")}>Rangliste</button>
-              {user && (
-                <button className="navbar-drawer-link" onClick={() => go(`/users/${user.userId}`)}>Profil</button>
-              )}
+              {user && <button className="navbar-drawer-link" onClick={() => go(`/users/${user.userId}`)}>Profil</button>}
             </div>
             <div className="navbar-drawer-section">
               {user ? (
@@ -370,15 +315,9 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Auth gate modal */}
       {isAuthModalVisible && (
         <div className="sbb-modal-overlay" role="dialog" aria-modal="true" aria-label="Wie willst du spielen?">
-          <button
-            type="button"
-            onClick={() => { setIsAuthModalVisible(false); setPendingJoinCode(null); }}
-            aria-label="Modal schliessen"
-            style={{ position: "absolute", inset: 0, background: "transparent", border: "none", cursor: "pointer" }}
-          />
+          <button type="button" onClick={() => { setIsAuthModalVisible(false); setPendingJoinCode(null); }} aria-label="Modal schliessen" style={{ position: "absolute", inset: 0, background: "transparent", border: "none", cursor: "pointer" }} />
           <div className="sbb-modal" style={{ position: "relative", zIndex: 1 }}>
             <span className="label">Vor dem Start</span>
             <h2>Wie willst du spielen?</h2>
