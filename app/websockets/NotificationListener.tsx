@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
@@ -13,6 +14,7 @@ export default function NotificationListener() {
     const { isConnected, subscribe } = useWebSocket();
     const { user, token } = useAuth();
     const { notification } = AntdApp.useApp();
+    const router = useRouter();
     const apiService = useApi();
     const backendBase = getApiDomain();
 
@@ -89,7 +91,12 @@ export default function NotificationListener() {
                                         Ablehnen
                                     </Button>
                                 </div>
-                            )
+                            ),
+                            className: "clickable-notification",
+                            style: { cursor: "pointer" },
+                            onClick: () => {
+                                router.push(`/users/${user.userId}?tab=friends`);
+                            }
                         });
                         break;
                     }
@@ -106,7 +113,12 @@ export default function NotificationListener() {
                             title: "Anfrage angenommen",
                             description: `${message.payload.username} ist jetzt dein Freund!`,
                             placement: "topRight",
-                            duration: 4
+                            duration: 4,
+                            className: "clickable-notification",
+                            style: { cursor: "pointer" },
+                            onClick: () => {
+                                router.push(`/users/${user.userId}?tab=friends`);
+                            }
                         });
                         break;
 
@@ -122,7 +134,12 @@ export default function NotificationListener() {
                             title: "Anfrage abgelehnt",
                             description: `${message.payload.username} möchte nicht mit dir befreundet sein.`,
                             placement: "topRight",
-                            duration: 4
+                            duration: 4,
+                            className: "clickable-notification",
+                            style: { cursor: "pointer" },
+                            onClick: () => {
+                                router.push(`/users/${user.userId}?tab=friends`);
+                            }
                         });
                         break;
 
@@ -143,9 +160,31 @@ export default function NotificationListener() {
                             description: `${message.payload.name} — ${message.payload.description}`,
                             placement: "topRight",
                             duration: 5,
-                            icon: <Image src={`${backendBase}${message.payload.iconUrl}`} alt={message.payload.name} style={{ width: 24, height: 24 }} />
+                            icon: <Image src={`${backendBase}${message.payload.iconUrl}`} alt={message.payload.name} style={{ width: 24, height: 24 }} />,
+                            className: "clickable-notification",
+                            style: { cursor: "pointer" },
+                            onClick: () => {
+                                router.push(`/users/${user.userId}?tab=achievements`);
+                            }
                         });
                         break;
+
+                    case "FEEDBACK":
+                        console.log("[FEEBACK]", message.payload);
+
+                        addNotification({
+                            type: "feedback",
+                            from: message.payload.username,
+                        });
+
+                        notification.success({
+                            title: "Anfrage gesendet!",
+                            description: `Freundschaftsanfrage wurde erfolgreich an ${message.payload.username} gesendet`,
+                            placement: "topRight",
+                            duration: 4
+                        });
+                        break;
+
                 }
             });
 

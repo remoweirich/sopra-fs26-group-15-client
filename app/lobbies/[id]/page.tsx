@@ -29,7 +29,7 @@ const LobbyWaitPage: React.FC = () => {
   const apiService = useApi();
   const { isConnected, connect, subscribe, publish } = useWebSocket();
 
-  const { user: currentUser, token } = useAuth();
+  const { user: currentUser, token, softLogout } = useAuth();
   const [lobby, setLobby] = useState<MyLobbyDTO | null>(null);
   const intentionalDisconnect = useRef<boolean>(false);
   const [isLoadingGame, setIsLoadingGame] = useState<boolean>(false);
@@ -113,8 +113,12 @@ const LobbyWaitPage: React.FC = () => {
 
   const handleLeave = () => {
     if (!currentUser || !token) return;
+
     intentionalDisconnect.current = true;
     publish(`/app/lobby/${lobbyId}/leave`, {});
+    if (currentUser?.username?.startsWith("guest_")) {
+      softLogout();
+    }
     router.push("/lobbies");
   };
 

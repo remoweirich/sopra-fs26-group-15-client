@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, FormEvent } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
@@ -32,7 +32,9 @@ const ProfilePage: React.FC = () => {
     const backendBase = getApiDomain()
     const [profileData, setProfileData] = useState<MyUserDTO | UserDTO | null>(null);
     const [editing, setEditing] = useState(false);
-    const [tab, setTab] = useState<ProfileTab>("overview");
+    const searchParams = useSearchParams();
+    const initialTab = (searchParams.get("tab") as ProfileTab) || "overview";
+    const [tab, setTab] = useState<ProfileTab>(initialTab);
 
     // Edit form state
     const [editName, setEditName] = useState("");
@@ -144,6 +146,7 @@ const ProfilePage: React.FC = () => {
     const bestRound = scoreboard?.bestRoundPoints ?? 0;
     const precision = scoreboard?.guessingPrecision ?? 0;
     const gamesWon = scoreboard?.gamesWon ?? 0;
+    const leaderboardPoints = scoreboard?.leaderboardPoints ?? 0;
 
     const handleStartEdit = () => {
         setEditName(profileData.username || "");
@@ -273,14 +276,14 @@ const ProfilePage: React.FC = () => {
 
             <div className="profile-hero-stats">
                 <div className="sbb-stat sbb-stat--gold">
-                    <div className="sbb-stat-icon">🏆</div>
-                    <div className="sbb-stat-value">{formatNumber(totalPoints)}</div>
-                    <div className="sbb-stat-label">Gesamtpunkte</div>
+                    <div className="sbb-stat-icon">⭐</div>
+                    <div className="sbb-stat-value">{formatNumber(leaderboardPoints)}</div>
+                    <div className="sbb-stat-label">Rangpunktzahl</div>
                 </div>
                 <div className="sbb-stat sbb-stat--dark">
-                    <div className="sbb-stat-icon">🎮</div>
-                    <div className="sbb-stat-value">{playedGames}</div>
-                    <div className="sbb-stat-label">Spiele</div>
+                    <div className="sbb-stat-icon">🏆</div>
+                    <div className="sbb-stat-value">{formatNumber(totalPoints)}</div>
+                    <div className="sbb-stat-label">Gesamtpunktzahl</div>
                 </div>
                 <div className="sbb-stat">
                     <div className="sbb-stat-icon">🥇</div>
@@ -314,6 +317,10 @@ const ProfilePage: React.FC = () => {
                         <section className="profile-section">
                             <div className="profile-section-head"><h2>Statistik im Detail</h2></div>
                             <div className="profile-detail-stats">
+                                <div className="profile-detail-stat">
+                                    <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{playedGames}</div><div>🎮</div></div>
+                                    <div className="profile-detail-stat-l">Spiele gespielt</div>
+                                </div>
                                 <div className="profile-detail-stat">
                                     <div className="profile-detail-stat-top"><div className="profile-detail-stat-v">{playedRounds}</div><div>🚂</div></div>
                                     <div className="profile-detail-stat-l">Runden gespielt</div>

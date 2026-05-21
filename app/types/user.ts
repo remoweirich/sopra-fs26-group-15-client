@@ -23,6 +23,7 @@ export interface UserScoreboard {
   gamesWon: number;
   bestRoundPoints: number;
   guessingPrecision: number;
+  leaderboardPoints: number;
 }
 
 export interface MyUserDTO {

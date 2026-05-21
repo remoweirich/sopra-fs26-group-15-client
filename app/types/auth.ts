@@ -4,4 +4,5 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (token: string, userId: number) => Promise<void>;
   logout: () => void;
+  softLogout: () => void;
 }
