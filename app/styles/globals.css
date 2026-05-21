@@ -2821,9 +2821,9 @@ img, svg { display: block; max-width: 100%; }
    14. LEADERBOARD + PROFILE
    ═══════════════════════════════════════════════════════════════════════════ */
 .lb-shell {
-  max-width: 720px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 28px;
+  padding: 30px 28px 50px;
 }
  
 /* Search */
@@ -2924,12 +2924,13 @@ img, svg { display: block; max-width: 100%; }
 .lb-table {
   background: var(--white);
   border-top: 4px solid var(--red);
+  overflow-x: auto;
 }
  
 .lb-table-head {
   display: grid;
-  grid-template-columns: 36px 1fr 90px 70px 100px;
-  gap: 8px;
+  grid-template-columns: 36px minmax(180px, 1fr) 115px 125px 70px 110px;
+  gap: 10px;
   align-items: center;
   padding: 10px 18px;
   background: var(--charcoal);
@@ -2944,13 +2945,13 @@ img, svg { display: block; max-width: 100%; }
 }
  
 /* Rows */
-.lb-row {
+.lb-table-head {
   display: grid;
-  grid-template-columns: 36px 1fr 90px 70px 100px;
-  gap: 8px;
+  grid-template-columns: 36px minmax(180px, 1fr) 115px 125px 70px 110px;
+  gap: 10px;
   align-items: center;
-  padding: 13px 18px;
-  border-bottom: 1px solid var(--warm);
+  padding: 10px 18px;
+  background: var(--charcoal);
 }
  
 .lb-row:last-child { border-bottom: none; }
@@ -3017,7 +3018,7 @@ img, svg { display: block; max-width: 100%; }
 /* Sortable column headers */
 .lb-col-sort {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--grey-l);
@@ -3102,17 +3103,26 @@ img, svg { display: block; max-width: 100%; }
  
 /* ── Leaderboard Responsive ──────────────────────────────────────────────── */
  
-/* Ultra-small (≤ 320px) */
 @media (max-width: 320px) {
-  .lb-shell { padding: 16px 12px; }
+  .lb-shell { padding: 22px 16px 40px; }
   .lb-podium { grid-template-columns: 1fr; gap: 8px; }
-  .lb-col-extra { display: none; }
+
+  .lb-col-extra,
+  .lb-col-precision {
+    display: none;
+  }
+
   .lb-table-head,
   .lb-row {
-    grid-template-columns: 30px 1fr 60px;
-    gap: 4px;
+    min-width: 520px;
+    grid-template-columns: 30px minmax(130px, 1fr) 90px 95px;
+    gap: 6px;
     padding: 10px 10px;
   }
+
+  .lb-col-sort-full { display: none; }
+  .lb-col-sort-short { display: inline; }
+
   .lb-col-sort--rank { font-size: 10px; }
   .lb-row-name { font-size: 12px; }
   .lb-add-friend { width: 20px; height: 20px; font-size: 13px; }
@@ -3120,17 +3130,26 @@ img, svg { display: block; max-width: 100%; }
   .lb-search-icon { width: 16px; height: 16px; }
 }
 
-/* Mobile portrait (321px – 480px) */
 @media (min-width: 321px) and (max-width: 480px) {
-  .lb-shell { padding: 20px 14px; }
+  .lb-shell { padding: 22px 16px 40px; }
   .lb-podium { grid-template-columns: 1fr; }
-  .lb-col-extra { display: none; }
+
+  .lb-col-extra,
+  .lb-col-precision {
+    display: none;
+  }
+
   .lb-table-head,
   .lb-row {
-    grid-template-columns: 32px 1fr 64px;
+    min-width: 560px;
+    grid-template-columns: 32px minmax(150px, 1fr) 95px 100px;
     gap: 6px;
     padding: 10px 12px;
   }
+
+  .lb-col-sort-full { display: none; }
+  .lb-col-sort-short { display: inline; }
+
   .lb-col-sort--rank { font-size: 11px; }
   .lb-row-name { font-size: 13px; }
   .lb-add-friend { width: 22px; height: 22px; font-size: 14px; }
@@ -3140,20 +3159,30 @@ img, svg { display: block; max-width: 100%; }
  
 /* Mobile landscape (481px – 767px) */
 @media (min-width: 481px) and (max-width: 767px) {
-  .lb-col-precision { display: none; }
+  .lb-col-precision {
+    display: none;
+  }
+
   .lb-table-head,
   .lb-row {
-    grid-template-columns: 32px 1fr 70px 56px;
-    gap: 6px;
+    min-width: 680px;
+    grid-template-columns: 32px minmax(170px, 1fr) 100px 110px 60px;
+    gap: 8px;
   }
+
+  .lb-col-sort-full { display: none; }
+  .lb-col-sort-short { display: inline; }
 }
 
 /* Tablet (768px – 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
-  .lb-col-precision { display: none; }
+  .lb-col-precision {
+    display: none;
+  }
+
   .lb-table-head,
   .lb-row {
-    grid-template-columns: 36px 1fr 80px 64px;
+    grid-template-columns: 36px minmax(180px, 1fr) 110px 120px 70px;
     gap: 8px;
   }
 }
@@ -3667,7 +3696,7 @@ img, svg { display: block; max-width: 100%; }
   .end-head h1 { font-size: 34px; }
   .end-podium { gap: 6px; }
 
-  .lb-shell { padding: 20px 16px; }
+  .lb-shell { padding: 22px 16px 40px; }
   .lb-podium { grid-template-columns: 1fr; }
   .lb-table-head,
   .lb-row { grid-template-columns: 28px 1fr 80px; }
@@ -3786,3 +3815,244 @@ img, svg { display: block; max-width: 100%; }
 .is-row { display: flex; align-items: center; }
 .is-row-between { display: flex; align-items: center; justify-content: space-between; }
 .is-col { display: flex; flex-direction: column; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEADERBOARD TABLE FIX — 4 metrics:
+   # | Spieler | Rangpunkte | Total Punkte | Spiele | Genauigkeit
+   Put this at the very end of globals.css
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lb-shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 28px 50px;
+}
+
+.lb-table {
+  background: var(--white);
+  border-top: 4px solid var(--red);
+  width: 100%;
+  overflow-x: auto;
+}
+
+.lb-table-head,
+.lb-row {
+  display: grid;
+  grid-template-columns: 36px minmax(190px, 1fr) 115px 125px 70px 105px;
+  gap: 8px;
+  align-items: center;
+}
+
+.lb-table-head {
+  padding: 10px 18px;
+  background: var(--charcoal);
+}
+
+.lb-row {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--warm);
+}
+
+.lb-row:last-child {
+  border-bottom: none;
+}
+
+.lb-table-head > span,
+.lb-col-sort {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.lb-col-sort {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--grey-l);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: right;
+}
+
+.lb-table-head > span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--grey-l);
+  letter-spacing: 0.10em;
+}
+
+.lb-col-sort:hover,
+.lb-col-sort.is-active {
+  color: var(--white);
+}
+
+.lb-col-sort--rank {
+  text-align: left;
+}
+
+.lb-row-rank {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--grey);
+}
+
+.lb-row-rank.is-medal {
+  color: var(--gold);
+}
+
+.lb-row-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.lb-row-name {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.lb-row-score,
+.lb-row-meta {
+  font-family: var(--font-mono);
+  text-align: right;
+  color: var(--grey);
+  white-space: nowrap;
+}
+
+.lb-row-score {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.lb-row-meta {
+  font-size: 13px;
+}
+
+.lb-row-score.is-sort-active,
+.lb-row-meta.is-sort-active {
+  color: var(--black);
+  font-weight: 700;
+}
+
+.lb-row--you {
+  background: rgba(235,0,0,0.03);
+  border-left: 3px solid var(--red);
+}
+
+.lb-col-sort-full {
+  display: inline;
+}
+
+.lb-col-sort-short {
+  display: none;
+}
+
+/* 850px / Tablet fix */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .lb-shell {
+    padding: 30px 28px 50px;
+  }
+
+  .lb-table-head,
+  .lb-row {
+    grid-template-columns: 32px minmax(160px, 1fr) 82px 86px 58px 72px;
+    gap: 6px;
+  }
+
+  .lb-table-head {
+    padding: 10px 12px;
+  }
+
+  .lb-row {
+    padding: 12px 12px;
+  }
+
+  .lb-col-sort-full {
+    display: none;
+  }
+
+  .lb-col-sort-short {
+    display: inline;
+  }
+
+  .lb-col-sort,
+  .lb-table-head > span {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .lb-row-name {
+    font-size: 13px;
+  }
+
+  .lb-row-score,
+  .lb-row-meta {
+    font-size: 12px;
+  }
+
+  .lb-badge {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+}
+
+/* Mobile: keep table readable by scrolling horizontally */
+@media (max-width: 767px) {
+  .lb-shell {
+    padding: 22px 16px 40px;
+  }
+
+  .lb-podium {
+    grid-template-columns: 1fr;
+  }
+
+  .lb-table-head,
+  .lb-row {
+    min-width: 620px;
+    grid-template-columns: 32px minmax(150px, 1fr) 90px 95px 58px 76px;
+    gap: 6px;
+  }
+
+  .lb-table-head {
+    padding: 10px 12px;
+  }
+
+  .lb-row {
+    padding: 12px 12px;
+  }
+
+  .lb-col-sort-full {
+    display: none;
+  }
+
+  .lb-col-sort-short {
+    display: inline;
+  }
+
+  .lb-col-sort,
+  .lb-table-head > span {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .lb-row-name {
+    font-size: 13px;
+  }
+
+  .lb-row-score,
+  .lb-row-meta {
+    font-size: 12px;
+  }
+}
+

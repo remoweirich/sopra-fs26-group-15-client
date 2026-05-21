@@ -8,7 +8,12 @@ import { UserDTO } from "@/types/user";
 import { App as AntdApp } from "antd";
 import { useNotifications } from "@/context/NotificationContext";
 
-type SortKey = "rank" | "totalPoints" | "playedGames" | "guessingPrecision";
+type SortKey =
+  | "rank"
+  | "leaderboardPoints"
+  | "totalPoints"
+  | "playedGames"
+  | "guessingPrecision";
 
 const LeaderboardInner: React.FC = () => {
   const { user, token } = useAuth();
@@ -20,7 +25,7 @@ const LeaderboardInner: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rows, setRows] = useState<UserDTO[]>([]);
   const [top3, setTop3] = useState<UserDTO[]>([]);
-  const [sortBy, setSortBy] = useState<SortKey>("totalPoints");
+  const [sortBy, setSortBy] = useState<SortKey>("leaderboardPoints");
   const [friends, setFriends] = useState<number[]>([]);
   const [friendRequestSent, setFriendRequestSent] = useState<Set<number>>(new Set());
 
@@ -32,7 +37,7 @@ const LeaderboardInner: React.FC = () => {
         const data = await apiService.get<UserDTO[]>(`/users/search?username=`);
         setTop3(
           [...(data ?? [])]
-            .sort((a, b) => (b.userScoreboard?.totalPoints ?? 0) - (a.userScoreboard?.totalPoints ?? 0))
+            .sort((a, b) => (b.userScoreboard?.leaderboardPoints ?? 0) - (a.userScoreboard?.leaderboardPoints ?? 0))
             .slice(0, 3)
         );
       } catch (err) {
@@ -51,6 +56,8 @@ const LeaderboardInner: React.FC = () => {
           `/users/search?username=${encodeURIComponent(search)}`
         );
         setRows(data ?? []);
+        console.log("Leaderboard data:", data);
+        console.log("First scoreboard:", data?.[0]?.userScoreboard);
       } catch (err) {
         console.error("Search failed", err);
       } finally {
@@ -92,7 +99,7 @@ const LeaderboardInner: React.FC = () => {
   // Feste Ränge basierend auf Punkte (bleibt immer gleich)
   const rankMap = new Map<number, number>();
   [...(rows ?? [])]
-    .sort((a, b) => (b.userScoreboard?.totalPoints ?? 0) - (a.userScoreboard?.totalPoints ?? 0))
+    .sort((a, b) => (b.userScoreboard?.leaderboardPoints ?? 0) - (a.userScoreboard?.leaderboardPoints ?? 0))
     .forEach((u, i) => rankMap.set(u.userId, i + 1));
 
   // Sortierung nach gewählter Spalte
@@ -181,7 +188,7 @@ const LeaderboardInner: React.FC = () => {
                 </div>
                 <div className="lb-podium-card-name">{p.username}</div>
                 <div className="lb-podium-card-score">
-                  {p.userScoreboard?.totalPoints?.toLocaleString("de-CH") ?? "–"}
+                  {p.userScoreboard?.leaderboardPoints?.toLocaleString("de-CH") ?? "–"}
                 </div>
                 <div className="lb-podium-card-meta">
                   {p.userScoreboard?.playedGames ?? "–"} Spiele
@@ -204,11 +211,20 @@ const LeaderboardInner: React.FC = () => {
             <span>SPIELER</span>
             <button
               type="button"
+              className={`lb-col-sort ${sortBy === "leaderboardPoints" ? "is-active" : ""}`}
+              onClick={() => setSortBy("leaderboardPoints")}
+            >
+              <span className="lb-col-sort-full">RANGPUNKTE</span>
+              <span className="lb-col-sort-short">RPKT</span>
+              {sortBy === "leaderboardPoints" && " ↓"}
+            </button>
+            <button
+              type="button"
               className={`lb-col-sort ${sortBy === "totalPoints" ? "is-active" : ""}`}
               onClick={() => setSortBy("totalPoints")}
             >
-              <span className="lb-col-sort-full">PUNKTE</span>
-              <span className="lb-col-sort-short">PKT</span>
+              <span className="lb-col-sort-full">TOTAL PUNKTE</span>
+              <span className="lb-col-sort-short">T PKT</span>
               {sortBy === "totalPoints" && " ↓"}
             </button>
             <button
@@ -269,15 +285,18 @@ const LeaderboardInner: React.FC = () => {
                       <span className="lb-badge" style={{ background: "rgba(200,150,12,0.12)", color: "var(--gold)" }}>Gesendet</span>
                     )}
                   </div>
+                  <div className={`lb-row-score ${sortBy === "leaderboardPoints" ? "is-sort-active" : ""}`}>
+                    {p.userScoreboard?.leaderboardPoints?.toLocaleString("de-CH") ?? "–"}
+                  </div>
                   <div className={`lb-row-score ${sortBy === "totalPoints" ? "is-sort-active" : ""}`}>
                     {p.userScoreboard?.totalPoints?.toLocaleString("de-CH") ?? "–"}
-                  </div>
-                  <div className={`lb-row-meta lb-col-extra ${sortBy === "playedGames" ? "is-sort-active" : ""}`}>
-                    {p.userScoreboard?.playedGames ?? "–"}
-                  </div>
-                  <div className={`lb-row-meta lb-col-extra lb-col-precision ${sortBy === "guessingPrecision" ? "is-sort-active" : ""}`}>
-                    {(p.userScoreboard?.guessingPrecision ?? 0).toFixed(1)}%
-                  </div>
+                    </div>
+                    <div className={`lb-row-meta lb-col-extra ${sortBy === "playedGames" ? "is-sort-active" : ""}`}>
+                      {p.userScoreboard?.playedGames ?? "–"}
+                    </div>
+                    <div className={`lb-row-meta lb-col-extra lb-col-precision ${sortBy === "guessingPrecision" ? "is-sort-active" : ""}`}>
+                      {(p.userScoreboard?.guessingPrecision ?? 0).toFixed(1)}%
+                    </div>
                 </div>
               );
             })
