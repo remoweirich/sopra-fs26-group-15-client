@@ -4,14 +4,71 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: navbar auth context 2">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix(Achievements): adjust hardcoded max achievements number">
+      <change afterPath="$PROJECT_DIR$/docs/screenshots/01-home.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/screenshots/02-lobbies.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/screenshots/03-lobby-room.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/screenshots/04-game.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/screenshots/05-overview.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/users/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/users/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="2e13bdc0-2a0b-40a1-a562-b6dc81184f1d" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="7529d074-8b06-4e6d-8625-a831e3c8146b" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="5b580c24-689a-4f20-b0b3-e1856134842c" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2fd8cf2e-1a7a-4773-bb6c-6513fa20a5e3" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="526f8429-971f-4735-95ad-e3ce51aa8946" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2e13bdc0-2a0b-40a1-a562-b6dc81184f1d" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
@@ -21,6 +78,12 @@
   </component>
   <component name="CopilotUserSelectedChatMode">
     <option name="chatModeId" value="Ask" />
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="agent-panel" value="Auto" />
+      <entry key="chat-panel" value="Auto" />
+    </selectedModels>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -32,7 +95,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="M4-Main-Preview-Client" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -43,16 +106,30 @@
     &quot;assignee&quot;: &quot;snowjademusic&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
-    &quot;accountId&quot;: &quot;b7bb69f4-867a-425b-873b-42f0cdfe52de&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:remoweirich/sopra-fs26-group-15-client.git",
+    "accountId": "6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="3BRDRiUIGYQN9IU52iwU206PbJs" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="LOCAL" />
+      </template>
+    </option>
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -66,7 +143,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "M4-Main-Preview-Client",
+    "git-widget-placeholder": "README__ADJUSTMENTS",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
@@ -76,7 +153,7 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "/home/claudestark/.config/JetBrains/IntelliJIdea2026.1/node/versions/24.15.0/bin/node",
+    "nodejs_interpreter_path": "node",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "terminal",
     "ts.external.directory.path": "/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
@@ -86,6 +163,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs/screenshots" />
     </key>
   </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
@@ -118,7 +198,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-WS-261.22158.274" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
       </set>
     </attachedChunks>
   </component>
@@ -162,6 +242,7 @@
       <workItem from="1778653048868" duration="4307000" />
       <workItem from="1778668214900" duration="989000" />
       <workItem from="1778759505004" duration="655000" />
+      <workItem from="1779376226268" duration="954000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -387,7 +468,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779355519112</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="fix(Achievements): adjust hardcoded max achievements number">
+      <option name="closed" value="true" />
+      <created>1779372704266</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1779372704266</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -405,7 +494,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat(lobbies): add tooltip to button hover" />
     <MESSAGE value="ci(gitignore): .idea files ignored" />
     <MESSAGE value="ci(gitignore): remove duplicate .cache" />
     <MESSAGE value="ci(semantic-commits): add automatic versioning through semantic Commits" />
@@ -430,7 +518,8 @@
     <MESSAGE value="fix: clear navbar when logging in to delete notifications" />
     <MESSAGE value="fix: navbar auth context" />
     <MESSAGE value="fix: navbar auth context 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: navbar auth context 2" />
+    <MESSAGE value="fix(Achievements): adjust hardcoded max achievements number" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix(Achievements): adjust hardcoded max achievements number" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
