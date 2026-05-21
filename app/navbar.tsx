@@ -8,6 +8,7 @@ import { LobbyAccessDTO, LobbyCodeDTO } from "@/types/lobby";
 import { useApi } from "@/hooks/useApi";
 import { useNotifications } from "@/context/NotificationContext";
 import type { AppNotification } from "@/context/NotificationContext";
+import {useWebSocket} from "@/context/WebSocketContext";
 
 function SBBCross({ size = 20 }: { size?: number }) {
   return (
@@ -25,6 +26,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const apiService = useApi();
+  const { publish } = useWebSocket();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [code, setCode] = useState("");
@@ -311,7 +313,13 @@ export default function Navbar() {
                     <button className={`navbar-link ${isActive(`/users/${user.userId}`) ? "is-active" : ""}`} onClick={() => go(`/users/${user.userId}`)}>
                       {user.username.length > 12 ? user.username.slice(0, 12) + "…" : user.username}
                     </button>
-                    <button className="navbar-logout" onClick={logout}>Logout</button>
+                    <button className="navbar-logout" onClick={() => {
+                      if (pathname?.startsWith("/lobbies/")) {
+                        const lobbyId = pathname.split("/")[2];
+                        if (lobbyId) publish(`/app/lobby/${lobbyId}/leave`, {});
+                      }
+                      logout();
+                    }}>Logout</button>
                   </>
                 ) : (
                   <button className="navbar-login" onClick={() => go("/login")}>Login</button>
@@ -344,7 +352,13 @@ export default function Navbar() {
             </div>
             <div className="navbar-drawer-section">
               {user ? (
-                <button className="navbar-drawer-link navbar-drawer-link--muted" onClick={logout}>Logout</button>
+                  <button className="navbar-drawer-link navbar-drawer-link--muted" onClick={() => {
+                    if (pathname?.startsWith("/lobbies/")) {
+                      const lobbyId = pathname.split("/")[2];
+                      if (lobbyId) publish(`/app/lobby/${lobbyId}/leave`, {});
+                    }
+                    logout();
+                  }}>Logout</button>
               ) : (
                 <button className="navbar-drawer-link--primary navbar-drawer-link" onClick={() => go("/login")}>Login</button>
               )}

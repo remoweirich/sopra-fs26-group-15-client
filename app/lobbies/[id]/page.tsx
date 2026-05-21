@@ -14,6 +14,10 @@ import { playerColors } from "@/utils/colors";
 // Pick a stable color from the playerColors palette for a given username.
 // Same string always gets the same color across rerenders without needing
 // server-side IDs.
+
+// Module-level timer — survives the Strict Mode remount
+let leaveTimer: ReturnType<typeof setTimeout> | null = null;
+
 const colorForUsername = (name: string): string => {
   let h = 0;
   for (let i = 0; i < name.length; i++) {
@@ -131,8 +135,7 @@ const LobbyWaitPage: React.FC = () => {
     setTimeout(() => setCopied(false), 1800);
   };
 
-// Module-level timer — survives the Strict Mode remount
-let leaveTimer: ReturnType<typeof setTimeout> | null = null;
+
 
 useEffect(() => {
   // Cancel any pending leave from a prior mount (handles Strict Mode double-mount)
