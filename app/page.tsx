@@ -55,7 +55,7 @@ const HomePage: React.FC = () => {
     const apiService = useApi();
     const [users, setUsers] = useState<number>(0);
     const [bestPlayer, setBestPlayer] = useState<UserDTO | null>(null);
-    const [bestPlayerName, setBestPlayerName] = useState<string>("KingBabaBui");
+    const [bestPlayerName, setBestPlayerName] = useState<string>("-");
     const [activeLobbies, setActiveLobbies] = useState<number>(0);
     const [activePlayers, setActivePlayers] = useState<number>(0);
 
@@ -206,9 +206,15 @@ const HomePage: React.FC = () => {
           </div>
           <div className="home-stat">
               <div className="home-stat-v">
-              <Link href={`/users/${bestPlayer?.userId}`} className="home-stat-v">
-                  {bestPlayerName}
-              </Link>
+                  {bestPlayer ? (
+                      <Link href={`/users/${bestPlayer?.userId}`} className="home-stat-v">
+                          {bestPlayerName}
+                      </Link>
+                  ) : (
+                      <div className="home-stat-v">
+                          {bestPlayerName}
+                      </div>
+                  )}
               </div>
             <div className="home-stat-l">#1 Weltweit</div>
           </div>
