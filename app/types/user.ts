@@ -17,23 +17,23 @@ export interface LoginPostDTO{
 }
 
 export interface UserScoreboard {
-  totalPoints: number;
-  playedGames: number;
-  playedRounds: number;
-  gamesWon: number;
-  bestRoundPoints: number;
-  guessingPrecision: number;
-  leaderboardPoints: number;
+  totalPoints?: number;
+  leaderboardPoints?: number;
+  playedGames?: number;
+  playedRounds?: number;
+  bestRoundPoints?: number;
+  guessingPrecision?: number;
+  gamesWon?: number;
 }
 
 export interface MyUserDTO {
-  userId: number;       // ← neu
+  userId: number;       
   username: string;
   email: string;
   userBio: string;
   creationDate: Date;
-  isGuest: boolean;     // ← neu
-  isOnline: boolean;    // ← neu
+  isGuest: boolean;     
+  isOnline: boolean;    
   userScoreboard: UserScoreboard;
   userAchievementDTOList?: UserAchievementDTO[]
   friends: UserDTO[];
@@ -46,6 +46,7 @@ export interface UserDTO{
   userBio: string,
   creationDate: Date,
   friends: UserDTO[]
+  isOnline: boolean;
 }
 
 export interface UserResult {

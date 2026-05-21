@@ -14,6 +14,10 @@ import { playerColors } from "@/utils/colors";
 // Pick a stable color from the playerColors palette for a given username.
 // Same string always gets the same color across rerenders without needing
 // server-side IDs.
+
+// Module-level timer — survives the Strict Mode remount
+let leaveTimer: ReturnType<typeof setTimeout> | null = null;
+
 const colorForUsername = (name: string): string => {
   let h = 0;
   for (let i = 0; i < name.length; i++) {
@@ -37,6 +41,7 @@ const LobbyWaitPage: React.FC = () => {
   const [connectionWarning, setConnectionWarning] = useState<string | null>(null);
   const webSocket = useWebSocket();
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -74,6 +79,7 @@ const LobbyWaitPage: React.FC = () => {
         setLobby(msg.payload);
       } else if (msg.type === "GAME_START") {
         console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
+        setGameStarted(true);
         router.push(`/game/${lobbyId}`);
       }
     });
@@ -136,6 +142,28 @@ const LobbyWaitPage: React.FC = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
+
+
+
+useEffect(() => {
+  // Cancel any pending leave from a prior mount (handles Strict Mode double-mount)
+  if (leaveTimer) {
+    clearTimeout(leaveTimer);
+    leaveTimer = null;
+  }
+
+  return () => {
+    // Don't leave if the game started or we're loading into the game
+    if (gameStarted || isLoadingGame) return;
+
+    // Delay long enough for Strict Mode remount to cancel it (~50ms is plenty)
+    leaveTimer = setTimeout(() => {
+      leaveTimer = null;
+      console.log("[LobbyRoom] Leaving lobby due to navigation");
+      publish(`/app/lobby/${lobbyId}/leave`, {});
+    }, 80);
+  };
+}, [lobbyId, publish, gameStarted, isLoadingGame]);
 
   const isHost = lobby && currentUser ? lobby.adminId === currentUser.userId : false;
 
@@ -254,7 +282,7 @@ const LobbyWaitPage: React.FC = () => {
                   aria-label="Verbunden"
                 >
                   {isMe && (
-                  <>  
+                  <>
                   <span
                     style={{
                       width: 9,
@@ -264,7 +292,7 @@ const LobbyWaitPage: React.FC = () => {
                       boxShadow: "0 0 0 2px rgba(45,106,79,0.22)",
                     }}
                   />
-                  
+
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",

@@ -459,7 +459,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({
                 className="sbb-btn sbb-btn--dark sbb-btn--lg sbb-btn--full"
                 onClick={handleEndGame}
               >
-                Endabrechnung →
+                Rangliste →
               </button>
             ) : !readyForNextRound ? (
               <button

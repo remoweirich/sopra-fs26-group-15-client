@@ -14,6 +14,7 @@ export interface Lobby {
   // The backend may not populate this yet — falls back gracefully when absent.
   host?: string;
   adminUsername?: string;
+  creationDate: number;
 }
 
 export interface MyLobbyDTO {

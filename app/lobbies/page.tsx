@@ -47,6 +47,8 @@ const LobbiesPage: React.FC = () => {
   const [privateJoin, setPrivateJoin] = useState<PrivateJoinTarget>(null);
   const [privateCode, setPrivateCode] = useState("");
 
+  const [reloadLobbies, setReloadLobbies] = useState(false);
+
   useEffect(() => {
     const fetchLobbies = async () => {
       try {
@@ -132,21 +134,21 @@ const LobbiesPage: React.FC = () => {
     }
   };
 
-  const fetchLobbies = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.get<Lobby[]>("/lobbies");
-      setLobbies(response);
-    } catch (error) {
-      console.error("Error fetching lobbies:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const fetchLobbies = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.get<Lobby[]>("/lobbies");
+        setLobbies(response);
+      } catch (error) {
+        console.error("Error fetching lobbies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchLobbies();
-  }, [apiService]);
+  }, [apiService, reloadLobbies]);
 
   return (
     <div className="page-root">
@@ -159,7 +161,7 @@ const LobbiesPage: React.FC = () => {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button
               className="sbb-btn sbb-btn--secondary sbb-btn--sm"
-              onClick={() => fetchLobbies()}
+              onClick={() => setReloadLobbies(!reloadLobbies)}
               type="button"
               aria-label="Lobbies aktualisieren"
             >
@@ -180,7 +182,7 @@ const LobbiesPage: React.FC = () => {
           while the grid of column labels stays centred to the shell. */}
       <div className="lobby-stripe is-head">
         <div className="lobby-table-head">
-          <span>ID</span>
+          <span>CODE</span>
           <span>NAME</span>
           <span className="hide-md col-players">SPIELER</span>
           <span className="hide-md col-rounds">RUNDEN</span>
@@ -223,9 +225,6 @@ const LobbiesPage: React.FC = () => {
               </div>
               <div>
                 <div className="lobby-row-name">{lobby.lobbyName}</div>
-                <div className="lobby-row-meta">
-                  by {lobby.host ?? lobby.adminUsername ?? "Anonymous"}
-                </div>
               </div>
               <Pips n={lobby.currentPlayers} max={lobby.maxPlayers} />
               <div className="lobby-row-rounds">{lobby.maxRounds}×</div>

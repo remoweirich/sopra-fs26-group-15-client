@@ -4,16 +4,56 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: navbar auth context 2">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat(King): All hail the King">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/context/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/context/AuthContext.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/context/NotificationContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/context/NotificationContext.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/game/[id]/leaderboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/leaderboard/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/lobbies/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/types/lobby.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/types/lobby.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/types/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/users/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/users/[id]/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotChats">
+    <option name="panelChat">
+      <chat>
+        <option name="activeSessionId" value="2fd8cf2e-1a7a-4773-bb6c-6513fa20a5e3" />
+        <option name="sessions">
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="7529d074-8b06-4e6d-8625-a831e3c8146b" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="5b580c24-689a-4f20-b0b3-e1856134842c" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2fd8cf2e-1a7a-4773-bb6c-6513fa20a5e3" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+        </option>
+        <option name="type" value="PANEL" />
+      </chat>
+    </option>
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
@@ -23,6 +63,12 @@
   </component>
   <component name="CopilotUserSelectedChatMode">
     <option name="chatModeId" value="Ask" />
+  </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="agent-panel" value="Auto" />
+      <entry key="chat-panel" value="Auto" />
+    </selectedModels>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -34,7 +80,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="M4-Main-Preview-Client" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -45,16 +91,40 @@
     &quot;assignee&quot;: &quot;snowjademusic&quot;
   }
 }</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="mainldfgjlds" />
+      </list>
+    </option>
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
-    &quot;accountId&quot;: &quot;b7bb69f4-867a-425b-873b-42f0cdfe52de&quot;
+    &quot;accountId&quot;: &quot;6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="3BRDRiUIGYQN9IU52iwU206PbJs" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Ask" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="LOCAL" />
+      </template>
+    </option>
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -68,20 +138,20 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "M4-Main-Preview-Client",
+    "git-widget-placeholder": "Merging M4-Main-Preview-Client",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-server",
+    "last_opened_file_path": "/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-client",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "/home/claudestark/.config/JetBrains/IntelliJIdea2026.1/node/versions/24.15.0/bin/node",
+    "nodejs_interpreter_path": "node",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "terminal",
-    "ts.external.directory.path": "/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-client/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/remoweirich/Desktop/UZH/FS2026/SoPra/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -120,7 +190,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-WS-261.22158.274" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
       </set>
     </attachedChunks>
   </component>
@@ -157,13 +227,12 @@
       <workItem from="1776680191021" duration="10536000" />
       <workItem from="1776702584032" duration="3717000" />
       <workItem from="1776775376427" duration="3659000" />
-      <workItem from="1778046333371" duration="8041000" />
-      <workItem from="1778072159937" duration="862000" />
-      <workItem from="1778602399016" duration="2792000" />
-      <workItem from="1778615286493" duration="2750000" />
-      <workItem from="1778653048868" duration="4307000" />
-      <workItem from="1778668214900" duration="989000" />
-      <workItem from="1778759505004" duration="655000" />
+      <workItem from="1778046333371" duration="603000" />
+      <workItem from="1778833376586" duration="2086000" />
+      <workItem from="1778847466456" duration="1160000" />
+      <workItem from="1779092834005" duration="922000" />
+      <workItem from="1779195296288" duration="505000" />
+      <workItem from="1779286300170" duration="9751000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -349,47 +418,31 @@
       <option name="project" value="LOCAL" />
       <updated>1778023574358</updated>
     </task>
-    <task id="LOCAL-00024" summary="update contributions">
+    <task id="LOCAL-00024" summary="feat(navbar): join via lobby code now possible">
       <option name="closed" value="true" />
-      <created>1778046984406</created>
+      <created>1778679844481</created>
       <option name="number" value="00024" />
       <option name="presentableId" value="LOCAL-00024" />
       <option name="project" value="LOCAL" />
-      <updated>1778046984406</updated>
+      <updated>1778679844481</updated>
     </task>
-    <task id="LOCAL-00025" summary="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)">
+    <task id="LOCAL-00025" summary="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab">
       <option name="closed" value="true" />
-      <created>1779212805404</created>
+      <created>1779283111274</created>
       <option name="number" value="00025" />
       <option name="presentableId" value="LOCAL-00025" />
       <option name="project" value="LOCAL" />
-      <updated>1779212805404</updated>
+      <updated>1779283111274</updated>
     </task>
-    <task id="LOCAL-00026" summary="fix: clear navbar when logging in to delete notifications">
+    <task id="LOCAL-00026" summary="feat(King): All hail the King">
       <option name="closed" value="true" />
-      <created>1779289288858</created>
+      <created>1779317877871</created>
       <option name="number" value="00026" />
       <option name="presentableId" value="LOCAL-00026" />
       <option name="project" value="LOCAL" />
-      <updated>1779289288858</updated>
+      <updated>1779317877871</updated>
     </task>
-    <task id="LOCAL-00027" summary="fix: navbar auth context">
-      <option name="closed" value="true" />
-      <created>1779353587338</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1779353587338</updated>
-    </task>
-    <task id="LOCAL-00028" summary="fix: navbar auth context 2">
-      <option name="closed" value="true" />
-      <created>1779355519112</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1779355519112</updated>
-    </task>
-    <option name="localTasksCounter" value="29" />
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -407,6 +460,8 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="chore: add to contributions.md" />
+    <MESSAGE value="feat(lobbies): handle joining and creating lobbies as guest with pop-up" />
     <MESSAGE value="feat(lobbies): add tooltip to button hover" />
     <MESSAGE value="ci(gitignore): .idea files ignored" />
     <MESSAGE value="ci(gitignore): remove duplicate .cache" />
@@ -427,12 +482,10 @@
     <MESSAGE value="feat: migrate app with new implementation npm install" />
     <MESSAGE value="feat: change semantic release npm version" />
     <MESSAGE value="fix: change url" />
-    <MESSAGE value="update contributions" />
-    <MESSAGE value="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)" />
-    <MESSAGE value="fix: clear navbar when logging in to delete notifications" />
-    <MESSAGE value="fix: navbar auth context" />
-    <MESSAGE value="fix: navbar auth context 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: navbar auth context 2" />
+    <MESSAGE value="feat(navbar): join via lobby code now possible" />
+    <MESSAGE value="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab" />
+    <MESSAGE value="feat(King): All hail the King" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(King): All hail the King" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

@@ -51,8 +51,21 @@ const Register: React.FC = () => {
       router.push(`/users/${response.userId}`);
     } catch (error: unknown) {
       const status = (error as { status?: number })?.status;
-      if (status === 400) setErrorMessage("Registrierung fehlgeschlagen: Benutzername bereits vergeben.");
-      else setErrorMessage("Ein unerwarteter Fehler ist aufgetreten.");
+      const message = (error as Error)?.message ?? "";
+
+      if (status === 400) {
+        if (message.includes("username and the email")) {
+          setErrorMessage("Benutzername und E-Mail sind bereits vergeben.");
+        } else if (message.includes("username")) {
+          setErrorMessage("Dieser Benutzername ist bereits vergeben.");
+        } else if (message.includes("email")) {
+          setErrorMessage("Diese E-Mail-Adresse ist bereits vergeben.");
+        } else {
+          setErrorMessage("Registrierung fehlgeschlagen.");
+        }
+      } else {
+        setErrorMessage("Ein unerwarteter Fehler ist aufgetreten.");
+      }
     } finally {
       setSubmitting(false);
     }
