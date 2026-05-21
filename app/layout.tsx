@@ -57,16 +57,16 @@ export default function RootLayout({
           variables let other elements opt into the mono via CSS var. */}
       <body className={`${spaceGrotesk.className}`}>
         <WebSocketProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <AntdApp>
-                <NotificationListener />
-                <Navbar />
-                <main>{children}</main>
-              </AntdApp>
-            </NotificationProvider>
-          </AuthProvider>
-        </WebSocketProvider>
+          <NotificationProvider>
+              <AuthProvider>
+                  <AntdApp>
+                    <NotificationListener />
+                    <Navbar />
+                    <main>{children}</main>
+                  </AntdApp>
+              </AuthProvider>
+        </NotificationProvider>
+      </WebSocketProvider>
       </body>
     </html>
   );

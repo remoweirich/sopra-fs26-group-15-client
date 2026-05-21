@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: navbar auth context">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="fix: navbar auth context 2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lobbies/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/context/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/context/AuthContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/context/NotificationContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/context/NotificationContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +34,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="M4-Main-Preview-Client" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -66,7 +68,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "ClaudeStuff",
+    "git-widget-placeholder": "M4-Main-Preview-Client",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
@@ -379,7 +381,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779353587338</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="fix: navbar auth context 2">
+      <option name="closed" value="true" />
+      <created>1779355519112</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1779355519112</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -397,7 +407,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat(lobbies): handle joining and creating lobbies as guest with pop-up" />
     <MESSAGE value="feat(lobbies): add tooltip to button hover" />
     <MESSAGE value="ci(gitignore): .idea files ignored" />
     <MESSAGE value="ci(gitignore): remove duplicate .cache" />
@@ -422,7 +431,8 @@
     <MESSAGE value="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)" />
     <MESSAGE value="fix: clear navbar when logging in to delete notifications" />
     <MESSAGE value="fix: navbar auth context" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: navbar auth context" />
+    <MESSAGE value="fix: navbar auth context 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: navbar auth context 2" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
