@@ -1,3 +1,25 @@
+# [1.7.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.6.0...v1.7.0) (2026-05-21)
+
+
+### Bug Fixes
+
+* **Achievements:** adjust hardcoded max achievements number ([f641e75](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f641e75d63ab069c5151051519703fd318040a80))
+* **app/page:** best player ([ee882e5](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ee882e5936b5731468ee3b32dd22b960239c2b4d))
+* differenciate between differenz already token username/emails ([bb11ce5](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/bb11ce5e70354cd89086dc4a92ff07ad342677f6))
+* **GameLeaderboard:** changed the comments to the score from "points >= 900" to "points/rounds >= 900" so that it scales with more rounds played (e.g. "SBB-Insider" closes [#60](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/60) ([774adcf](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/774adcf76e6733d5f3b0a7c336d047108123b78f))
+* handle unmounted lobby in logout action ([a902c8f](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/a902c8f16cabed13ca86d8722e8ab8a1f2e5de8b))
+* **lobbies:** refresh button ([918c51d](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/918c51deac7aca2bc84b84ff451cbbcee48e2526))
+
+
+### Features
+
+* **design:** friend removal with confirmation modal, friends reload button ([3e1b400](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/3e1b400f516a9b83c74fd90528479901e494291b))
+* **design:** responsive navbar overhaul and bug fixes ([8719608](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/8719608c07c008ab4e49477057d6c50017d861e4))
+* **Frontend:** removed lots of irrelevant mock data everywhere and added some fetchers/used existing fetchers to display dynamic information in /app/page closes [#60](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/60) ([86a32c2](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/86a32c216c8b42ffb8f011fb1987eff5a904051f))
+* if user navigates away from the lobbypage, a leave message is published [#59](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/59) ([ff56c6a](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ff56c6adc65ad7447ee7b8210933fcfa28dbbe82))
+* **leaderboard:** update scoreboard metrics and enhance leaderboard layout ([ac1cbdf](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ac1cbdfeb1ffeb0714ef736c2412ed5a83a5b3dc))
+* **profile:** enhance responsive layout for profile detail stats ([558bd52](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/558bd52698b1cbcceaff853340ccb64abb56d8fb))
+
 # [1.6.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.5.0...v1.6.0) (2026-05-21)
 
 
