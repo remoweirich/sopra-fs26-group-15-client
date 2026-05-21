@@ -1,3 +1,17 @@
+# [1.6.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.5.0...v1.6.0) (2026-05-21)
+
+
+### Bug Fixes
+
+* change context in layout ([a52fa5b](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/a52fa5bcbcee30b3e641172e877b4351a68f9cf2))
+* **King:** adjust time ([e291f1d](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/e291f1da3cdacf49441e8d09875587de7a97c4e5))
+
+
+### Features
+
+* **King:** All hail the King ([1be8b76](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/1be8b764847c057d1878e23e5de53e9fcd62d43e))
+* **LobbyWaitPage:** implemented Indicator whether the player is subscribed to websockets [#49](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/49) ([0dd2d81](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/0dd2d81073ddf66101efb908280a65f4231cb32a))
+
 # [1.5.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.4.1...v1.5.0) (2026-05-21)
 
 
