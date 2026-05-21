@@ -43,6 +43,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   const add = useCallback((notif: NewNotification, customId?: string) => {
+
+    console.log("[NotificationContext] add called:", notif);
     const id = customId ?? `${notif.type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const entry = { ...notif, id, time: new Date() } as AppNotification;
     setNotifications((prev) => [entry, ...prev]);
