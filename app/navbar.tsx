@@ -12,6 +12,7 @@ import { App as AntdApp, Image } from "antd";
 import { getApiDomain } from "@/utils/domain";
 
 const backendBase = getApiDomain();
+import {useWebSocket} from "@/context/WebSocketContext";
 
 function SBBCross({ size = 20 }: { size?: number }) {
   return (
@@ -23,12 +24,14 @@ function SBBCross({ size = 20 }: { size?: number }) {
 }
 
 export default function Navbar() {
+  // COMBINED: Only call useAuth once and pass token/user down to where needed, instead of calling useAuth separately in Navbar and NotificationListener. This avoids redundant context lookups and keeps auth state management centralized. 
   const { user, logout, isLoading, login, token } = useAuth();
   const isLoggedIn = !!user;
   const pathname = usePathname();
   const router = useRouter();
   const apiService = useApi();
   const { notification } = AntdApp.useApp();
+  const { publish } = useWebSocket();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [code, setCode] = useState("");
@@ -250,7 +253,7 @@ export default function Navbar() {
                                     </div>
                                   </>
                                 )}
-                                
+
                               </div>
                             ))
                           )}
@@ -268,7 +271,13 @@ export default function Navbar() {
                     <button className={`navbar-link ${isActive(`/users/${user.userId}`) ? "is-active" : ""}`} onClick={() => go(`/users/${user.userId}`)}>
                       {user.username.length > 8 ? user.username.slice(0, 8) + "…" : user.username}
                     </button>
-                    <button className="navbar-logout" onClick={logout}>Logout</button>
+                    <button className="navbar-logout" onClick={() => {
+                      if (pathname?.startsWith("/lobbies/")) {
+                        const lobbyId = pathname.split("/")[2];
+                        if (lobbyId) publish(`/app/lobby/${lobbyId}/leave`, {});
+                      }
+                      logout();
+                    }}>Logout</button>
                   </>
                 ) : (
                   <button className="navbar-login" onClick={() => go("/login")}>Login</button>
@@ -306,7 +315,13 @@ export default function Navbar() {
             </div>
             <div className="navbar-drawer-section">
               {user ? (
-                <button className="navbar-drawer-link navbar-drawer-link--muted" onClick={logout}>Logout</button>
+                  <button className="navbar-drawer-link navbar-drawer-link--muted" onClick={() => {
+                    if (pathname?.startsWith("/lobbies/")) {
+                      const lobbyId = pathname.split("/")[2];
+                      if (lobbyId) publish(`/app/lobby/${lobbyId}/leave`, {});
+                    }
+                    logout();
+                  }}>Logout</button>
               ) : (
                 <button className="navbar-drawer-link--primary navbar-drawer-link" onClick={() => go("/login")}>Login</button>
               )}
