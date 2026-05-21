@@ -47,6 +47,8 @@ const LobbiesPage: React.FC = () => {
   const [privateJoin, setPrivateJoin] = useState<PrivateJoinTarget>(null);
   const [privateCode, setPrivateCode] = useState("");
 
+  const [reloadLobbies, setReloadLobbies] = useState(false);
+
   useEffect(() => {
     const fetchLobbies = async () => {
       try {
@@ -132,21 +134,21 @@ const LobbiesPage: React.FC = () => {
     }
   };
 
-  const fetchLobbies = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.get<Lobby[]>("/lobbies");
-      setLobbies(response);
-    } catch (error) {
-      console.error("Error fetching lobbies:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const fetchLobbies = async () => {
+      try {
+        setLoading(true);
+        const response = await apiService.get<Lobby[]>("/lobbies");
+        setLobbies(response);
+      } catch (error) {
+        console.error("Error fetching lobbies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchLobbies();
-  }, [apiService]);
+  }, [apiService, reloadLobbies]);
 
   return (
     <div className="page-root">
@@ -159,7 +161,7 @@ const LobbiesPage: React.FC = () => {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button
               className="sbb-btn sbb-btn--secondary sbb-btn--sm"
-              onClick={() => fetchLobbies()}
+              onClick={() => setReloadLobbies(!reloadLobbies)}
               type="button"
               aria-label="Lobbies aktualisieren"
             >
