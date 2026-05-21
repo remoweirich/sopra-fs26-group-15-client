@@ -254,7 +254,7 @@ const ProfilePage: React.FC = () => {
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
         { id: "games", icon: "🎮", label: "Spiele", count: DUMMY_HISTORY.length },
-        { id: "achievements", icon: "🏆", label: "Erfolge", count: `${(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0}/10` },
+        { id: "achievements", icon: "🏆", label: "Erfolge", count: `${(profileData as Partial<MyUserDTO>).userAchievementDTOList?.length ?? 0}/11` },
         ...(showFriends
             ? [{ id: "friends" as ProfileTab, icon: "👥", label: "Freunde" }]
             : []),
