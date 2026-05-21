@@ -3485,6 +3485,32 @@ img, svg { display: block; max-width: 100%; }
   margin-top: 2px;
 }
 
+.profile-friend-remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--grey-l);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all 0.16s ease;
+  opacity: 0;
+}
+
+.profile-friend-card:hover .profile-friend-remove { opacity: 1; }
+.profile-friend-remove:hover { border-color: var(--red); color: var(--red); background: rgba(235,0,0,0.06); }
+
+@media (hover: none) {
+  .profile-friend-remove { opacity: 1; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    15. ANIMATIONS
    ═══════════════════════════════════════════════════════════════════════════ */
