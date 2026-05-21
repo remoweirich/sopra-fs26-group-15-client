@@ -5,12 +5,12 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { MyUserDTO, UserDTO } from "@/types/user";
 import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
-import {getApiDomain} from "@/utils/domain";
-import {Image} from "antd";
+import { getApiDomain } from "@/utils/domain";
+import { Image, App as AntdApp } from "antd";
+import { useNotifications } from "@/context/NotificationContext";
 
 type ProfileTab = "overview" | "games" | "friends" | "achievements";
 
-// Dummy game history (no backend endpoint yet)
 const DUMMY_HISTORY = [
     { name: "Pendler-Challenge", date: "10. Mär", rounds: "5R", score: 4280 },
     { name: "Mittagspause Express", date: "09. Mär", rounds: "3R", score: 2340 },
@@ -28,15 +28,23 @@ const ProfilePage: React.FC = () => {
     const router = useRouter();
     const profileId = Number(useParams().id);
     const { user: currentUser, token, login, logout, isLoading } = useAuth();
+    const { dismiss: dismissNotif, bumpFriendsVersion, friendsVersion } = useNotifications();
+    const { notification } = AntdApp.useApp();
 
-    const backendBase = getApiDomain()
+    const backendBase = getApiDomain();
     const [profileData, setProfileData] = useState<MyUserDTO | UserDTO | null>(null);
     const [editing, setEditing] = useState(false);
     const searchParams = useSearchParams();
     const initialTab = (searchParams.get("tab") as ProfileTab) || "overview";
     const [tab, setTab] = useState<ProfileTab>(initialTab);
+    const tabParam = searchParams.get("tab") as ProfileTab | null;
 
-    // Edit form state
+    useEffect(() => {
+        if (tabParam && ["overview", "games", "friends", "achievements"].includes(tabParam)) {
+            setTab(tabParam);
+        }
+    }, [tabParam]);
+
     const [editName, setEditName] = useState("");
     const [editBio, setEditBio] = useState("");
     const [editPassword, setEditPassword] = useState("");
@@ -50,7 +58,6 @@ const ProfilePage: React.FC = () => {
     const [pendingReceived, setPendingReceived] = useState<UserDTO[]>([]);
     const [pendingSent, setPendingSent] = useState<UserDTO[]>([]);
     const [isLoadingFriends, setIsLoadingFriends] = useState(false);
-
     const [friendToRemove, setFriendToRemove] = useState<UserDTO | null>(null);
 
     useEffect(() => {
@@ -79,13 +86,18 @@ const ProfilePage: React.FC = () => {
                 });
                 setFriends(friendsData);
 
-                if (isOwnProfile) {
+                if (isOwnProfile && currentUser?.userId) {
+                    const ownUserId = currentUser.userId.toString();
                     const [received, sent] = await Promise.all([
-                        apiService.get<UserDTO[]>(`/friends/${profileId}/pendingReceived`, { headers: { token } }),
-                        apiService.get<UserDTO[]>(`/friends/${profileId}/pendingSent`, { headers: { token } }),
+                        apiService.get<UserDTO[]>(`/friends/${ownUserId}/pendingReceived`, { headers: { token, userId: ownUserId } }),
+                        apiService.get<UserDTO[]>(`/friends/${ownUserId}/pendingSent`, { headers: { token, userId: ownUserId } }),
                     ]);
-                    setPendingReceived(received);
-                    setPendingSent(sent);
+
+                    setPendingReceived(received ?? []);
+                    setPendingSent(sent ?? []);
+                } else {
+                    setPendingReceived([]);
+                    setPendingSent([]);
                 }
             } catch (error) {
                 console.error("Error when loading friends", error);
@@ -95,28 +107,45 @@ const ProfilePage: React.FC = () => {
         };
 
         fetchFriends();
-    }, [tab, profileId, profileData, token, isOwnProfile, apiService]);
+    }, [tab, profileId, profileData, token, isOwnProfile, apiService, friendsVersion, currentUser?.userId]);
 
     const refreshFriends = React.useCallback(async () => {
         if (!token) return;
         try {
             const friendsData = await apiService.get<UserDTO[]>(`/friends/${profileId}`, {
-                headers: { token: token ?? "", userId: profileId.toString() },
+                headers: { token, userId: currentUser?.userId?.toString() ?? profileId.toString() },
             });
             setFriends(friendsData);
 
-            if (isOwnProfile) {
+            if (isOwnProfile && currentUser?.userId) {
+                const ownUserId = currentUser.userId.toString();
                 const [received, sent] = await Promise.all([
-                    apiService.get<UserDTO[]>(`/friends/${profileId}/pendingReceived`, { headers: { token } }),
-                    apiService.get<UserDTO[]>(`/friends/${profileId}/pendingSent`, { headers: { token } }),
+                    apiService.get<UserDTO[]>(`/friends/${ownUserId}/pendingReceived`, { headers: { token, userId: ownUserId } }),
+                    apiService.get<UserDTO[]>(`/friends/${ownUserId}/pendingSent`, { headers: { token, userId: ownUserId } }),
                 ]);
-                setPendingReceived(received);
-                setPendingSent(sent);
+                setPendingReceived(received ?? []);
+                setPendingSent(sent ?? []);
+            } else {
+                setPendingReceived([]);
+                setPendingSent([]);
             }
         } catch (error) {
             console.error("Error when refreshing friends", error);
         }
-    }, [token, profileId, isOwnProfile, apiService]);
+    }, [token, profileId, isOwnProfile, apiService, currentUser?.userId]);
+
+    useEffect(() => {
+        if (!profileData) return;
+
+        const maybeGuest =
+            (profileData as Partial<MyUserDTO>).isGuest === true ||
+            profileData.username?.startsWith("guest_") ||
+            (profileData as Partial<MyUserDTO>).email?.endsWith("@guest.com") === true;
+
+        if (maybeGuest && tab === "friends") {
+            setTab("overview");
+        }
+    }, [profileData, tab]);
 
     if (isLoading || !profileData) {
         return <div className="page-loading">Lade Profil…</div>;
@@ -128,10 +157,6 @@ const ProfilePage: React.FC = () => {
         profileAsAny.email?.endsWith("@guest.com") === true;
     const showFriends = !isGuest;
     const showPasswordField = !isGuest;
-
-    if (!showFriends && tab === "friends") {
-        setTab("overview");
-    }
 
     const initial = profileData.username ? profileData.username[0].toUpperCase() : "?";
     const creationDate = profileData.creationDate
@@ -205,14 +230,17 @@ const ProfilePage: React.FC = () => {
         }
     };
 
-
     const handleAccept = async (requestingUserId: number) => {
+        if (!currentUser?.userId || !token) return;
+
         try {
             await apiService.post(`/friends/accept/${requestingUserId}`,
                 {},
-                { headers: { userId: profileId.toString(), token: token ?? "" } }
+                { headers: { userId: currentUser.userId.toString(), token } }
             );
-
+            dismissNotif(`friend-request-${requestingUserId}`);
+            notification.destroy(`friend-request-${requestingUserId}`);
+            bumpFriendsVersion();
             await refreshFriends();
 
         } catch (error) {
@@ -221,20 +249,24 @@ const ProfilePage: React.FC = () => {
     };
 
     const handleReject = async (requestingUserId: number) => {
+        if (!currentUser?.userId || !token) return;
+
         try {
-            await apiService.post(`/friends/reject/${requestingUserId}`,
+            await apiService.post(
+                `/friends/reject/${requestingUserId}`,
                 {},
-                {
-                    headers: { userId: profileId.toString(), token: token ?? "" }
-                });
+                { headers: { userId: currentUser.userId.toString(), token } }
+            );
+            
+            dismissNotif(`friend-request-${requestingUserId}`);
+            notification.destroy(`friend-request-${requestingUserId}`);
 
+            bumpFriendsVersion();
             await refreshFriends();
-
         } catch (error) {
             console.error("Error when reject request:", error);
         }
     };
-
 
     const tabs: { id: ProfileTab; icon: string; label: string; count?: string | number }[] = [
         { id: "overview", icon: "📊", label: "Übersicht" },
@@ -394,10 +426,10 @@ const ProfilePage: React.FC = () => {
                             <h2>👥 Freunde</h2>
                             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                                 <button
-                                  type="button"
-                                  className="sbb-btn sbb-btn--secondary sbb-btn--sm"
-                                  onClick={() => refreshFriends()}
-                                  aria-label="Freundesliste aktualisieren"
+                                    type="button"
+                                    className="sbb-btn sbb-btn--secondary sbb-btn--sm"
+                                    onClick={() => refreshFriends()}
+                                    aria-label="Freundesliste aktualisieren"
                                 >↻</button>
                                 {isOwnProfile && (
                                     <button type="button" className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => router.push("/leaderboard?addFriend=1")}>+ Freund hinzufügen</button>
@@ -407,24 +439,29 @@ const ProfilePage: React.FC = () => {
 
                         {isLoadingFriends ? (
                             <div className="lb-empty">Lade Freunde…</div>
-
-                        ) : (<div className="profile-friends-grid">
+                        ) : friends.length === 0 ? (
+                            <div className="lb-empty">
+                                Noch keine Freunde vorhanden.
+                                {isOwnProfile && <button type="button" className="sbb-link" onClick={() => router.push("/leaderboard?addFriend=1")} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--red)", marginLeft: "5px" }}>Auf der Rangliste suchen →</button>}
+                            </div>
+                        ) : (
+                            <div className="profile-friends-grid">
                                 {friends.map((f) => (
                                     <div key={f.userId} className="profile-friend-card">
                                         <div className="profile-friend-avatar" onClick={() => router.push(`/users/${f.userId}`)} style={{ cursor: "pointer" }}>
-                                          {f.username?.[0]?.toUpperCase() ?? "?"}
+                                            {f.username?.[0]?.toUpperCase() ?? "?"}
                                         </div>
                                         <div style={{ flex: 1, minWidth: 0, cursor: "pointer" }} onClick={() => router.push(`/users/${f.userId}`)}>
-                                          <div className="profile-friend-name">{f.username}</div>
-                                          <div className="profile-friend-meta">Mitglied</div>
+                                            <div className="profile-friend-name">{f.username}</div>
+                                            <div className="profile-friend-meta">Mitglied</div>
                                         </div>
                                         {isOwnProfile && (
-                                          <button
-                                            type="button"
-                                            className="profile-friend-remove"
-                                            aria-label={`${f.username} entfernen`}
-                                            onClick={() => setFriendToRemove(f)}
-                                          >✕</button>
+                                            <button
+                                                type="button"
+                                                className="profile-friend-remove"
+                                                aria-label={`${f.username} entfernen`}
+                                                onClick={() => setFriendToRemove(f)}
+                                            >✕</button>
                                         )}
                                     </div>
                                 ))}
@@ -440,12 +477,8 @@ const ProfilePage: React.FC = () => {
                                         {pendingReceived.map((req) => (
                                             <div key={req.userId} className="profile-history-row">
                                                 <div className="profile-history-info"><div className="profile-history-name">{req.username}</div><div className="profile-history-meta">Möchte dein Freund sein</div></div>
-                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => {handleAccept(req.userId)}}>Annehmen</button>
-                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm"
-                                                        onClick={() => {handleReject(req.userId)}}
-                                                        style={{ background: "grey", borderColor: "black" }}
-                                                >Ablehnen
-                                                </button>
+                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => { handleAccept(req.userId); }}>Annehmen</button>
+                                                <button className="sbb-btn sbb-btn--primary sbb-btn--sm" onClick={() => { handleReject(req.userId); }} style={{ background: "grey", borderColor: "black" }}>Ablehnen</button>
                                             </div>
                                         ))}
                                     </div>
@@ -467,7 +500,8 @@ const ProfilePage: React.FC = () => {
                 )}
             </div>
 
-             {friendToRemove && (
+            {/* Friend removal confirmation modal */}
+            {friendToRemove && (
                 <div className="sbb-modal-overlay" role="dialog" aria-modal="true" aria-label="Freund entfernen">
                     <button type="button" onClick={() => setFriendToRemove(null)} aria-label="Abbrechen" style={{ position: "absolute", inset: 0, background: "transparent", border: "none", cursor: "pointer" }} />
                     <div className="sbb-modal" style={{ position: "relative", zIndex: 1, maxWidth: 400 }}>
@@ -477,18 +511,54 @@ const ProfilePage: React.FC = () => {
                         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
                             <button type="button" className="sbb-btn sbb-btn--secondary sbb-btn--md" onClick={() => setFriendToRemove(null)}>Abbrechen</button>
                             <button type="button" className="sbb-btn sbb-btn--primary sbb-btn--md" onClick={async () => {
-                              try {
-                                await apiService.delete(`/friends/remove/${friendToRemove.userId}`, {
-                                  headers: { userId: profileId.toString(), token: token ?? "" }
-                                });
-                                await refreshFriends();
-                              } catch (e) {
-                                console.error("Error removing friend", e);
-                              }
-                              setFriendToRemove(null);
+                                try {
+                                    if (!currentUser?.userId || !token) return;
+                                    await apiService.delete(`/friends/remove/${friendToRemove.userId}`, {
+                                        headers: { userId: currentUser.userId.toString(), token }
+                                    });
+                                    bumpFriendsVersion();
+                                    await refreshFriends();
+                                } catch (e) {
+                                    console.error("Error removing friend", e);
+                                }
+                                setFriendToRemove(null);
                             }}>Entfernen</button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Profile edit modal */}
+            {editing && isOwnProfile && (
+                <div className="sbb-modal-overlay" role="dialog" aria-modal="true" aria-label="Profil bearbeiten">
+                    <button type="button" onClick={() => setEditing(false)} aria-label="Modal schliessen" style={{ position: "absolute", inset: 0, background: "transparent", border: "none", cursor: "pointer" }} />
+                    <form onSubmit={handleSave} className="sbb-modal" style={{ position: "relative", zIndex: 1, padding: 0, borderTop: "none", maxWidth: 480, overflow: "hidden" }}>
+                        <div style={{ background: "var(--black)", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                            <h2 style={{ color: "var(--white)", fontFamily: "var(--font-sans)", fontWeight: 800, fontSize: 18, letterSpacing: "-0.02em", margin: 0 }}>Profil bearbeiten</h2>
+                            <button type="button" onClick={() => setEditing(false)} aria-label="Schliessen" style={{ background: "rgba(255,255,255,0.10)", color: "var(--white)", border: "none", width: 30, height: 30, borderRadius: "50%", cursor: "pointer", fontSize: 16, fontFamily: "var(--font-sans)", lineHeight: 1, padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>×</button>
+                        </div>
+                        <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+                            {updateError && <div className="sbb-field-error">{updateError}</div>}
+                            {updateSuccess && <div className="sbb-field-error" style={{ background: "rgba(45,106,79,0.10)", borderLeftColor: "var(--green)", color: "var(--green)" }}>✓ Profil aktualisiert!</div>}
+                            <div className="sbb-field"><div className="sbb-field-label"><span className="label label--grey">Benutzername</span></div><input className="sbb-input" value={editName} onChange={(e) => setEditName(e.target.value)} /></div>
+                            <div className="sbb-field"><div className="sbb-field-label"><span className="label label--grey">Bio</span></div><textarea className="sbb-input sbb-textarea" value={editBio} onChange={(e) => setEditBio(e.target.value.slice(0, 200))} placeholder="Erzähl was über dich…" rows={3} /><div className="sbb-field-hint">{editBio.length}/200 Zeichen</div></div>
+                            {showPasswordField ? (
+                                <div style={{ borderTop: "1px solid var(--warm)", paddingTop: 16 }}>
+                                    <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--grey)", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Passwort ändern (optional)</div>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                        <input className="sbb-input" type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} placeholder="Neues Passwort" />
+                                        <input className="sbb-input" type="password" value={editPassword2} onChange={(e) => setEditPassword2(e.target.value)} placeholder="Passwort wiederholen" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ padding: "10px 14px", background: "rgba(200,150,12,0.12)", borderLeft: "3px solid var(--gold)", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--charcoal)", letterSpacing: "0.04em", lineHeight: 1.6 }}>Gäste haben kein Passwort. <button type="button" onClick={() => { setEditing(false); router.push("/register"); }} style={{ background: "transparent", border: "none", color: "var(--red)", cursor: "pointer", font: "inherit", padding: 0, textDecoration: "underline", fontWeight: 700 }}>Konto erstellen</button> für Passwort, Freunde und persistente Stats.</div>
+                            )}
+                        </div>
+                        <div style={{ padding: "14px 24px", borderTop: "1px solid var(--warm)", display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                            <button type="button" className="sbb-btn sbb-btn--secondary sbb-btn--md" onClick={() => setEditing(false)}>Abbrechen</button>
+                            <button type="submit" className="sbb-btn sbb-btn--primary sbb-btn--md">Speichern</button>
+                        </div>
+                    </form>
                 </div>
             )}
         </div>

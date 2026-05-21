@@ -5,12 +5,16 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
 import { UserDTO } from "@/types/user";
+import { App as AntdApp } from "antd";
+import { useNotifications } from "@/context/NotificationContext";
 
 type SortKey = "rank" | "totalPoints" | "playedGames" | "guessingPrecision";
 
 const LeaderboardInner: React.FC = () => {
   const { user, token } = useAuth();
   const apiService = useApi();
+  const { notification } = AntdApp.useApp();
+  const { friendsVersion, bumpFriendsVersion } = useNotifications();
 
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +22,7 @@ const LeaderboardInner: React.FC = () => {
   const [top3, setTop3] = useState<UserDTO[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("totalPoints");
   const [friends, setFriends] = useState<number[]>([]);
+  const [friendRequestSent, setFriendRequestSent] = useState<Set<number>>(new Set());
 
   const podiumColors = ["var(--gold)", "var(--grey-l)", "#CD7F32"];
 
@@ -35,9 +40,11 @@ const LeaderboardInner: React.FC = () => {
       }
     };
     fetchTop3();
-  }, []);
+  }, [apiService]);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const debounce = setTimeout(async () => {
       try {
         const data = await apiService.get<UserDTO[]>(
@@ -55,29 +62,32 @@ const LeaderboardInner: React.FC = () => {
   }, [search, apiService]);
 
   useEffect(() => {
-    if (!user || !token) return;
-    const getFriends = async () => {
+    if (!user?.userId || !token) {
+      setFriends([]);
+      setFriendRequestSent(new Set());
+      return;
+    }
+
+    const getFriendState = async () => {
       try {
-        const data = await apiService.get<UserDTO[]>(
-          `/friends/${user?.userId}`,
-          {
-            headers: { userId: user.userId.toString() ?? "", token: token ?? "" },
-          }
-        );
-        const friendIdList: number[] = [];
-        for (let i = 0; i < data.length; i++) {
-          const friend = data.at(i);
-          if (friend != null) {
-            friendIdList.push(friend.userId);
-          }
-        }
-        setFriends(friendIdList);
+        const [friendsData, pendingSentData] = await Promise.all([
+          apiService.get<UserDTO[]>(`/friends/${user.userId}`, {
+            headers: { userId: user.userId.toString(), token },
+          }),
+          apiService.get<UserDTO[]>(`/friends/${user.userId}/pendingSent`, {
+            headers: { userId: user.userId.toString(), token },
+          }),
+        ]);
+
+        setFriends((friendsData ?? []).map((f) => f.userId));
+        setFriendRequestSent(new Set((pendingSentData ?? []).map((p) => p.userId)));
       } catch (e) {
-        console.log(e, "Error while fetching friends");
+        console.log(e, "Error while fetching friend state");
       }
     };
-    getFriends();
-  }, [user, token, apiService]);
+
+    getFriendState();
+  }, [user?.userId, token, apiService, friendsVersion]);
 
   // Feste Ränge basierend auf Punkte (bleibt immer gleich)
   const rankMap = new Map<number, number>();
@@ -91,16 +101,37 @@ const LeaderboardInner: React.FC = () => {
       return (rankMap.get(a.userId) ?? 0) - (rankMap.get(b.userId) ?? 0);
     }
     return (b.userScoreboard?.[sortBy as keyof typeof a.userScoreboard] ?? 0)
-         - (a.userScoreboard?.[sortBy as keyof typeof a.userScoreboard] ?? 0);
+      - (a.userScoreboard?.[sortBy as keyof typeof a.userScoreboard] ?? 0);
   });
 
   const handleFriendRequest = async (receivingUserId: number) => {
+    if (!user?.userId || !token) return;
+
     try {
       await apiService.post(`/friends/request/${receivingUserId}`, {}, {
-        headers: { userId: user?.userId.toString() ?? "", token: token ?? "" },
+        headers: { userId: user.userId.toString(), token },
       });
-    } catch (e) {
-      console.error("Error while sending friend request", e);
+
+      setFriendRequestSent((prev) => new Set(prev).add(receivingUserId));
+      bumpFriendsVersion();
+    } catch (e: unknown) {
+      const msg = String(e);
+      if (msg.includes("409")) {
+        setFriendRequestSent((prev) => new Set(prev).add(receivingUserId));
+        notification.warning({
+          title: "Anfrage existiert bereits",
+          description: "Es besteht bereits eine offene Freundschaftsanfrage zwischen euch.",
+          placement: "topRight",
+          duration: 4,
+        });
+      } else {
+        notification.error({
+          title: "Fehler",
+          description: "Freundschaftsanfrage konnte nicht gesendet werden.",
+          placement: "topRight",
+          duration: 4,
+        });
+      }
     }
   };
 
@@ -163,14 +194,14 @@ const LeaderboardInner: React.FC = () => {
         {/* Table */}
         <div className="lb-table">
           <div className="lb-table-head">
-              <button
-                type="button"
-                className={`lb-col-sort lb-col-sort--rank ${sortBy === "rank" ? "is-active" : ""}`}
-                onClick={() => setSortBy("rank")}
-              >
-                # {sortBy === "rank" && "↓"}
-              </button>
-              <span>SPIELER</span>
+            <button
+              type="button"
+              className={`lb-col-sort lb-col-sort--rank ${sortBy === "rank" ? "is-active" : ""}`}
+              onClick={() => setSortBy("rank")}
+            >
+              # {sortBy === "rank" && "↓"}
+            </button>
+            <span>SPIELER</span>
             <button
               type="button"
               className={`lb-col-sort ${sortBy === "totalPoints" ? "is-active" : ""}`}
@@ -224,7 +255,7 @@ const LeaderboardInner: React.FC = () => {
                     {user && !isMe && isFriend && (
                       <span className="lb-badge lb-badge--friend">✓ Freund</span>
                     )}
-                    {user && !isMe && !isFriend && (
+                    {user && !isMe && !isFriend && !friendRequestSent.has(p.userId) && (
                       <button
                         type="button"
                         className="lb-add-friend"
@@ -233,6 +264,9 @@ const LeaderboardInner: React.FC = () => {
                       >
                         +
                       </button>
+                    )}
+                    {user && !isMe && !isFriend && friendRequestSent.has(p.userId) && (
+                      <span className="lb-badge" style={{ background: "rgba(200,150,12,0.12)", color: "var(--gold)" }}>Gesendet</span>
                     )}
                   </div>
                   <div className={`lb-row-score ${sortBy === "totalPoints" ? "is-sort-active" : ""}`}>
