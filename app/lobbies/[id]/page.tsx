@@ -36,6 +36,7 @@ const LobbyWaitPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [connectionWarning, setConnectionWarning] = useState<string | null>(null);
   const webSocket = useWebSocket();
+  const [gameStarted, setGameStarted] = useState(false);
 
   // ── Initial fetch ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -71,6 +72,7 @@ const LobbyWaitPage: React.FC = () => {
         setLobby(msg.payload);
       } else if (msg.type === "GAME_START") {
         console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
+        setGameStarted(true);
         router.push(`/game/${lobbyId}`);
       }
     });
@@ -128,6 +130,29 @@ const LobbyWaitPage: React.FC = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
+
+// Module-level timer — survives the Strict Mode remount
+let leaveTimer: ReturnType<typeof setTimeout> | null = null;
+
+useEffect(() => {
+  // Cancel any pending leave from a prior mount (handles Strict Mode double-mount)
+  if (leaveTimer) {
+    clearTimeout(leaveTimer);
+    leaveTimer = null;
+  }
+
+  return () => {
+    // Don't leave if the game started or we're loading into the game
+    if (gameStarted || isLoadingGame) return;
+
+    // Delay long enough for Strict Mode remount to cancel it (~50ms is plenty)
+    leaveTimer = setTimeout(() => {
+      leaveTimer = null;
+      console.log("[LobbyRoom] Leaving lobby due to navigation");
+      publish(`/app/lobby/${lobbyId}/leave`, {});
+    }, 80);
+  };
+}, [lobbyId, publish, gameStarted, isLoadingGame]);
 
   const isHost = lobby && currentUser ? lobby.adminId === currentUser.userId : false;
 
