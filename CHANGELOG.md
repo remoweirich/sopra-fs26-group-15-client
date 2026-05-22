@@ -1,3 +1,10 @@
+## [1.9.4](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.3...v1.9.4) (2026-05-22)
+
+
+### Bug Fixes
+
+* passwort/username max länge und hard coded stuff weg ([f2d42f1](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f2d42f1c4f06c6c96482ddbc82532f16a0698665))
+
 ## [1.9.3](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.2...v1.9.3) (2026-05-22)
 
 
