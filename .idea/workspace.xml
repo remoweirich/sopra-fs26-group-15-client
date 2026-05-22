@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="feat(King): All hail the King">
+    <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="docs(README.md): start on README.md">
+      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/RoundOverview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/game/[id]/leaderboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/game/[id]/leaderboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/lobbies/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/lobbies/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/styles/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/styles/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/types/lobby.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/types/lobby.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/types/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/users/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/users/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +17,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="2fd8cf2e-1a7a-4773-bb6c-6513fa20a5e3" />
+        <option name="activeSessionId" value="cc3771ed-b1ed-4f62-a0b2-8e0d80c5f6ee" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -48,6 +42,31 @@
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="auto" />
             <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="526f8429-971f-4735-95ad-e3ce51aa8946" />
+            <option name="modeId" value="Ask" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2e13bdc0-2a0b-40a1-a562-b6dc81184f1d" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="cc3771ed-b1ed-4f62-a0b2-8e0d80c5f6ee" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -91,22 +110,12 @@
     &quot;assignee&quot;: &quot;snowjademusic&quot;
   }
 }</component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="mainldfgjlds" />
-      </list>
-    </option>
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
     &quot;accountId&quot;: &quot;6a6c7ed2-89ad-4a5b-9ef7-5756a0a2509f&quot;
   }
 }</component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -114,7 +123,7 @@
   <component name="ProjectSessionTemplates">
     <option name="panelTemplate">
       <template>
-        <option name="modeId" value="Ask" />
+        <option name="modeId" value="Agent" />
         <option name="model">
           <model>
             <option name="modelType" value="builtin_family" />
@@ -129,35 +138,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JavaScript Debug.localhost:3000.executor": "Debug",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "Merging M4-Main-Preview-Client",
-    "javascript.preferred.runtime.type.id": "node",
-    "js.debugger.nextJs.config.created.client": "true",
-    "js.debugger.nextJs.config.created.server": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-client",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "terminal",
-    "ts.external.directory.path": "/Users/remoweirich/Desktop/UZH/FS2026/SoPra/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JavaScript Debug.localhost:3000.executor&quot;: &quot;Debug&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;README__ADJUSTMENTS&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/claudestark/Desktop/Code - Claude Stark/uzh/softwareConstruction/sopra-fs26-group-15-server&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/shadi/Documents/UZH/4.Semester/code/GuesSBB/sopra-fs26-group-15-client/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs/screenshots" />
     </key>
   </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
@@ -227,12 +239,15 @@
       <workItem from="1776680191021" duration="10536000" />
       <workItem from="1776702584032" duration="3717000" />
       <workItem from="1776775376427" duration="3659000" />
-      <workItem from="1778046333371" duration="603000" />
-      <workItem from="1778833376586" duration="2086000" />
-      <workItem from="1778847466456" duration="1160000" />
-      <workItem from="1779092834005" duration="922000" />
-      <workItem from="1779195296288" duration="505000" />
-      <workItem from="1779286300170" duration="9751000" />
+      <workItem from="1778046333371" duration="8041000" />
+      <workItem from="1778072159937" duration="862000" />
+      <workItem from="1778602399016" duration="2792000" />
+      <workItem from="1778615286493" duration="2750000" />
+      <workItem from="1778653048868" duration="4307000" />
+      <workItem from="1778668214900" duration="989000" />
+      <workItem from="1778759505004" duration="655000" />
+      <workItem from="1779376226268" duration="1009000" />
+      <workItem from="1779438158494" duration="8519000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -418,31 +433,71 @@
       <option name="project" value="LOCAL" />
       <updated>1778023574358</updated>
     </task>
-    <task id="LOCAL-00024" summary="feat(navbar): join via lobby code now possible">
+    <task id="LOCAL-00024" summary="update contributions">
       <option name="closed" value="true" />
-      <created>1778679844481</created>
+      <created>1778046984406</created>
       <option name="number" value="00024" />
       <option name="presentableId" value="LOCAL-00024" />
       <option name="project" value="LOCAL" />
-      <updated>1778679844481</updated>
+      <updated>1778046984406</updated>
     </task>
-    <task id="LOCAL-00025" summary="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab">
+    <task id="LOCAL-00025" summary="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)">
       <option name="closed" value="true" />
-      <created>1779283111274</created>
+      <created>1779212805404</created>
       <option name="number" value="00025" />
       <option name="presentableId" value="LOCAL-00025" />
       <option name="project" value="LOCAL" />
-      <updated>1779283111274</updated>
+      <updated>1779212805404</updated>
     </task>
-    <task id="LOCAL-00026" summary="feat(King): All hail the King">
+    <task id="LOCAL-00026" summary="fix: clear navbar when logging in to delete notifications">
       <option name="closed" value="true" />
-      <created>1779317877871</created>
+      <created>1779289288858</created>
       <option name="number" value="00026" />
       <option name="presentableId" value="LOCAL-00026" />
       <option name="project" value="LOCAL" />
-      <updated>1779317877871</updated>
+      <updated>1779289288858</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fix: navbar auth context">
+      <option name="closed" value="true" />
+      <created>1779353587338</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1779353587338</updated>
+    </task>
+    <task id="LOCAL-00028" summary="fix: navbar auth context 2">
+      <option name="closed" value="true" />
+      <created>1779355519112</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1779355519112</updated>
+    </task>
+    <task id="LOCAL-00029" summary="fix(Achievements): adjust hardcoded max achievements number">
+      <option name="closed" value="true" />
+      <created>1779372704266</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1779372704266</updated>
+    </task>
+    <task id="LOCAL-00030" summary="docs(README.md): start on README.md">
+      <option name="closed" value="true" />
+      <created>1779377223393</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1779377223393</updated>
+    </task>
+    <task id="LOCAL-00031" summary="docs(README.md): start on README.md">
+      <option name="closed" value="true" />
+      <created>1779443768807</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1779443768807</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -460,10 +515,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: add to contributions.md" />
-    <MESSAGE value="feat(lobbies): handle joining and creating lobbies as guest with pop-up" />
-    <MESSAGE value="feat(lobbies): add tooltip to button hover" />
-    <MESSAGE value="ci(gitignore): .idea files ignored" />
     <MESSAGE value="ci(gitignore): remove duplicate .cache" />
     <MESSAGE value="ci(semantic-commits): add automatic versioning through semantic Commits" />
     <MESSAGE value="fix(WebSockets): disentangle WebSocket messages" />
@@ -482,10 +533,14 @@
     <MESSAGE value="feat: migrate app with new implementation npm install" />
     <MESSAGE value="feat: change semantic release npm version" />
     <MESSAGE value="fix: change url" />
-    <MESSAGE value="feat(navbar): join via lobby code now possible" />
-    <MESSAGE value="feat(notifications): notifications and bell notifications are now clickable and send you to the correct user profile tab" />
-    <MESSAGE value="feat(King): All hail the King" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(King): All hail the King" />
+    <MESSAGE value="update contributions" />
+    <MESSAGE value="feat(profile): update scoreboard display and add gamesWon field&#10;&#10;- Replace avgPoints with gamesWon in hero stats (3 cards instead of 4)&#10;- Add gamesWon to UserScoreboard TypeScript interface&#10;- Fix precision display (already in %, no * 100 needed)&#10;- Update profile-detail-stats to 3 columns (was 4)&#10;- Mobile: hero stats and detail stats now stack vertically (1 column)" />
+    <MESSAGE value="fix: clear navbar when logging in to delete notifications" />
+    <MESSAGE value="fix: navbar auth context" />
+    <MESSAGE value="fix: navbar auth context 2" />
+    <MESSAGE value="fix(Achievements): adjust hardcoded max achievements number" />
+    <MESSAGE value="docs(README.md): start on README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs(README.md): start on README.md" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
