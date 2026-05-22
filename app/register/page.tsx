@@ -34,6 +34,11 @@ const Register: React.FC = () => {
       return;
     }
 
+    if (username.trim().length > 20) {
+      setErrorMessage("Der Benutzername darf maximal 20 Zeichen lang sein.");
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setErrorMessage("Bitte gib eine gültige E-Mail-Adresse ein.");
@@ -92,14 +97,6 @@ const Register: React.FC = () => {
           <h1>Bereit für die Schweiz?</h1>
           <p>Erstelle dein Konto und steig ein in die SBB-Liga.</p>
           <div className="auth-left-stats">
-            <div className="auth-left-stat">
-              <div className="auth-left-stat-v">12K+</div>
-              <div className="auth-left-stat-l">Spieler</div>
-            </div>
-            <div className="auth-left-stat">
-              <div className="auth-left-stat-v">50K+</div>
-              <div className="auth-left-stat-l">Runden</div>
-            </div>
           </div>
         </div>
       </div>
@@ -123,6 +120,7 @@ const Register: React.FC = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Pick a cool name"
                 autoComplete="username"
+                maxLength={20}
               />
             </div>
 
@@ -151,6 +149,7 @@ const Register: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min. 6 Zeichen"
                 autoComplete="new-password"
+                maxLength={100}
               />
             </div>
 

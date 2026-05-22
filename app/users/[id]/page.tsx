@@ -212,6 +212,11 @@ const ProfilePage: React.FC = () => {
             return;
         }
 
+        if (editName.trim().length > 20) {
+            setUpdateError("Der Benutzername darf maximal 20 Zeichen lang sein.");
+            return;
+        }
+
         const wantsPasswordChange = showPasswordField && editPassword.length > 0;
         if (wantsPasswordChange) {
             if (editPassword.length < 6) {
@@ -548,14 +553,14 @@ const ProfilePage: React.FC = () => {
                         <div style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
                             {updateError && <div className="sbb-field-error">{updateError}</div>}
                             {updateSuccess && <div className="sbb-field-error" style={{ background: "rgba(45,106,79,0.10)", borderLeftColor: "var(--green)", color: "var(--green)" }}>✓ Profil aktualisiert!</div>}
-                            <div className="sbb-field"><div className="sbb-field-label"><span className="label label--grey">Benutzername</span></div><input className="sbb-input" value={editName} onChange={(e) => setEditName(e.target.value)} /></div>
+                            <div className="sbb-field"><div className="sbb-field-label"><span className="label label--grey">Benutzername</span></div><input className="sbb-input" value={editName} onChange={(e) => setEditName(e.target.value)} maxLength={20}/></div>
                             <div className="sbb-field"><div className="sbb-field-label"><span className="label label--grey">Bio</span></div><textarea className="sbb-input sbb-textarea" value={editBio} onChange={(e) => setEditBio(e.target.value.slice(0, 200))} placeholder="Erzähl was über dich…" rows={3} /><div className="sbb-field-hint">{editBio.length}/200 Zeichen</div></div>
                             {showPasswordField ? (
                                 <div style={{ borderTop: "1px solid var(--warm)", paddingTop: 16 }}>
                                     <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--grey)", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, marginBottom: 10 }}>Passwort ändern (optional)</div>
                                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                        <input className="sbb-input" type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} placeholder="Neues Passwort" />
-                                        <input className="sbb-input" type="password" value={editPassword2} onChange={(e) => setEditPassword2(e.target.value)} placeholder="Passwort wiederholen" />
+                                        <input className="sbb-input" type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} placeholder="Neues Passwort" maxLength={100}/>
+                                        <input className="sbb-input" type="password" value={editPassword2} onChange={(e) => setEditPassword2(e.target.value)} placeholder="Passwort wiederholen" maxLength={100} />
                                     </div>
                                 </div>
                             ) : (

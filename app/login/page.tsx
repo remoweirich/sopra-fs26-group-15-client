@@ -60,14 +60,6 @@ const Login: React.FC = () => {
           <h1>Willkommen zurück!</h1>
           <p>Logg dich ein und beweise, dass du die Schweizer Strecken kennst.</p>
           <div className="auth-left-stats">
-            <div className="auth-left-stat">
-              <div className="auth-left-stat-v">12K+</div>
-              <div className="auth-left-stat-l">Spieler</div>
-            </div>
-            <div className="auth-left-stat">
-              <div className="auth-left-stat-v">50K+</div>
-              <div className="auth-left-stat-l">Runden</div>
-            </div>
           </div>
         </div>
       </div>
