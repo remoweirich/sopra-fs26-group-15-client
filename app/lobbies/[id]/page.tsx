@@ -81,6 +81,9 @@ const LobbyWaitPage: React.FC = () => {
         console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
         setGameStarted(true);
         router.push(`/game/${lobbyId}`);
+      } else if (msg.type === "LOAD_GAME") {
+        console.log("[LobbyRoom] LOAD_GAME — navigating to /lobbies/lobbyLoadingScreen/", lobbyId);
+        setIsLoadingGame(true);
       }
     });
     return () => {

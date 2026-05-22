@@ -8,3 +8,4 @@ export type LobbyMessage =
     | { type: "START_GAME"; payload: UserAuthDTO }
     | { type: "LEAVE_LOBBY"; payload: UserAuthDTO }
     | { type: "GAME_START"; payload: MyLobbyDTO }
+    | { type: "LOAD_GAME"; payload: null }
