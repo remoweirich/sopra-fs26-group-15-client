@@ -1,3 +1,15 @@
+# [1.8.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.7.0...v1.8.0) (2026-05-22)
+
+
+### Bug Fixes
+
+* **lobbies/id:** all players get to loading page after publish start ([17a3dfc](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/17a3dfced83508352711ce013ae2669e35b0a95b))
+
+
+### Features
+
+* **lobbies/id:** leaderboard can be filter for friends closes [#52](https://github.com/remoweirich/sopra-fs26-group-15-client/issues/52) ([eb15bdf](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/eb15bdfca77e45eb2ee0c942adefd8ec1577be52))
+
 # [1.7.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.6.0...v1.7.0) (2026-05-21)
 
 
