@@ -34,6 +34,17 @@ const Register: React.FC = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setErrorMessage("Bitte gib eine gültige E-Mail-Adresse ein.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("Das Passwort muss mindestens 6 Zeichen lang sein.");
+      return;
+    }
+
     const values: RegisterPostDTO = {
       username: username.trim(),
       email: email.trim(),
