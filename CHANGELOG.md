@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.8.0...v1.9.0) (2026-05-22)
+
+
+### Features
+
+* removed some console logs + comments ([ceed343](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/ceed343d8379aef368f7419943892894a4f54b7a))
+
 # [1.8.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.7.0...v1.8.0) (2026-05-22)
 
 
