@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9baeaeea-4fab-4319-844e-810556100fc0" name="Changes" comment="docs(README.md): start on README.md">
-      <change afterPath="$PROJECT_DIR$/docs/screenshots/06-leaderboard.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
@@ -17,7 +17,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="2e13bdc0-2a0b-40a1-a562-b6dc81184f1d" />
+        <option name="activeSessionId" value="cc3771ed-b1ed-4f62-a0b2-8e0d80c5f6ee" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -59,6 +59,14 @@
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="auto" />
             <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="cc3771ed-b1ed-4f62-a0b2-8e0d80c5f6ee" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -239,7 +247,7 @@
       <workItem from="1778668214900" duration="989000" />
       <workItem from="1778759505004" duration="655000" />
       <workItem from="1779376226268" duration="1009000" />
-      <workItem from="1779438158494" duration="5370000" />
+      <workItem from="1779438158494" duration="8519000" />
     </task>
     <task id="LOCAL-00001" summary="chore: add to contributions.md">
       <option name="closed" value="true" />
@@ -481,7 +489,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779377223393</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="docs(README.md): start on README.md">
+      <option name="closed" value="true" />
+      <created>1779443768807</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1779443768807</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

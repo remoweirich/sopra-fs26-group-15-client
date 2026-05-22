@@ -146,6 +146,9 @@ This project was created by:
 - **Dorian Rother** [@dorianrother](https://github.com/dorianrother)
 - **Shadi Vandeventer** [@snowjademusic](https://www.github.com/snowjademusic)
 
-Special thanks to the fly on the wall and everyone who helped shape the GuesSBB idea into a playable Swiss train guessing game.
+Special thanks geOps for providing unlimited credits for train fetching during our development phase and to the fly on the wall for listening to our ramblings.
 
-
+## License
+- This project is licensed under GNU AGPLv3. See [`LICENSE`](LICENSE) for the full text.
+- Commercial licensing information is available in [`COMMERCIAL.md`](COMMERCIAL.md).
+- Contribution terms are described in [`CLA.md`](CLA.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md).
