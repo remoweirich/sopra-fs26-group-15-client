@@ -2,6 +2,7 @@
 
 ## Introduction
 
+This project is the client frontend for a Swiss-train based game.
 For many Swiss commuters, long train rides are part of their daily routine. This can feel repetitive and tedious, so we wanted to create a fun way to engage with that experience.
 It brings together Switzerland’s train enthusiasts and geography enthusiasts alike, allowing them to explore Switzerland together.
 Finally, the project should also show our genuine appreciation for the Swiss transport network.
