@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.1...v1.9.2) (2026-05-22)
+
+
+### Bug Fixes
+
+* **change password:** password change now also does the same check as in register page ([f7a1f86](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/f7a1f86a11291834d9b3ebd9ba782a98da55a77e))
+
 ## [1.9.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.0...v1.9.1) (2026-05-22)
 
 
