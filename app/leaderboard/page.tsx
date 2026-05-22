@@ -56,8 +56,8 @@ const LeaderboardInner: React.FC = () => {
           `/users/search?username=${encodeURIComponent(search)}`
         );
         setRows(data ?? []);
-        console.log("Leaderboard data:", data);
-        console.log("First scoreboard:", data?.[0]?.userScoreboard);
+        //console.log("Leaderboard data:", data);
+        //console.log("First scoreboard:", data?.[0]?.userScoreboard);
       } catch (err) {
         console.error("Search failed", err);
       } finally {

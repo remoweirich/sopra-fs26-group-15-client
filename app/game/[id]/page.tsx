@@ -208,9 +208,9 @@ const reloadTimer = useRef<number | null>(null);
 
 useEffect(() => {
     if (!isConnected) return;
-    console.log(`[Game] Subscribing to /topic/game/${gameId}`);
+    console.log(`[Game] Subscribing to websockets game topic`);
     const subscription = subscribe<GameMessage>(`/topic/game/${gameId}`, (update) => {
-      console.log("[Game] WS message received:", update);
+      //console.log("[Game] WS message received:", update);
       if (update.type === "ROUND_START") roundStarted.current = true;
       handleMessage(update);
     });
@@ -252,7 +252,7 @@ useEffect(() => {
             publish(`/app/game/${gameId}/ready`, {});
           }
         } else {
-          console.log(`[Game] Publishing /ready to /app/game/${gameId}/ready`);
+          //console.log(`[Game] Publishing /ready to /app/game/${gameId}/ready`);
           publish(`/app/game/${gameId}/ready`, {});
         }
       }, 250);

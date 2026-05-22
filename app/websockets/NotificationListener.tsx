@@ -180,7 +180,7 @@ export default function NotificationListener() {
           break;
 
         case "ACHIEVEMENT":
-          console.log("[ACHIEVEMENT]", message.payload);
+          //console.log("[ACHIEVEMENT]", message.payload);
 
           addNotification({
             type: "achievement",
@@ -210,7 +210,7 @@ export default function NotificationListener() {
           break;
 
         case "FEEDBACK":
-          console.log("[FEEDBACK]", message.payload);
+          //console.log("[FEEDBACK]", message.payload);
 
           notification.success({
             title: "Anfrage gesendet!",

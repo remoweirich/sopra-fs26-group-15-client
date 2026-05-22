@@ -36,7 +36,7 @@ export default function useLocalStorage<T>(
         setValue(JSON.parse(stored) as T);
       }
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
+      //console.error(`Error reading localStorage key "${key}":`, error);
     }
   }, [key]);
 
