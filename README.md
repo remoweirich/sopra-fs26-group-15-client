@@ -1,6 +1,10 @@
 # GuesSBB
 
-GuesSBB is a Swiss train guessing game built with Next.js. The project’s goal is to improve our, and our users’, knowledge about the Swiss train system in a playful way: players have to infer where a train is located based on live route and timetable clues, then place their guess on a map of Switzerland.
+## Introduction
+
+For many Swiss commuters, long train rides are part of their daily routine. This can feel repetitive and tedious, so we wanted to create a fun way to engage with that experience.
+It brings together Switzerland’s train enthusiasts and geography enthusiasts alike, allowing them to explore Switzerland together.
+Finally, the project should also show our genuine appreciation for the Swiss transport network.
 
 ## Technologies used
 
@@ -18,23 +22,19 @@ The application is structured around a small number of shared building blocks th
    - `app/layout.tsx` wraps the whole app in the global providers and renders the shared navigation.
    - `app/navbar.tsx` handles the lobby join bar, authentication-aware links, notifications, and the mobile drawer.
 
-2. **Authentication and session state** [`app/context/AuthContext.tsx`](app/context/AuthContext.tsx)
-   - Stores the current user and token.
-   - Restores sessions from local storage, performs login/logout, and connects to the websocket layer after authentication.
-
-3. **Real-time communication layer** [`app/context/WebSocketContext.tsx`](app/context/WebSocketContext.tsx)
+2. **Real-time communication layer** [`app/context/WebSocketContext.tsx`](app/context/WebSocketContext.tsx)
    - Manages the STOMP/SockJS connection to the backend.
    - Provides `connect`, `subscribe`, and `publish` so lobby and game screens can react instantly to backend events.
 
-4. **Lobby discovery and waiting room** [`app/lobbies/page.tsx`](app/lobbies/page.tsx) and [`app/lobbies/[id]/page.tsx`](app/lobbies/[id]/page.tsx)
+3. **Lobby discovery and waiting room** [`app/lobbies/page.tsx`](app/lobbies/page.tsx) and [`app/lobbies/[id]/page.tsx`](app/lobbies/[id]/page.tsx)
    - `app/lobbies/page.tsx` shows open lobbies and lets users create or join one.
    - `app/lobbies/[id]/page.tsx` is the lobby waiting room where players gather, copy invite codes, and start the match.
 
-5. **Game round experience** [`app/game/[id]/page.tsx`](app/game/[id]/page.tsx)
+4. **Game round experience** [`app/game/[id]/page.tsx`](app/game/[id]/page.tsx)
    - Displays the current train clues, the map, round timer, guess marker, and the transition between rounds.
    - Uses the websocket layer and resync endpoint to keep the game state consistent.
 
-6. **Leaderboard and social features** [`app/leaderboard/page.tsx`](app/leaderboard/page.tsx)
+5. **Leaderboard and social features** [`app/leaderboard/page.tsx`](app/leaderboard/page.tsx)
    - Lets players search others, compare scores, and send friend requests.
    - This page reuses the auth and API helpers to fetch scoreboard and friend data.
 
@@ -81,7 +81,7 @@ npm run start
 
 ### Tests and validation
 
-This repository does not currently provide a dedicated test script. The recommended checks for contributors are:
+The recommended checks for contributors are:
 
 ```bash
 npm run lint
@@ -126,38 +126,26 @@ The main user flow is:
    ![Round overview image](docs/screenshots/05-overview.png)
 6. Check the leaderboard to see the top players and send friend requests.
 
+   ![Leaderboard image](docs/screenshots/06-leaderboard.png)
 
-
-If you want screenshots in this README, place them in `docs/screenshots/` and use these names:
-
-
-
-- `docs/screenshots/01-home.png` — landing page
-- `docs/screenshots/02-lobbies.png` — lobby overview
-- `docs/screenshots/03-lobby-room.png` — waiting room
-- `docs/screenshots/04-game.png` — in-game map and clues
-- `docs/screenshots/05-overview.png` — leaderboard
-
-If you add them later, you can reference them in Markdown like this:
-
-```md
-![Landing page image]
-![Lobby overview image]
-![In-game view image]
-```
 
 ## Roadmap
 
 Good next contributions for new developers could be:
 
-1. **Add in-game statistics** — show per-round accuracy, average distance, and personal bests in the round overview.
-2. **Improve matchmaking and lobby discovery** — add filters for public/private lobbies, player count, and game state.
-3. **Expand social features** — invite friends directly from the lobby, add in-app game invites, and improve notification handling.
+1. **Add game history:** show per-user game history with statistics, average distance, and per-round overviews.
+2. **Improve matchmaking and lobby discovery:** add friend invites, filters for public/private lobbies, player count, and game state.
+3. **Train retrieval:** tell players about how the trains are fetched and when.
 
 ## Authors and acknowledgment
 
-This project was created by Group 15 as part of the UZH SOPRA course.
+This project was created by:
+- **Claude Stark** [@ClaudeStark](https://github.com/ClaudeStark)
+- **Remo Weirich** [@remoweirich](https://www.github.com/remoweirich)
+- **Michael Jankovic** [@T-N-T-O](https://github.com/T-N-T-O)
+- **Dorian Rother** [@dorianrother](https://github.com/dorianrother)
+- **Shadi Vandeventer** [@snowjademusic](https://www.github.com/snowjademusic)
 
-Special thanks to the backend team, course supervisors, and everyone who helped shape the GuesSBB idea into a playable Swiss train guessing game.
+Special thanks to the fly on the wall and everyone who helped shape the GuesSBB idea into a playable Swiss train guessing game.
 
 
