@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.0...v1.9.1) (2026-05-22)
+
+
+### Bug Fixes
+
+* password and email check ([b1977bd](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/b1977bd60910f2e192121a849f13de2fa194ebfb))
+
 # [1.9.0](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.8.0...v1.9.0) (2026-05-22)
 
 
