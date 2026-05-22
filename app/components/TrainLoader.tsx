@@ -17,7 +17,7 @@ interface TrainLoaderProps {
   readonly timeoutMs?: number;
 }
 
-const TrainLoader: React.FC<TrainLoaderProps> = ({ label = "Lade Fahrplan", timeoutMs = 12000 }) => {
+const TrainLoader: React.FC<TrainLoaderProps> = ({ label = "Lade Fahrplan", timeoutMs = 20000 }) => {
   const [stalled, setStalled] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setStalled(true), timeoutMs);
