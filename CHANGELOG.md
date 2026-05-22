@@ -1,3 +1,10 @@
+## [1.9.3](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.2...v1.9.3) (2026-05-22)
+
+
+### Bug Fixes
+
+* **TrainLoader:** update LoadingScreenTimeout from 12 to 20 Seconds ([d8cf1af](https://github.com/remoweirich/sopra-fs26-group-15-client/commit/d8cf1af1cbab25689868a8da4901cea5fcdf927f))
+
 ## [1.9.2](https://github.com/remoweirich/sopra-fs26-group-15-client/compare/v1.9.1...v1.9.2) (2026-05-22)
 
 
