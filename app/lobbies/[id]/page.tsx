@@ -163,6 +163,9 @@ useEffect(() => {
       leaveTimer = null;
       console.log("[LobbyRoom] Leaving lobby due to navigation");
       publish(`/app/lobby/${lobbyId}/leave`, {});
+      if (currentUser?.username?.startsWith("guest_")) {
+        softLogout();
+      }
     }, 80);
   };
 }, [lobbyId, publish, gameStarted, isLoadingGame]);
