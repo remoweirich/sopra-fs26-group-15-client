@@ -73,7 +73,7 @@ const RoundOverview: React.FC<RoundOverviewProps> = ({
           });
           setUsernamesMap((prev) => ({ ...prev, [result.userId]: data.username }));
         } catch (err) {
-          console.log("Failed to fetch username for userId " + result.userId, err);
+          //console.log("Failed to fetch username for userId " + result.userId, err);
         }
       }
     };

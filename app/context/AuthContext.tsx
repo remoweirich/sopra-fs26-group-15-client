@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         disconnect();
         clearAll()
-        console.log("[Auth] clearAll called, notifications should be empty")
+        //console.log("[Auth] clearAll called, notifications should be empty")
         router.push("/login");
     };
 
@@ -97,9 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("token", JSON.stringify(token));
         localStorage.setItem("userId", JSON.stringify(userId));
         clearAll();
-        //setToken(token);
         await fetchUser(token, userId);
-        //connect(String(userId), token);
     };
 
     return (

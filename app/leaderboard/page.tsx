@@ -43,8 +43,8 @@ const LeaderboardInner: React.FC = () => {
         );
         if (search.trim() === "") setAllUsers(data ?? []);
         setRows(data ?? []);
-        console.log("Leaderboard data:", data);
-        console.log("First scoreboard:", data?.[0]?.userScoreboard);
+        //console.log("Leaderboard data:", data);
+        //console.log("First scoreboard:", data?.[0]?.userScoreboard);
       } catch (err) {
         console.error("Search failed", err);
       } finally {

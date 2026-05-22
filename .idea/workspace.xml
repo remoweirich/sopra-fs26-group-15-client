@@ -43,13 +43,6 @@
     &quot;assignee&quot;: &quot;snowjademusic&quot;
   }
 }</component>
-  <component name="GithubProjectSettings">
-    <option name="branchProtectionPatterns">
-      <list>
-        <option value="mainldfgjlds" />
-      </list>
-    </option>
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;git@github.com:remoweirich/sopra-fs26-group-15-client.git&quot;,
@@ -93,6 +86,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs/screenshots" />
     </key>
   </component>
   <component name="RunManager" selected="npm.Next.js: server-side">

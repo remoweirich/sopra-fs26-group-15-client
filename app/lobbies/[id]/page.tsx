@@ -71,18 +71,18 @@ const LobbyWaitPage: React.FC = () => {
   // ── WebSocket subscribe ──────────────────────────────────────────────────
   useEffect(() => {
     if (!isConnected || !lobbyId) return;
-    console.log(`[LobbyRoom] Subscribing to /topic/lobby/${lobbyId}`);
+    console.log(`[LobbyRoom] Subscribing to lobby topic`);
     setIsSubscribed(true);
     const subscription = subscribe<LobbyMessage>(`/topic/lobby/${lobbyId}`, (msg) => {
-      console.log("[LobbyRoom] WS message:", msg);
+      //console.log("[LobbyRoom] WS message:", msg);
       if (msg.type === "LOBBY_STATE") {
         setLobby(msg.payload);
       } else if (msg.type === "GAME_START") {
-        console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
+        //console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
         setGameStarted(true);
         router.push(`/game/${lobbyId}`);
       } else if (msg.type === "LOAD_GAME") {
-        console.log("[LobbyRoom] LOAD_GAME — navigating to /lobbies/lobbyLoadingScreen/", lobbyId);
+        //console.log("[LobbyRoom] LOAD_GAME — navigating to /lobbies/lobbyLoadingScreen/", lobbyId);
         setIsLoadingGame(true);
       }
     });
@@ -102,7 +102,7 @@ const LobbyWaitPage: React.FC = () => {
     if (!currentUser || !token) return;
     const payload: UserAuthDTO = { userId: currentUser.userId, token };
     const messageBody: LobbyMessage = { type: "START_GAME", payload };
-    console.log(`[LobbyRoom] Publishing START_GAME to /app/lobby/${lobbyId}/start`, messageBody);
+    //console.log(`[LobbyRoom] Publishing START_GAME to /app/lobby/${lobbyId}/start`, messageBody);
     webSocket.publish(`/app/lobby/${lobbyId}/start`, messageBody);
     setIsLoadingGame(true);
   };
@@ -140,7 +140,6 @@ const LobbyWaitPage: React.FC = () => {
     try {
       await navigator.clipboard.writeText(lobby.lobbyCode);
     } catch {
-      // Fallback silently
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
