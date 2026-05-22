@@ -81,6 +81,9 @@ const LobbyWaitPage: React.FC = () => {
         console.log("[LobbyRoom] GAME_START — navigating to /game/", lobbyId);
         setGameStarted(true);
         router.push(`/game/${lobbyId}`);
+      } else if (msg.type === "LOAD_GAME") {
+        console.log("[LobbyRoom] LOAD_GAME — navigating to /lobbies/lobbyLoadingScreen/", lobbyId);
+        setIsLoadingGame(true);
       }
     });
     return () => {
@@ -161,6 +164,9 @@ useEffect(() => {
       leaveTimer = null;
       console.log("[LobbyRoom] Leaving lobby due to navigation");
       publish(`/app/lobby/${lobbyId}/leave`, {});
+      if (currentUser?.username?.startsWith("guest_")) {
+        softLogout();
+      }
     }, 80);
   };
 }, [lobbyId, publish, gameStarted, isLoadingGame]);
