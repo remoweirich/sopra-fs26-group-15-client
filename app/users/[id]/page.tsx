@@ -213,9 +213,15 @@ const ProfilePage: React.FC = () => {
         }
 
         const wantsPasswordChange = showPasswordField && editPassword.length > 0;
-        if (wantsPasswordChange && editPassword !== editPassword2) {
-            setUpdateError("Passwörter stimmen nicht überein.");
-            return;
+        if (wantsPasswordChange) {
+            if (editPassword.length < 6) {
+                setUpdateError("Das Passwort muss mindestens 6 Zeichen lang sein.");
+                return;
+            }
+            if (editPassword !== editPassword2) {
+                setUpdateError("Passwörter stimmen nicht überein.");
+                return;
+            }
         }
 
         const payload: { username: string; userBio?: string; password?: string } = {
